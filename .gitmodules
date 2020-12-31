@@ -4,6 +4,6 @@
 [submodule "dependencies/spdlog"]
 	path = dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "dependencies/LuaJIT"]
-	path = dependencies/LuaJIT
-	url = https://github.com/LuaJIT/LuaJIT.git
+[submodule "dependencies/detours/Detours"]
+	path = dependencies/detours/Detours
+	url = https://github.com/microsoft/Detours.git

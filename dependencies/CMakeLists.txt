@@ -1,8 +1,11 @@
+# Detours
+add_subdirectory(detours)
+
 # LuaJIT
-include(luajit.cmake)
+#add_subdirectory(luajit)
 
 # sol2
-add_subdirectory(sol2)
+#add_subdirectory(sol2)
 
 # spdlog
 add_subdirectory(spdlog)
