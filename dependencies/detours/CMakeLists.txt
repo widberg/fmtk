@@ -38,6 +38,6 @@ set_source_files_properties(Detours/src/uimports.cpp PROPERTIES
 	HEADER_FILE_ONLY true
 )
 
-target_compile_definitions(detours PRIVATE DETOUR_DEBUG=1)
-
+target_compile_options(detours PUBLIC "/FI ${CMAKE_CURRENT_SOURCE_DIR}/debug.hpp")
+	
 target_include_directories(detours PUBLIC Detours/src)
