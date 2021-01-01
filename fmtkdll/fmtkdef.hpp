@@ -1,0 +1,4 @@
+#ifndef INSTRUMENTED_HPP
+#define INSTRUMENTED_HPP
+
+#endif // !INSTRUMENTED_HPP

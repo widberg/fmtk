@@ -1,5 +1,7 @@
 add_library(fmtkdll SHARED
 	fmtkdll.cpp
+	instrumented.cpp
+	win32def.hpp fmtkdef.hpp
 )
 target_link_libraries(fmtkdll common detours spdlog luajit sol2)
 target_link_options(fmtkdll PRIVATE /export:DetourFinishHelperProcess,@1,NONAME)
