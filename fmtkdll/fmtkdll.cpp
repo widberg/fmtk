@@ -40749,6 +40749,8 @@ void BindCrtHandlesToStdHandles(bool bindStdIn, bool bindStdOut, bool bindStdErr
 
 #include "logging.hpp"
 
+#include <sol/sol.hpp>
+
 BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD dwReason, PVOID lpReserved)
 {
     (void)hModule;
@@ -40773,6 +40775,16 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD dwReason, PVOID lpReserved)
         LOG_INIT();
         LOG(trace, CORE, "trcapi" DETOURS_STRINGIFY(DETOURS_BITS) ".dll:"
             " DllMain DLL_PROCESS_ATTACH\n");
+        {
+            struct vars {
+                int boop = 0;
+            };
+            sol::state lua;
+            lua.new_usertype<vars>("vars", "boop", &vars::boop);
+            lua.script("beep = vars.new()\n"
+                "beep.boop = 1");
+            assert(lua.get<vars>("beep").boop == 1);
+        }
         return ProcessAttach(hModule);
     case DLL_PROCESS_DETACH:
         ret = ProcessDetach(hModule);

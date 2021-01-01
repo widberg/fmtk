@@ -7,3 +7,6 @@
 [submodule "dependencies/detours/Detours"]
 	path = dependencies/detours/Detours
 	url = https://github.com/microsoft/Detours.git
+[submodule "dependencies/luajit/LuaJIT"]
+	path = dependencies/luajit/LuaJIT
+	url = https://github.com/LuaJIT/LuaJIT.git
