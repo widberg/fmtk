@@ -1,0 +1,82 @@
+# Asobo Studios - Ratatouille DPC/DPS (script 0.1.4a)
+# script for QuickBMS http://quickbms.aluigi.org
+
+endian big
+get SIGN string # "Asobo Studios"
+if SIGN & "Asobo"
+
+    goto 0x100
+    do
+        get DUMMY long
+    while DUMMY == 0
+    endian guess DUMMY
+    do
+        get DUMMY long
+    while DUMMY u< 0x01000000
+    goto -20 0 SEEK_CUR
+    savepos INFO_OFF
+    for EXTRACT = 0 < 2
+        goto INFO_OFF
+        for i = 0
+            get DUMMY long
+            get XSIZE long
+            get SIZE long
+            if XSIZE == 0
+                break
+            endif
+            if SIZE u> XSIZE    # work-around
+                math SIZE = XSIZE
+            endif
+            get SOME_OFF long   # ???
+            get SOME_CRC long
+            get ZERO long
+            if EXTRACT != 0
+                log "" OFFSET SIZE
+                math OFFSET += XSIZE
+            endif
+        next i
+        padding 0x800
+        savepos OFFSET
+    next EXTRACT
+
+else
+
+    goto 0
+    get DUMMY long
+    if DUMMY == 0
+        math OFFSET = 0x705 # ???
+        get ZERO byte
+        get ONE long
+        get FILES long
+        endian guess FILES
+            get DUMMY long
+            get DUMMY long
+            get DUMMY long
+            get DUMMY long
+            get DUMMY long
+            get DUMMY long
+        for i = 0 < FILES
+            get ID long
+            get XSIZE long
+            get SIZE long
+            get ALIGN long
+            get SOME_CRC longlong
+            log "" OFFSET SIZE
+            math OFFSET + XSIZE
+        next i
+
+    else
+        endian guess DUMMY
+        get FILES long
+        padding 0x10
+        for i = 0 < FILES
+            get DUMMY long
+            get DUMMY byte
+            get ALIGN threebyte
+            get OFFSET long
+            get SIZE long
+            log "" OFFSET SIZE
+        next i
+    endif
+
+endif

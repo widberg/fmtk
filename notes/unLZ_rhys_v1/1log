@@ -1,0 +1,274 @@
+len1=176
+len2=113
+mask=00000000
+c=A8 flag=0 flagbit=30 lenbits=2
+literal A8 '¨'  0
+c=00 flag=0 flagbit=29 lenbits=2
+literal 00 '?'  1
+c=00 flag=0 flagbit=28 lenbits=2
+literal 00 '?'  2
+c=00 flag=0 flagbit=27 lenbits=2
+literal 00 '?'  3
+c=45 flag=0 flagbit=26 lenbits=2
+literal 45 'E'  4
+c=58 flag=0 flagbit=25 lenbits=2
+literal 58 'X'  5
+c=50 flag=0 flagbit=24 lenbits=2
+literal 50 'P'  6
+c=53 flag=0 flagbit=23 lenbits=2
+literal 53 'S'  7
+c=4B flag=0 flagbit=22 lenbits=2
+literal 4B 'K'  8
+c=49 flag=0 flagbit=21 lenbits=2
+literal 49 'I'  9
+c=4E flag=0 flagbit=20 lenbits=2
+literal 4E 'N'  10
+c=20 flag=0 flagbit=19 lenbits=2
+literal 20 ' '  11
+c=58 flag=0 flagbit=18 lenbits=2
+literal 58 'X'  12
+c=3A flag=0 flagbit=17 lenbits=2
+literal 3A ':'  13
+c=5C flag=0 flagbit=16 lenbits=2
+literal 5C '\'  14
+c=44 flag=0 flagbit=15 lenbits=2
+literal 44 'D'  15
+c=41 flag=0 flagbit=14 lenbits=2
+literal 41 'A'  16
+c=54 flag=0 flagbit=13 lenbits=2
+literal 54 'T'  17
+c=41 flag=0 flagbit=12 lenbits=2
+literal 41 'A'  18
+c=53 flag=0 flagbit=11 lenbits=2
+literal 53 'S'  19
+c=5C flag=0 flagbit=10 lenbits=2
+literal 5C '\'  20
+c=5F flag=0 flagbit=9 lenbits=2
+literal 5F '_'  21
+c=4D flag=0 flagbit=8 lenbits=2
+literal 4D 'M'  22
+c=41 flag=0 flagbit=7 lenbits=2
+literal 41 'A'  23
+c=53 flag=0 flagbit=6 lenbits=2
+literal 53 'S'  24
+c=54 flag=0 flagbit=5 lenbits=2
+literal 54 'T'  25
+c=45 flag=0 flagbit=4 lenbits=2
+literal 45 'E'  26
+c=52 flag=0 flagbit=3 lenbits=2
+literal 52 'R'  27
+c=5C flag=0 flagbit=2 lenbits=2
+literal 5C '\'  28
+c=47 flag=0 flagbit=1 lenbits=2
+literal 47 'G'  29
+mask=40400080
+c=5F flag=0 flagbit=30 lenbits=2
+literal 5F '_'  30
+c=40 flag=1 flagbit=29 lenbits=2
+match d=16/10 l=4/4 400F
+ 44 'D'  31 15
+ 41 'A'  32 17
+ 54 'T'  33 19
+ 41 'A'  34 21
+c=5C flag=0 flagbit=28 lenbits=2
+literal 5C '\'  35
+c=43 flag=0 flagbit=27 lenbits=2
+literal 43 'C'  36
+c=48 flag=0 flagbit=26 lenbits=2
+literal 48 'H'  37
+c=41 flag=0 flagbit=25 lenbits=2
+literal 41 'A'  38
+c=52 flag=0 flagbit=24 lenbits=2
+literal 52 'R'  39
+c=41 flag=0 flagbit=23 lenbits=2
+literal 41 'A'  40
+c=43 flag=0 flagbit=22 lenbits=2
+literal 43 'C'  41
+c=00 flag=1 flagbit=21 lenbits=2
+match d=17/11 l=3/3 0010
+ 54 'T'  42 25
+ 45 'E'  43 27
+ 52 'R'  44 29
+c=53 flag=0 flagbit=20 lenbits=2
+literal 53 'S'  45
+c=5C flag=0 flagbit=19 lenbits=2
+literal 5C '\'  46
+c=44 flag=0 flagbit=18 lenbits=2
+literal 44 'D'  47
+c=45 flag=0 flagbit=17 lenbits=2
+literal 45 'E'  48
+c=4D flag=0 flagbit=16 lenbits=2
+literal 4D 'M'  49
+c=4F flag=0 flagbit=15 lenbits=2
+literal 4F 'O'  50
+c=4E flag=0 flagbit=14 lenbits=2
+literal 4E 'N'  51
+c=49 flag=0 flagbit=13 lenbits=2
+literal 49 'I'  52
+c=43 flag=0 flagbit=12 lenbits=2
+literal 43 'C'  53
+c=5C flag=0 flagbit=11 lenbits=2
+literal 5C '\'  54
+c=50 flag=0 flagbit=10 lenbits=2
+literal 50 'P'  55
+c=4C flag=0 flagbit=9 lenbits=2
+literal 4C 'L'  56
+c=41 flag=0 flagbit=8 lenbits=2
+literal 41 'A'  57
+c=59 flag=0 flagbit=7 lenbits=2
+literal 59 'Y'  58
+c=00 flag=1 flagbit=6 lenbits=2
+match d=33/21 l=3/3 0020
+ 45 'E'  59 26
+ 52 'R'  60 28
+ 5C '\'  61 30
+c=4D flag=0 flagbit=5 lenbits=2
+literal 4D 'M'  62
+c=45 flag=0 flagbit=4 lenbits=2
+literal 45 'E'  63
+c=53 flag=0 flagbit=3 lenbits=2
+literal 53 'S'  64
+c=48 flag=0 flagbit=2 lenbits=2
+literal 48 'H'  65
+c=50 flag=0 flagbit=1 lenbits=2
+literal 50 'P'  66
+mask=29264803
+c=57 flag=0 flagbit=30 lenbits=5
+literal 57 'W'  67
+c=50 flag=0 flagbit=29 lenbits=5
+literal 50 'P'  68
+c=20 flag=1 flagbit=28 lenbits=5
+match d=15/F l=7/7 200E
+ 5C '\'  69 54
+ 50 'P'  70 56
+ 4C 'L'  71 58
+ 41 'A'  72 60
+ 59 'Y'  73 62
+ 45 'E'  74 64
+ 52 'R'  75 66
+c=5F flag=0 flagbit=27 lenbits=5
+literal 5F '_'  76
+c=08 flag=1 flagbit=26 lenbits=5
+match d=70/46 l=4/4 0845
+ 53 'S'  77 7
+ 4B 'K'  78 9
+ 49 'I'  79 11
+ 4E 'N'  80 13
+c=2E flag=0 flagbit=25 lenbits=5
+literal 2E '.'  81
+c=54 flag=0 flagbit=24 lenbits=5
+literal 54 'T'  82
+c=08 flag=1 flagbit=23 lenbits=5
+match d=6/6 l=4/4 0805
+ 53 'S'  83 77
+ 4B 'K'  84 79
+ 49 'I'  85 81
+ 4E 'N'  86 83
+c=0A flag=0 flagbit=22 lenbits=5
+literal 0A '?'  87
+c=0D flag=0 flagbit=21 lenbits=5
+literal 0D '?'  88
+c=10 flag=1 flagbit=20 lenbits=5
+match d=85/55 l=5/5 1054
+ 45 'E'  89 4
+ 58 'X'  90 6
+ 50 'P'  91 8
+ 53 'S'  92 10
+ 4B 'K'  93 12
+c=45 flag=0 flagbit=19 lenbits=5
+literal 45 'E'  94
+c=4C flag=0 flagbit=18 lenbits=5
+literal 4C 'L'  95
+c=F8 flag=1 flagbit=17 lenbits=5
+match d=85/55 l=34/22 F854
+ 20 ' '  96 11
+ 58 'X'  97 13
+ 3A ':'  98 15
+ 5C '\'  99 17
+ 44 'D'  100 19
+ 41 'A'  101 21
+ 54 'T'  102 23
+ 41 'A'  103 25
+ 53 'S'  104 27
+ 5C '\'  105 29
+ 5F '_'  106 31
+ 4D 'M'  107 33
+ 41 'A'  108 35
+ 53 'S'  109 37
+ 54 'T'  110 39
+ 45 'E'  111 41
+ 52 'R'  112 43
+ 5C '\'  113 45
+ 47 'G'  114 47
+ 5F '_'  115 49
+ 44 'D'  116 51
+ 41 'A'  117 53
+ 54 'T'  118 55
+ 41 'A'  119 57
+ 5C '\'  120 59
+ 43 'C'  121 61
+ 48 'H'  122 63
+ 41 'A'  123 65
+ 52 'R'  124 67
+ 41 'A'  125 69
+ 43 'C'  126 71
+ 54 'T'  127 73
+ 45 'E'  128 75
+ 52 'R'  129 77
+c=F8 flag=1 flagbit=16 lenbits=5
+match d=85/55 l=34/22 F854
+ 53 'S'  130 45
+ 5C '\'  131 47
+ 44 'D'  132 49
+ 45 'E'  133 51
+ 4D 'M'  134 53
+ 4F 'O'  135 55
+ 4E 'N'  136 57
+ 49 'I'  137 59
+ 43 'C'  138 61
+ 5C '\'  139 63
+ 50 'P'  140 65
+ 4C 'L'  141 67
+ 41 'A'  142 69
+ 59 'Y'  143 71
+ 45 'E'  144 73
+ 52 'R'  145 75
+ 5C '\'  146 77
+ 4D 'M'  147 79
+ 45 'E'  148 81
+ 53 'S'  149 83
+ 48 'H'  150 85
+ 50 'P'  151 87
+ 57 'W'  152 89
+ 50 'P'  153 91
+ 5C '\'  154 93
+ 50 'P'  155 95
+ 4C 'L'  156 97
+ 41 'A'  157 99
+ 59 'Y'  158 101
+ 45 'E'  159 103
+ 52 'R'  160 105
+ 5F '_'  161 107
+ 53 'S'  162 109
+ 4B 'K'  163 111
+c=45 flag=0 flagbit=15 lenbits=5
+literal 45 'E'  164
+c=4C flag=0 flagbit=14 lenbits=5
+literal 4C 'L'  165
+c=08 flag=1 flagbit=13 lenbits=5
+match d=85/55 l=4/4 0854
+ 2E '.'  166 81
+ 54 'T'  167 83
+ 53 'S'  168 85
+ 4B 'K'  169 87
+c=45 flag=0 flagbit=12 lenbits=5
+literal 45 'E'  170
+c=4C flag=0 flagbit=11 lenbits=5
+literal 4C 'L'  171
+c=00 flag=1 flagbit=10 lenbits=5
+match d=171/AB l=3/3 00AA
+ 00 '?'  172 1
+ 00 '?'  173 3
+ 00 '?'  174 5
+c=00 flag=0 flagbit=9 lenbits=5
+literal 00 '?'  175

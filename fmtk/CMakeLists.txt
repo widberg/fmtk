@@ -2,7 +2,7 @@ add_executable(fmtk
 	fmtk.cpp
 )
 target_link_libraries(fmtk common detours spdlog)
-add_dependencies(fmtk fmtkdll)
+add_dependencies(fmtk fmtkdll secudll)
 
 set_target_properties(fmtk PROPERTIES
 	VS_DEBUGGER_WORKING_DIRECTORY "${FUEL_DIR}"

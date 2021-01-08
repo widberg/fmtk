@@ -4,7 +4,6 @@
 #include <cassert>
 
 #define FMTK_ASSERT(condition, message) assert((message, condition))
-#define FMTK_ASSERT(condition) assert(condition)
 #define FMTK_STATIC_ASSERT(condition, message) static_assert(condition, message)
 
 #if defined(_DEBUG) || defined(DEBUG) || !defined(NDEBUG)

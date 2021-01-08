@@ -49,7 +49,7 @@ int CDECL main(int argc, char** argv)
 
     FreeEnvironmentStrings(lpEnvironmentString);
 
-    STARTUPINFOA si;
+    STARTUPINFOW si;
     PROCESS_INFORMATION pi;
 
     ZeroMemory(&si, sizeof(si));
@@ -58,16 +58,20 @@ int CDECL main(int argc, char** argv)
 
     DWORD dwFlags = CREATE_DEFAULT_ERROR_MODE | CREATE_SUSPENDED;
 
-    if (!DetourCreateProcessWithDllEx("SecuLauncher.exe", NULL,
+    if (!DetourCreateProcessWithDllExW(L"SecuLauncher.exe", NULL,
         NULL, NULL, TRUE, dwFlags, reinterpret_cast<LPVOID>(environment.str().data()), NULL,
-        &si, &pi, "fmtkdll.dll", NULL))
+        &si, &pi, "secudll.dll", NULL))
     {
         LOG(error, CORE, "DetourCreateProcessWithDllEx failed: %ld\n", GetLastError());
         LogLastError();
         return 9009;
     }
 
+    LOG(trace, CORE, "Resuming SecuLauncher");
+
     ResumeThread(pi.hThread);
+
+    LOG(trace, CORE, "SecuLauncher resumed");
 
     WaitForSingleObject(pi.hProcess, INFINITE);
 
@@ -76,6 +80,10 @@ int CDECL main(int argc, char** argv)
         LOG(error, CORE, "GetExitCodeProcess failed: %ld\n", GetLastError());
         LogLastError();
         return 9010;
+    }
+    else
+    {
+        LOG(trace, CORE, "SecuLauncher exited with code: 0x{0:x}", dwResult);
     }
 
     return dwResult;

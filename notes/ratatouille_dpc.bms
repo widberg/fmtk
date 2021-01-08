@@ -1,0 +1,116 @@
+# Ratatouille DPC (script 0.1.4)
+#   doesn't support compressed files and doesn't parse the resources, it's just a dumper
+# script for QuickBMS http://quickbms.aluigi.org
+
+get NAME string
+if NAME & "Asobo"
+    math BASE_OFF = 0x100
+else
+    math BASE_OFF = 0
+endif
+
+goto BASE_OFF
+get FILE_TYPE long
+get DUMMY long
+get ZERO byte
+get FILES long
+if FILE_TYPE == 0
+    getdstring DUMMY 0x18
+elif FILE_TYPE == 1
+    getdstring DUMMY 0x13
+elif FILE_TYPE == 0x30
+    getdstring DUMMY 0xf
+else
+    getdstring DUMMY 0x13
+endif
+savepos INFO_OFF
+xmath OFFSET "INFO_OFF + 0x6e0"
+if FILE_TYPE == 0x30
+    math OFFSET += 4
+endif
+
+for i = 0 #< FILES
+    get SUB_FILES long
+    if SUB_FILES == 0
+        break
+    endif
+    get XSIZE long
+    get SIZE long
+    get ALIGN long
+    get CRC longlong
+    log MEMORY_FILE OFFSET SIZE
+    callfunction UNPACK
+    math OFFSET += XSIZE
+next i
+
+startfunction UNPACK
+    math NEXT_OFF = 0
+    for j = 0 < SUB_FILES
+        get XSIZE long MEMORY_FILE
+        savepos TMP_OFF MEMORY_FILE
+        if FILE_TYPE == 0x30
+            get ZSIZE long MEMORY_FILE
+            if j == 0
+                get TYPE long MEMORY_FILE
+            else
+                math TMP_OFF -= 4
+            endif
+            get DUMMY longlong MEMORY_FILE
+            savepos TMP_OFF2 MEMORY_FILE
+            get ZERO long MEMORY_FILE
+            get REAL_SIZE long MEMORY_FILE
+            if ZSIZE != 0
+                math XSIZE = ZSIZE
+            endif
+        else
+            get DUMMY long MEMORY_FILE
+            get XZSIZE long MEMORY_FILE
+            get ZSIZE long MEMORY_FILE
+            get TYPE long MEMORY_FILE
+            get DUMMY longlong MEMORY_FILE
+            savepos TMP_OFF2 MEMORY_FILE
+            get ZERO long MEMORY_FILE
+            get REAL_SIZE long MEMORY_FILE
+        endif
+
+        savepos OFFSET MEMORY_FILE
+        xmath NEXT_OFF "NEXT_OFF + (TMP_OFF2 - TMP_OFF) + XSIZE"
+        xmath SIZE "NEXT_OFF - OFFSET"
+
+        if SIZE > 0
+            if ZSIZE == 0
+
+                # DDS
+                if TYPE == 0x57b1f99e
+                    # not enough
+                    #math OFFSET += 0x10
+                    #math SIZE   -= 0x10
+
+                    savepos TMP
+                    goto OFFSET
+                    findloc DDS_OFF string "DDS " MEMORY_FILE ""
+                    goto TMP
+                    if DDS_OFF != ""
+                        xmath TMP "DDS_OFF - OFFSET"
+                        if TMP > 0
+                            if TMP < SIZE
+                                math SIZE - TMP
+                                math OFFSET = DDS_OFF
+                            endif
+                        endif
+                    endif
+                endif
+
+                string NAME p= "/%08x/" TYPE
+                log NAME OFFSET SIZE MEMORY_FILE
+            else
+                # compression is not supported because some resources have an header
+                string NAME p= "compressed/%08x/" TYPE
+                log NAME OFFSET SIZE MEMORY_FILE
+            endif
+        endif
+
+        goto NEXT_OFF MEMORY_FILE
+    next j
+endfunction
+

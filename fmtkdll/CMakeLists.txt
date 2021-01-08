@@ -1,10 +1,11 @@
 add_library(fmtkdll SHARED
-	fmtkdll.cpp
-	instrumented.cpp
-	win32def.hpp fmtkdef.hpp
+	fmtkdll.cpp fmtkdll.hpp
+	instrument.cpp instrument.hpp
+	scripting.cpp scripting.hpp
 )
-target_link_libraries(fmtkdll common detours spdlog luajit sol2)
+target_link_libraries(fmtkdll common detours spdlog luajit sol2 d3d9)
 target_link_options(fmtkdll PRIVATE /export:DetourFinishHelperProcess,@1,NONAME)
+target_compile_options(fmtkdll PRIVATE /EHa)
 
 set_target_properties(fmtkdll PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
