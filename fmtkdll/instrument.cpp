@@ -14,6 +14,11 @@
 #include "logging.hpp"
 #include "scripting.hpp"
 
+#define FUNCTION(address, returnType, callingConvention, name, ...) \
+returnType (callingConvention * Real_##name)(__VA_ARGS__)           \
+	= reinterpret_cast<decltype(Real_##name)>(address);             \
+returnType callingConvention FMTK_##name(__VA_ARGS__)
+
 #define ATTACH(x)       DetourAttach(&(PVOID&)Real_##x, FMTK_##x)
 #define DETACH(x)       DetourDetach(&(PVOID&)Real_##x, FMTK_##x)
 
@@ -161,11 +166,8 @@ bool FMTK_CommandCallback()
 
 const void** pGlobalCommandState = reinterpret_cast<const void**>(0x00a7c080);
 
-// ScriptManagerInit
-void(__fastcall* Real_ScriptManagerInit)(DWORD, DWORD, DWORD)
-	= reinterpret_cast<void(__fastcall*)(DWORD, DWORD, DWORD)>(0x0081cdb0);
 
-void __fastcall FMTK_ScriptManagerInit(DWORD x, DWORD y, DWORD z)
+FUNCTION(0x0081cdb0, void, __fastcall, ScriptManagerInit, DWORD x, DWORD y, DWORD z)
 {
 	LOG(trace, CORE, "{} {} {}", x, y, z);
 	Real_ScriptManagerInit(x, y, z);
@@ -174,6 +176,7 @@ void __fastcall FMTK_ScriptManagerInit(DWORD x, DWORD y, DWORD z)
 	LOG(trace, CORE, "Setting our callback");
 
 	Bridge_RegisterCommand(*pGlobalCommandState, FMTK_CommandCallback, "FMTK");
+	Bridge_RegisterCommand(*pGlobalCommandState, FMTKEmitEventCallback, "FMTKEmitEvent");
 }
 
 // Load
@@ -502,6 +505,28 @@ __declspec(naked) void FMTK_IsCarInGame(void)
 	}
 }
 
+// Death
+void(* Real_Death)(void* p)
+	= reinterpret_cast<void(*)(void*)>(0x0052f370);
+
+void __fastcall FMTK_Death()
+{
+	void* p;
+
+	__asm
+	{
+		mov p, esi
+	}
+
+	LOG(trace, CORE, "DEATH");
+
+	__asm
+	{
+		mov esi, p
+		call Real_Death
+	}
+}
+
 bool AttachDetoursXLive()
 {
 	HINSTANCE hiXLive = GetModuleHandleA("xlive.dll");
@@ -556,11 +581,12 @@ LONG AttachDetours()
 	//ATTACH(LoadLibraryExA);
 	//ATTACH(LoadLibraryExW);
 	//ATTACH(TerminateProcess);
-	ATTACH(CreateWindowExW);
+	//ATTACH(CreateWindowExW);
 	ATTACH(RegisterCommand);
 	ATTACH(ScriptManagerInit);
 	ATTACH(Load);
 	//ATTACH(IsCarInGame);
+	//ATTACH(Death);
 
     LOG(trace, CORE, "Ready to commit");
 
@@ -589,11 +615,12 @@ LONG DetachDetours()
 	//DETACH(LoadLibraryExA);
 	//DETACH(LoadLibraryExW);
 	//DETACH(TerminateProcess);
-	DETACH(CreateWindowExW);
+	//DETACH(CreateWindowExW);
 	DETACH(RegisterCommand);
 	DETACH(ScriptManagerInit);
 	DETACH(Load);
 	//DETACH(IsCarInGame);
+	//DETACH(Death);
 
     LOG(trace, CORE, "Ready to commit");
 

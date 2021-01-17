@@ -26,10 +26,11 @@ void alias(std::wstring originalPath, std::wstring newPath)
 	aliases[originalPath] = newPath;
 }
 
-void hook(EventType eventType, sol::function function)
+int hook(EventType eventType, sol::function function)
 {
 	LOG(trace, CORE, "Hook added for {}", eventType);
 	hooks[eventType].push_back(function);
+	return 0;
 }
 
 bool run_command(std::string command)
@@ -42,6 +43,40 @@ bool run_command(std::string command)
 std::string get_current_file_path(sol::this_state ts)
 {
 	return "";
+}
+
+std::unordered_map<std::string, sol::function> modCommands;
+
+bool ModCommandCallback()
+{
+	const char** pArg0 = (const char**)((char*)*pGlobalCommandState + 0xa3b0);
+	const char* commandName = *pArg0;
+
+	if (modCommands.count(commandName))
+	{
+		DWORD argc = *(DWORD*)((char*)*pGlobalCommandState + 0x23ac);
+
+		std::vector<std::string> argv;
+		argv.resize(argc);
+
+		for (int i = 0; i < argc; ++i)
+		{
+			argv.push_back(*(pArg0 + i));
+		}
+
+		sol::function func = modCommands.at(commandName);
+		return func(argc, argv);
+	}
+
+	return false;
+}
+
+int register_command(std::string name, sol::function func)
+{
+	modCommands.insert({name, func});
+	Bridge_RegisterCommand(*pGlobalCommandState, ModCommandCallback, name.c_str());
+
+	return 0;
 }
 
 void ScriptingEvent(EventType eventType)
@@ -63,6 +98,41 @@ void ScriptingEvent(EventType eventType)
 	}
 }
 
+#define EVENTNAME(name) { "FMTK_EVENT_" #name, EventType::##name }
+
+std::unordered_map<std::string, EventType> eventNames = {
+	EVENTNAME(ENTRY),
+	EVENTNAME(EXIT),
+	EVENTNAME(TICK),
+	EVENTNAME(DEATH),
+	EVENTNAME(COMMAND_INIT),
+	EVENTNAME(LOAD),
+	EVENTNAME(LOAD_DATA),
+	EVENTNAME(LOAD_SHADERS),
+};
+
+bool FMTKEmitEventCallback()
+{
+	DWORD argc = *(DWORD*)((char*)*pGlobalCommandState + 0x23ac);
+	if (argc < 2)
+	{
+		return false;
+	}
+
+	const char** pArg0 = (const char**)((char*)*pGlobalCommandState + 0xa3b0);
+	const char* arg1 = *(pArg0 + 1);
+
+	if (eventNames.count(arg1))
+	{
+		EventType eventType = eventNames.at(arg1);
+		ScriptingEvent(eventType);
+
+		return true;
+	}
+
+	return false;
+}
+
 sol::state lua;
 
 bool ScriptingInit()
@@ -78,12 +148,12 @@ bool ScriptingInit()
 	fmtk_table.set_function("hook", &hook);
 	fmtk_table.set_function("run_command", &run_command);
 	fmtk_table.set_function("get_current_file_path", &get_current_file_path);
+	fmtk_table.set_function("register_command", &register_command);
 
-	lua.set("FMTK_EVENT_ENTRY", EventType::ENTRY);
-	lua.set("FMTK_EVENT_EXIT", EventType::EXIT);
-	lua.set("FMTK_EVENT_TICK", EventType::TICK);
-	lua.set("FMTK_EVENT_DEATH", EventType::DEATH);
-	lua.set("FMTK_EVENT_LOAD", EventType::LOAD);
+	for (auto it : eventNames)
+	{
+		lua.set(it.first, it.second);
+	}
 	
 	LOG(trace, CORE, "Autorun");
 

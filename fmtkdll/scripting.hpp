@@ -2,6 +2,7 @@
 #define SCRIPTING_HPP
 
 #include <sol/sol.hpp>
+#include <unordered_map>
 
 extern sol::state lua;
 
@@ -21,5 +22,8 @@ enum EventType
 };
 
 void ScriptingEvent(EventType eventType);
+
+bool FMTKEmitEventCallback();
+extern std::unordered_map<std::string, EventType> eventNames;
 
 #endif // !SCRIPTING_HPP
