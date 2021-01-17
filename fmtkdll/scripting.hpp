@@ -21,7 +21,7 @@ enum EventType
 	LOAD_SHADERS,
 };
 
-void ScriptingEvent(EventType eventType);
+void ScriptingEmitEvent(EventType eventType);
 
 bool FMTKEmitEventCallback();
 extern std::unordered_map<std::string, EventType> eventNames;

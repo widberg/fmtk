@@ -79,7 +79,7 @@ int register_command(std::string name, sol::function func)
 	return 0;
 }
 
-void ScriptingEvent(EventType eventType)
+void ScriptingEmitEvent(EventType eventType)
 {
 	for (sol::function function : hooks[eventType])
 	{
@@ -125,7 +125,7 @@ bool FMTKEmitEventCallback()
 	if (eventNames.count(arg1))
 	{
 		EventType eventType = eventNames.at(arg1);
-		ScriptingEvent(eventType);
+		ScriptingEmitEvent(eventType);
 
 		return true;
 	}
@@ -198,6 +198,6 @@ bool ScriptingInit()
 
 bool ScriptingShutdown()
 {
-	ScriptingEvent(EventType::EXIT);
+	ScriptingEmitEvent(EventType::EXIT);
 	return true;
 }
