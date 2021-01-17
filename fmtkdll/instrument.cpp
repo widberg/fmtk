@@ -14,6 +14,8 @@
 #include "logging.hpp"
 #include "scripting.hpp"
 
+#define __usercall __stdcall
+
 #define FUNCTION(name, address, returnType, callingConvention, ...) \
 returnType (callingConvention * Real_##name)(__VA_ARGS__)           \
 	= reinterpret_cast<decltype(Real_##name)>(address);             \
@@ -35,6 +37,27 @@ returnType callingConvention FMTK_XLive_##name(__VA_ARGS__)
 #define XLIVE_DLL_BASE_ADDRESS (0x400000)
 #define ATTACHXLIVE(x)  Real_XLive_##x = reinterpret_cast<decltype(Real_XLive_##x)>((DWORD_PTR)hiXLive +  (DWORD_PTR)Real_XLive_##x - (DWORD_PTR)XLIVE_DLL_BASE_ADDRESS); DetourAttach(&(PVOID&)Real_XLive_##x, FMTK_XLive_##x)
 #define DETACHXLIVE(x)  DetourDetach(&(PVOID&)Real_XLive_##x, FMTK_XLive_##x)
+
+
+#define BACKUP_REGISTER(reg) \
+DWORD backup_##reg;          \
+__asm                        \
+{                            \
+	mov backup_##reg, reg    \
+}
+
+#define RESTORE_REGISTER(reg) \
+__asm                         \
+{                             \
+	mov reg, backup_##reg     \
+}
+
+#define REG_TO_VAR(reg, type, var) \
+type var;                          \
+__asm                              \
+{                                  \
+	mov var, reg                   \
+};
 
 bool AttachDetoursXLive();
 bool DetachDetoursXLive();
@@ -96,12 +119,12 @@ FUNCTION(CreateFileW, CreateFileW, HANDLE, WINAPI,
 	if (aliases.count(fileName))
 	{
 		std::wstring alias = aliases.at(fileName);
-		LOGW(trace, CORE, "FUEL opening file: {} which resolved to {}", fileName, alias);
+		LOGW(trace, FMTK, "FUEL opening file: {} which resolved to {}", fileName, alias);
 		fileName = alias;
 	}
 	else
 	{
-		LOGW(trace, CORE, "FUEL opening file: {}", fileName);
+		LOGW(trace, FMTK, "FUEL opening file: {}", fileName);
 	}
 
 	HANDLE rv = Real_CreateFileW(fileName.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
@@ -113,7 +136,7 @@ FUNCTION(CreateFileW, CreateFileW, HANDLE, WINAPI,
 		FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL, dwError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpBuffer, 0, NULL);
 
-		LOG(error, CORE, "Error {} : {}", dwError, lpBuffer);
+		LOG(error, FMTK, "Error {} : {}", dwError, lpBuffer);
 
 		LocalFree(lpBuffer);
 	}
@@ -121,16 +144,11 @@ FUNCTION(CreateFileW, CreateFileW, HANDLE, WINAPI,
 	return rv;
 }
 
-FUNCTION(RegisterCommand, 0x0069a400, void, __stdcall, const void* pThis, void* callback)
+FUNCTION(RegisterCommand, 0x0069a400, void, __usercall, const void* pThis, void* callback)
 {
-	// uses a non standard calling convention, first 2 args on stack right to left, third arg in edi, a result of msvc avoiding trashing the stack
-	LPCSTR name;
-	__asm
-	{
-		mov name, edi
-	};
+	REG_TO_VAR(edi, LPCSTR, name);
 
-	LOG(trace, CORE, "Registering command: {}", name);
+	LOG(trace, FMTK, "Registering command: {}", name);
 
 	Bridge_RegisterCommand(pThis, callback, name);
 }
@@ -148,11 +166,11 @@ void Bridge_RegisterCommand(const void* pThis, void* callback, LPCSTR name)
 
 FUNCTION(ScriptManagerInit, 0x0081cdb0, void, __fastcall, DWORD x, DWORD y, DWORD z)
 {
-	LOG(trace, CORE, "{} {} {}", x, y, z);
+	LOG(trace, FMTK, "{} {} {}", x, y, z);
 	Real_ScriptManagerInit(x, y, z);
 
-	LOG(trace, CORE, "ScriptManagerInit");
-	LOG(trace, CORE, "Setting our callback");
+	LOG(trace, FMTK, "ScriptManagerInit");
+	LOG(trace, FMTK, "Setting our callback");
 
 	Bridge_RegisterCommand(*pGlobalCommandState, FMTKEmitEventCallback, "FMTKEmitEvent");
 }
@@ -169,7 +187,7 @@ NAKEDFUNCTION(Load, 0x00689256)
 
 FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	LOG(trace, CORE, "Entry Point");
+	LOG(trace, FMTK, "Entry Point");
 
 	AttachDetoursXLive();
 
@@ -179,7 +197,7 @@ FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevI
 
 	_set_se_translator([](unsigned int code, EXCEPTION_POINTERS* pEP)
 	{
-		LOG(critical, CORE, "Translating SEH Exception");
+		LOG(critical, FMTK, "Translating SEH Exception");
 		throw SEHException(pEP);
 	});
 
@@ -189,11 +207,11 @@ FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevI
 	}
 	catch (const std::exception& e)
 	{
-		LOG(critical, CORE, "{}", e.what());
+		LOG(critical, FMTK, "{}", e.what());
 	}
 	catch (...)
 	{
-		LOG(critical, CORE, "Unhandled exception");
+		LOG(critical, FMTK, "Unhandled exception");
 	}
 
 	return result;
@@ -234,7 +252,7 @@ FUNCTION(D3DXCompileShaderFromFileA, 0x008b11e6, HRESULT, WINAPI,
 	LPD3DXBUFFER*                   ppErrorMsgs,
 	LPD3DXCONSTANTTABLE*            ppConstantTable)
 {
-	LOG(trace, CORE, "Compiling shader: {}", pSrcFile);
+	LOG(trace, FMTK, "Compiling shader: {}", pSrcFile);
 
 	*ppErrorMsgs = nullptr;
 	LPD3DXBUFFER errorBuffer;
@@ -243,61 +261,14 @@ FUNCTION(D3DXCompileShaderFromFileA, 0x008b11e6, HRESULT, WINAPI,
 
 	if (errorBuffer != nullptr)
 	{
-		LOG(error, CORE, "{}", (char*)errorBuffer->GetBufferPointer());
+		LOG(error, FMTK, "{}", (char*)errorBuffer->GetBufferPointer());
 	}
 
 	return result;
 }
 
-FUNCTION(TerminateProcess, TerminateProcess, BOOL, WINAPI,
-	HANDLE hProcess,
-	UINT   uExitCode)
-{
-	LOG(trace, CORE, "Pray to god you see this {}", uExitCode);
-
-	return TerminateProcess(hProcess, uExitCode);
-}
-
-FUNCTION(LoadLibraryA, LoadLibraryA, HMODULE, WINAPI,
-	LPCSTR lpLibFileName)
-{
-	LOG(trace, CORE, "ALoading dll: {}", lpLibFileName);
-	
-	return Real_LoadLibraryA(lpLibFileName);
-}
-
-FUNCTION(LoadLibraryExA, LoadLibraryExA, HMODULE, WINAPI,
-	LPCSTR lpLibFileName,
-	HANDLE hFile,
-	DWORD  dwFlags)
-{
-	LOG(trace, CORE, "ExALoading dll: {} 0x{0:x}", lpLibFileName, dwFlags);
-
-	return Real_LoadLibraryExA(lpLibFileName, hFile, dwFlags);
-}
-
-FUNCTION(LoadLibraryW, LoadLibraryW, HMODULE, WINAPI,
-	LPCWSTR lpLibFileName)
-{
-	LOGW(trace, CORE, "WLoading dll: {}", lpLibFileName);
-
-	return Real_LoadLibraryW(lpLibFileName);
-}
-
-FUNCTION(LoadLibraryExW, LoadLibraryExW, HMODULE, WINAPI,
-	LPCWSTR lpLibFileName,
-	HANDLE hFile,
-	DWORD  dwFlags)
-{
-	LOGW(trace, CORE, "ExWLoading dll: {} 0x{0:x}", lpLibFileName, dwFlags);
-
-	return Real_LoadLibraryExW(lpLibFileName, hFile, dwFlags);
-}
-
 FUNCTIONXLIVE(ValidateMemory, 0x004f36b3, INT, WINAPI, DWORD, DWORD, DWORD)
 {
-	//LOG(trace, CORE, "ValidateMemory");
-
 	return 0;
 }
 
@@ -315,7 +286,7 @@ FUNCTION(CreateWindowExW, CreateWindowExW, HWND, WINAPI,
 	HINSTANCE hInstance,
 	LPVOID    lpParam)
 {
-	LOG(trace, CORE, "Creating window");
+	LOG(trace, FMTK, "Creating window");
 
 	int w = GetSystemMetrics(SM_CXSCREEN);
 	int h = GetSystemMetrics(SM_CYSCREEN);
@@ -331,20 +302,18 @@ NAKEDFUNCTION(IsCarInGame, 0x0060f2a9)
 	}
 }
 
-FUNCTION(Death, 0x0052f370, void, __cdecl, void)
+FUNCTION(Death, 0x0052f370, void, __usercall, void* x)
 {
-	void* p;
+	BACKUP_REGISTER(ecx);
+	BACKUP_REGISTER(esi);
 
+	LOG(trace, FMTK, "DEATH");
+
+	RESTORE_REGISTER(ecx);
+	RESTORE_REGISTER(esi);
 	__asm
 	{
-		mov p, esi
-	}
-
-	LOG(trace, CORE, "DEATH");
-
-	__asm
-	{
-		mov esi, p
+		push x
 		call Real_Death
 	}
 }
@@ -376,24 +345,18 @@ bool DetachDetoursXLive()
 // Instrument
 LONG AttachDetours()
 {
-    LOG(trace, CORE, "Attaching detours");
+    LOG(trace, FMTK, "Attaching detours");
 
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
 	ATTACH(CreateFileW);
 	ATTACH(WinMain);
-	//ATTACH(IsDebuggerPresent);
 	ATTACH(CoreMainLoop);
-	//ATTACH(OutputDebugStringA);
-	//ATTACH(OutputDebugStringW);
+	ATTACH(OutputDebugStringA);
+	ATTACH(OutputDebugStringW);
 	ATTACH(RunCommand);
 	ATTACH(D3DXCompileShaderFromFileA);
-	//ATTACH(LoadLibraryA);
-	//ATTACH(LoadLibraryW);
-	//ATTACH(LoadLibraryExA);
-	//ATTACH(LoadLibraryExW);
-	//ATTACH(TerminateProcess);
 	//ATTACH(CreateWindowExW);
 	ATTACH(RegisterCommand);
 	ATTACH(ScriptManagerInit);
@@ -401,14 +364,14 @@ LONG AttachDetours()
 	//ATTACH(IsCarInGame);
 	ATTACH(Death);
 
-    LOG(trace, CORE, "Ready to commit");
+    LOG(trace, FMTK, "Ready to commit");
 
     return DetourTransactionCommit();
 }
 
 LONG DetachDetours()
 {
-    LOG(trace, CORE, "Detaching detours");
+    LOG(trace, FMTK, "Detaching detours");
 
 	DetachDetoursXLive();
 
@@ -417,17 +380,11 @@ LONG DetachDetours()
 
 	DETACH(CreateFileW);
 	DETACH(WinMain);
-	//DETACH(IsDebuggerPresent);
 	DETACH(CoreMainLoop);
-	//DETACH(OutputDebugStringA);
-	//DETACH(OutputDebugStringW);
+	DETACH(OutputDebugStringA);
+	DETACH(OutputDebugStringW);
 	DETACH(RunCommand);
 	DETACH(D3DXCompileShaderFromFileA);
-	//DETACH(LoadLibraryA);
-	//DETACH(LoadLibraryW);
-	//DETACH(LoadLibraryExA);
-	//DETACH(LoadLibraryExW);
-	//DETACH(TerminateProcess);
 	//DETACH(CreateWindowExW);
 	DETACH(RegisterCommand);
 	DETACH(ScriptManagerInit);
@@ -435,7 +392,7 @@ LONG DetachDetours()
 	//DETACH(IsCarInGame);
 	DETACH(Death);
 
-    LOG(trace, CORE, "Ready to commit");
+    LOG(trace, FMTK, "Ready to commit");
 
     return DetourTransactionCommit();
 }

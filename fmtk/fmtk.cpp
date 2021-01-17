@@ -62,28 +62,28 @@ int CDECL main(int argc, char** argv)
         NULL, NULL, TRUE, dwFlags, reinterpret_cast<LPVOID>(environment.str().data()), NULL,
         &si, &pi, "secudll.dll", NULL))
     {
-        LOG(error, CORE, "DetourCreateProcessWithDllEx failed: %ld\n", GetLastError());
+        LOG(error, FMTK, "DetourCreateProcessWithDllEx failed: %ld\n", GetLastError());
         LogLastError();
         return 9009;
     }
 
-    LOG(trace, CORE, "Resuming SecuLauncher");
+    LOG(trace, FMTK, "Resuming SecuLauncher");
 
     ResumeThread(pi.hThread);
 
-    LOG(trace, CORE, "SecuLauncher resumed");
+    LOG(trace, FMTK, "SecuLauncher resumed");
 
     WaitForSingleObject(pi.hProcess, INFINITE);
 
     DWORD dwResult = 0;
     if (!GetExitCodeProcess(pi.hProcess, &dwResult)) {
-        LOG(error, CORE, "GetExitCodeProcess failed: %ld\n", GetLastError());
+        LOG(error, FMTK, "GetExitCodeProcess failed: %ld\n", GetLastError());
         LogLastError();
         return 9010;
     }
     else
     {
-        LOG(trace, CORE, "SecuLauncher exited with code: 0x{0:x}", dwResult);
+        LOG(trace, FMTK, "SecuLauncher exited with code: 0x{0:x}", dwResult);
     }
 
     return dwResult;
@@ -98,7 +98,7 @@ void LogLastError()
         FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL, dwError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpBuffer, 0, NULL);
 
-        LOG(error, CORE, "{}", lpBuffer);
+        LOG(error, FMTK, "{}", lpBuffer);
 
         LocalFree(lpBuffer);
     }

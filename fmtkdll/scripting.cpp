@@ -15,7 +15,7 @@ std::unordered_map<EventType, std::vector<sol::function>> hooks;
 
 void alias(std::wstring originalPath, std::wstring newPath)
 {
-	LOGW(trace, CORE, "Aliasing {} as {}", originalPath, newPath);
+	LOGW(trace, FMTK, "Aliasing {} as {}", originalPath, newPath);
 
 	originalPath = std::filesystem::absolute(originalPath);
 	std::transform(originalPath.begin(), originalPath.end(), originalPath.begin(), std::towlower);
@@ -28,14 +28,14 @@ void alias(std::wstring originalPath, std::wstring newPath)
 
 int hook(EventType eventType, sol::function function)
 {
-	LOG(trace, CORE, "Hook added for {}", eventType);
+	LOG(trace, FMTK, "Hook added for {}", eventType);
 	hooks[eventType].push_back(function);
 	return 0;
 }
 
 bool run_command(std::string command)
 {
-	LOG(trace, CORE, "Running command: {}", command);
+	LOG(trace, FMTK, "Running command: {}", command);
 
 	return Real_RunCommand(*pGlobalCommandState, command.c_str(), CommandSource::GAME);
 }
@@ -83,18 +83,18 @@ void ScriptingEmitEvent(EventType eventType)
 {
 	for (sol::function function : hooks[eventType])
 	{
-		LOG(trace, CORE, "Calling function for {}", eventType);
+		LOG(trace, FMTK, "Calling function for {}", eventType);
 
 		auto result = function();
-		LOG(trace, CORE, "Error checking");
+		LOG(trace, FMTK, "Error checking");
 		if (!result.valid())
 		{
 			sol::error error = result;
-			LOG(critical, CORE, "Lua error: {}", error.what());
+			LOG(critical, FMTK, "Lua error: {}", error.what());
 			FMTK_ASSERT(false, "lua error");
 		}
 
-		LOG(trace, CORE, "Ran successfully");
+		LOG(trace, FMTK, "Ran successfully");
 	}
 }
 
@@ -137,11 +137,11 @@ sol::state lua;
 
 bool ScriptingInit()
 {
-	LOG(trace, CORE, "Opening lua libraries");
+	LOG(trace, FMTK, "Opening lua libraries");
 
 	lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::coroutine, sol::lib::string, sol::lib::os, sol::lib::math, sol::lib::table, sol::lib::debug, sol::lib::bit32, sol::lib::io, sol::lib::ffi, sol::lib::jit, sol::lib::utf8);
 
-	LOG(trace, CORE, "Creating fmtk table");
+	LOG(trace, FMTK, "Creating fmtk table");
 
 	auto fmtk_table = lua["fmtk"].get_or_create<sol::table>();
 	fmtk_table.set_function("alias", &alias);
@@ -155,12 +155,12 @@ bool ScriptingInit()
 		lua.set(it.first, it.second);
 	}
 	
-	LOG(trace, CORE, "Autorun");
+	LOG(trace, FMTK, "Autorun");
 
 	std::function<void(std::filesystem::path)> autorun;
 	autorun = [&](std::filesystem::path dir)
 	{
-		LOG(trace, CORE, "Autorun dir: {}", dir.string());
+		LOG(trace, FMTK, "Autorun dir: {}", dir.string());
 
 		lua["FMTK_CURRENT_DIR"] = dir.string();
 
@@ -172,18 +172,18 @@ bool ScriptingInit()
 			}
 			else if (it.path().filename() == "autorun.lua")
 			{
-				LOG(trace, CORE, "Autorun script: {}", it.path().string());
+				LOG(trace, FMTK, "Autorun script: {}", it.path().string());
 
 				auto result = lua.safe_script_file(it.path().string(), sol::script_pass_on_error);
-				LOG(trace, CORE, "Error checking");
+				LOG(trace, FMTK, "Error checking");
 				if (!result.valid())
 				{
 					sol::error error = result;
-					LOG(critical, CORE, "Lua error: {}", error.what());
+					LOG(critical, FMTK, "Lua error: {}", error.what());
 					FMTK_ASSERT(false, "lua error");
 				}
 
-				LOG(trace, CORE, "Ran successfully");
+				LOG(trace, FMTK, "Ran successfully");
 			}
 		}
 	};

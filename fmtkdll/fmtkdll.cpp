@@ -19,35 +19,34 @@ BOOL ProcessAttach(HMODULE hDll)
     }
 
     LOG_INIT();
-    LOG(trace, CORE, "Attaching to FUEL");
+    LOG(trace, FMTK, "Attaching to FUEL");
 
     ScriptingInit();
 
     LONG error = AttachDetours();
     if (error != NO_ERROR)
     {
-        LOG(critical, CORE, "Error attaching detours: {}", error);
+        LOG(critical, FMTK, "Error attaching detours: {}", error);
     }
 
-    LOG(trace, CORE, "Attached to FUEL");
+    LOG(trace, FMTK, "Attached to FUEL");
 
     return TRUE;
 }
 
 BOOL ProcessDetach(HMODULE hDll)
 {
-    LOG(trace, CORE, "Detaching from FUEL");
+    LOG(trace, FMTK, "Detaching from FUEL");
 
     ScriptingShutdown();
 
     LONG error = DetachDetours();
     if (error != NO_ERROR)
     {
-        LOG(critical, CORE, "Error detaching detours: {}", error);
+        LOG(critical, FMTK, "Error detaching detours: {}", error);
     }
 
-
-    LOG(trace, CORE, "Detatched from FUEL");
+    LOG(trace, FMTK, "Detatched from FUEL");
 
     return TRUE;
 }
