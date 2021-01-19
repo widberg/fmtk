@@ -1,0 +1,373 @@
+#ifndef	__SCAT_MESH_VHL__
+#define	__SCAT_MESH_VHL__
+
+#include "_vertex_const.h"
+#include "scat_mesh.h"
+#include "hlsl_shadow.h"
+#include "_vertex_scatter.h"
+
+//-----------------------------------------------------
+
+struct VS_Input
+{
+	float4	position	: POSITION;
+	float4	tangent		: POSITION1;
+	float3	normal		: NORMAL;
+	float2	uv			: TEXCOORD0;
+	float2	luv			: TEXCOORD1;
+#ifdef	bGouraud
+	float4	color		: COLOR0;
+#endif
+};
+
+//---------------------------------------------------------------------------------------------------------------------------------
+//			(asobo) Basic shader for any Mesh
+//---------------------------------------------------------------------------------------------------------------------------------
+
+//	handles the majority of buildings, rocks, etc... static / unmovable stuff
+void vh_base(VS_Input i, inout VS_ScatOutput o)
+{
+	float4	wPos, vPos;
+			o.position = WorldAndViewAndProjectVertex( i.position, wPos, vPos );
+
+	#ifdef	bShadowMap
+			o.shadowtcproj = vPos.xyz;
+	#endif
+
+	#ifdef	bOmni
+	// only filling 3 floats on omni.xyz
+	// DirectX is column-major, so mul wPos.xyzw by 4 columns (xyzw) of 3 rows and skip processing 4th
+	// since we don't have a .w to stuff it in
+			o.omni.xyz = mul(wPos, C_OMNI_0_WORLDTOLOCAL).xyz * C_HALF + C_HALF;
+	#else
+			o.omni.xyz = C_NULL;
+	#endif
+
+			o.eyevec.xyz = EYE_LOCAL.xyz - i.position.xyz;
+
+	//Tangent Space
+	float3	normal			= i.normal * C_TWO - C_UNIT;
+#ifdef	bNormal
+	float3x3 mLight			= LightMat(i.tangent,normal);
+	OutTexSpace(o.TexSpace,mLight);
+#else
+	OutTexSpace(o.TexSpace,normal);
+#endif
+
+
+	// Il faut normalizer car il peut y avoir des scale dans la matrice du mesh
+
+	scatteringbase(wPos, o.extinction.xyz, o.inscatter.xyz);
+
+	//Texture Coord
+	float2	uv	= MaterialMat(i.uv.xy);
+	SetDiffuseUV(o,uv);
+	SetBroken(o,C_NULL);
+
+
+	o.brokenUV			= SetBrokenUV(uv);
+
+			o.extinction.xyz	*= GOURAUD_DFLT.xyz;
+			o.inscatter.xyz		*= MTL_ADDSOUS_NULL;	//Matiere Additif ou Soustractif on vire !
+}
+
+
+//------------------------------------------------
+// (asobo) Morphing, is not done if we assume that the car must be in FL_MTL_CODE_CAR0
+// not sure what this handles...
+
+void vh_mbase(VS_Input i, float3 morph_d0 : POSITION2,inout VS_ScatOutput o)
+{
+	vh_base(i,o);
+}
+
+
+/*---------------------------------------------------------------------------------------------------------------------------------
+//			Shader avec le FL_MTL_CODE_CAR0 FL_MTL_CODE_CAR1 FL_MTL_CODE_CAR2
+----------------------------------------------------------------------------------------------------------------------------------*/
+
+// (asobo) ATTENTION: Position passed in parameter, morphing see below
+// this seems to handle a lot of vehicles (AI cars, roaming trucks, even blue-hooded junk trucks in field)
+void vh_main_car(VS_Input i, inout VS_ScatOutput o, float4 position)
+{
+	float4	wPos, vPos;
+			o.position	= WorldAndViewAndProjectVertex( position, wPos, vPos );
+
+	#ifdef	bShadowMap
+			o.shadowtcproj = vPos.xyz;
+	#endif
+
+	#ifdef	bOmni
+	// only filling 3 floats on omni.xyz
+	// DirectX is column-major, so mul wPos.xyzw by 4 columns (xyzw) of 3 rows and skip processing 4th
+	// since we don't have a .w to stuff it in
+			o.omni.xyz = mul(wPos, C_OMNI_0_WORLDTOLOCAL).xyz * C_HALF + C_HALF;
+	#else
+			o.omni.xyz = C_NULL;
+	#endif
+
+			o.eyevec.xyz = EYE_LOCAL.xyz - position.xyz;
+
+	//Tangent Space
+	float3	normal			= i.normal * C_TWO - C_UNIT;
+#ifdef	bNormal
+	float3x3 mLight	= LightMat(i.tangent,normal);
+	OutTexSpace(o.TexSpace,mLight);
+#else
+	OutTexSpace(o.TexSpace,normal);
+#endif
+	
+	// Il faut normalizer car il peut y avoir des scale dans la matrice du mesh
+	scatteringbase(wPos,o.extinction.xyz,o.inscatter.xyz);
+
+	//Texture Coord
+	float2	uv				= MaterialMat(i.uv.xy);
+	SetDiffuseUV(o,uv);
+	SetBroken(o,C_NULL);
+
+			o.brokenUV		= SetBrokenUV(uv);
+
+	//o.extinction.xyz non mutliplié au GOURAUD_DFLT.xyz il sert a la coloration de la voiture !
+			o.inscatter.xyz	*= MTL_ADDSOUS_NULL;	//Matiere Additif ou Soustractif on vire !
+	
+#ifdef	bDirt
+	SetDirtiness ( o );
+#endif
+}
+
+
+//------------------------------------------------
+
+// Mesh morph + MTL_CODE_CAR
+
+// some parts of player vehicles ( damageable parts I presume )
+void vh_mcar(VS_Input i, float3 morph_d0 : POSITION2,inout VS_ScatOutput o)
+{
+	float	pixelmorph;
+	float4	newposition = TargetMorph(i.position,morph_d0,pixelmorph);
+	
+	float4	position	= newposition;
+	//-----------------------------------------
+//		vh_main_car(i,o,newposition);
+	//-----------------------------------------
+	float4	wPos, vPos;
+			o.position	= WorldAndViewAndProjectVertex( position, wPos, vPos );
+
+	#ifdef	bShadowMap
+			o.shadowtcproj = vPos.xyz;
+	#endif
+
+	#ifdef	bOmni
+	// only filling 3 floats on omni.xyz
+	// DirectX is column-major, so mul wPos.xyzw by 4 columns (xyzw) of 3 rows and skip processing 4th
+	// since we don't have a .w to stuff it in
+			o.omni.xyz = mul(wPos, C_OMNI_0_WORLDTOLOCAL).xyz * C_HALF + C_HALF;
+	#else
+			o.omni.xyz = C_NULL;
+	#endif
+
+			o.eyevec.xyz = EYE_LOCAL.xyz - position.xyz;
+
+	//Tangent Space
+	float3	normal			= i.normal * C_TWO - C_UNIT;
+#ifdef	bNormal
+	float3x3 mLight	= LightMat(i.tangent,normal);
+	OutTexSpace(o.TexSpace,mLight);
+#else
+	OutTexSpace(o.TexSpace,normal);
+#endif
+
+	// Il faut normalizer car il peut y avoir des scale dans la matrice du mesh
+	scatteringbase(wPos,o.extinction.xyz,o.inscatter.xyz);
+
+	//Texture Coord
+	float2	uv	= MaterialMat(i.uv.xy);
+	SetDiffuseUV(o,uv);
+//		SetBroken(o,C_NULL);
+
+//		o.brokenUV			= uv.xyxy;//SetBrokenUV(uv);
+
+	//o.extinction.xyz non mutliplié au GOURAUD_DFLT.xyz il sert a la coloration de la voiture !
+	o.inscatter.xyz*=MTL_ADDSOUS_NULL;	//Matiere Additif ou Soustractif on vire !
+	
+#ifdef	bDirt
+	SetDirtiness ( o );
+#endif
+	//-----------------------------------------
+
+
+	SetBroken(o,pixelmorph);
+
+	o.brokenUV			= SetBrokenUV(uv);
+}
+	
+//------------------------------------------------
+
+// Mesh + MTL_CODE_CAR
+// (no vehicle damage)
+// roaming trucks, some vehicle parts, etc
+void vh_car(VS_Input i, inout VS_ScatOutput o)
+{
+		vh_main_car(i,o,i.position);
+}
+	
+//------------------------------------------------
+
+// + face de rotshape
+// basic objects... scrub brush, broken trees, plant debris on roads		 
+void vh_rbase(VS_Input i, inout VS_ScatOutput o)
+{
+	float4	wPos;
+			wPos.xyz	= i.position.xyz;
+			wPos.w		= C_UNIT;
+			wPos		= WorldVertex(wPos);
+	float	Scale		= GetWorldScale();
+			i.luv.xy	*= Scale;
+	float3	lPos		= CAM_WSIDE * i.luv.x// * Scale
+						+ CAM_WUP   * i.luv.y;// * Scale;
+			wPos.xyz	+= lPos;
+	
+	float4	vPos		= WorldToViewVertex(wPos);
+			o.position	= ProjVertex(vPos);
+
+	#ifdef	bShadowMap
+			o.shadowtcproj = vPos.xyz;
+	#endif
+
+			o.omni.xyz	 = C_NULL;
+			o.eyevec.xyz = EYE_LOCAL.xyz - i.position.xyz;
+	
+	//Tangent Space
+	float3	normal		= i.normal * C_TWO - C_UNIT;
+#ifdef	bNormal
+	float3x3 mLight	= LightMat(i.tangent,normal);
+	OutTexSpace(o.TexSpace,mLight);
+#else
+	OutTexSpace(o.TexSpace,normal);
+#endif
+			
+	scatteringbase(wPos,o.extinction.xyz,o.inscatter.xyz);
+
+	//Texture Coord
+	float2	uv	= MaterialMat(i.uv.xy);
+	SetDiffuseUV(o,uv);
+
+	SetBroken(o,C_NULL);
+
+	o.brokenUV			= SetBrokenUV(uv);
+
+	o.extinction.xyz *= GOURAUD_DFLT.xyz;
+	o.inscatter.xyz*=MTL_ADDSOUS_NULL;	//Matiere Additif ou Soustractif on vire !
+}
+	
+//------------------------------------------------
+
+// + face de rotshape + MATERIAL_CODE_NORMAL_ALPHA0			 
+void vh_rbase_alpha0(VS_Input i,inout VS_ScatOutput o)
+{
+	vh_rbase(i,o);
+}	   
+
+
+//---------------------------------------------
+// GBUFFER STUFFS
+//---------------------------------------------
+
+
+void vh_gbuffer_base(VS_Input i, inout VS_GBufferOutput o)
+{
+			o.position.xyz	= i.position.xyz;
+			o.position.w	= C_UNIT;
+			o.position		= ProjectVertex( o.position );
+			o.position2		= o.position;
+
+	//Tangent Space
+	float3	normal = i.normal * C_TWO - C_UNIT;
+#ifdef	bNormal
+	float3x3 mLight	= LightMat(i.tangent,normal);
+	mLight = transpose(transpose(mLight));	// inverse mLight
+//	mLight = transpose(mLight);	// inverse mLight
+	OutTexSpace(o.TexSpace,mLight);
+#else
+	OutTexSpace(o.TexSpace,normal);
+#endif
+
+	//Texture Coord
+	o.tDiffuse.xy = MaterialMat(i.uv.xy);
+}
+
+//Morphing, n'est pas fait si on suppose que la voiture doit etre en FL_MTL_CODE_CAR0
+void vh_gbuffer_mbase(VS_Input i, float3 morph_d0 : POSITION2, inout VS_GBufferOutput o)
+{
+	vh_gbuffer_base(i,o);
+}
+	
+void vh_gbuffer_main_car(VS_Input i, out VS_GBufferOutput o, float4 position)
+{
+	o.position = ProjectVertex( position );
+	o.position2 = o.position;
+
+	//Tangent Space
+	float3	normal=i.normal*C_TWO-C_UNIT;
+#ifdef	bNormal
+	float3x3 mLight	= LightMat(i.tangent,normal);
+	mLight = transpose(transpose(mLight));	// inverse mLight
+	OutTexSpace(o.TexSpace,mLight);
+#else
+	OutTexSpace(o.TexSpace,normal);
+#endif		
+	//Texture Coord
+	o.tDiffuse.xy = MaterialMat(i.uv.xy);
+}
+
+//
+// Mesh morph + MTL_CODE_CAR
+
+void vh_gbuffer_mcar(VS_Input i, float3 morph_d0 : POSITION2,inout VS_GBufferOutput o)
+
+{
+	float	pixelmorph;
+	float4	newposition = TargetMorph(i.position,morph_d0,pixelmorph);
+	
+	vh_gbuffer_main_car(i,o,newposition);
+}
+	
+//
+// Mesh + MTL_CODE_CAR
+void vh_gbuffer_car(VS_Input i,inout VS_GBufferOutput o)
+{
+		vh_gbuffer_main_car(i,o,i.position);
+}
+
+void vh_rbase_gbuffer(VS_Input i,out VS_GBufferOutput o)
+{
+	float4	wPos;
+			wPos.xyz	= i.position.xyz;
+			wPos.w		= C_UNIT;
+			wPos		= WorldVertex(wPos);
+	float	Scale 		= GetWorldScale();
+			i.luv.xy	*= Scale;
+	float3	lPos		= CAM_WSIDE * i.luv.x// * Scale
+						+ CAM_WUP   * i.luv.y;// * Scale;
+
+			wPos.xyz	+= lPos;
+	
+	float4	vPos		= WorldToViewVertex(wPos);
+			o.position	= ProjVertex(vPos);
+			o.position2	= o.position;
+
+	//Tangent Space
+	float3	normal		= i.normal * C_TWO - C_UNIT;
+#ifdef	bNormal
+	float3x3 mLight	= LightMat(i.tangent,normal);
+	mLight = transpose(transpose(mLight));	// inverse mLight
+	OutTexSpace(o.TexSpace,mLight);
+#else
+	OutTexSpace(o.TexSpace,normal);
+#endif
+
+	o.tDiffuse.xy = MaterialMat(i.uv.xy);
+}
+
+
+#endif

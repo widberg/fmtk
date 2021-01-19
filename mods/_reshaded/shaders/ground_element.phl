@@ -1,0 +1,3 @@
+// Disabled Code
+
+	float4 ph_base() : COLOR0	{return 0;}

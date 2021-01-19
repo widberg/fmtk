@@ -1,0 +1,176 @@
+#ifndef	__BASE_VHL__
+#define	__BASE_VHL__
+
+#include "_vertex_const.h"
+#include "hlsl_math.h"
+
+
+//------------------------------------------
+// the ph_* functions need to stay here,
+// b/c putting them in base.phl causes shader
+// compilation to blow up. This shader compiles
+// before everything else I think, because it
+// handles basic UI stuff. So, I think this
+// compiles, then UI screen shows shader compile
+// progress bar as rest of shaders compile.
+//------------------------------------------
+
+struct VS_2DInOut
+{
+	float4	position	: POSITION;
+	float4	color		: COLOR0;
+	float2	diffuse		: TEXCOORD0;
+};
+
+struct VS_3DIn {
+	float4	position : POSITION0; // position (xyz) | fog coeff (w)
+	float4	color	 : COLOR0;
+	float2	diffuse	 : TEXCOORD0;
+};
+
+struct VS_3DOut {
+	float4	position	: POSITION0;
+	float4	color		: COLOR0;
+	float2	diffuse		: TEXCOORD0;
+	float4	fog		: COLOR1;
+};
+
+
+// (asobo) the diffuse Texture will be blender
+// by the Specular Texture positioned in
+// C_USER0.x C_USER0.y of size C_USER0.z C_USER0.w
+struct VS_2DOutUserAlpha
+{
+	float4	position	: POSITION;
+	float4	color		: COLOR0;
+	float2	diffuse		: TEXCOORD0;
+	float2	blend		: TEXCOORD1;
+};
+
+
+//-------------------------------------------
+// Vertex Shaders
+//-------------------------------------------
+
+	// Vertex shader for Vertex3D_Z
+	// (omni occlusion underneath wandering trucks and AI vehicles)
+	void vh_3d (VS_3DIn i, out VS_3DOut o)
+	{
+		o.position.xyz	= i.position.xyz;
+		o.position.w	= C_UNIT;
+		o.position		= ProjVertex( o.position );
+		o.diffuse		= i.diffuse;
+		o.fog.xyz		= FOG_COLOR;
+		o.fog.w			= FOG_ON * i.position.w;
+		o.color			= i.color;
+		o.color.rgb		*= 2.0;	// moved here from pixel shader
+	}
+
+
+
+	// Vertex shader for Vertex2D_Z
+	// many UI elements .. logos, splash screens, menus, etc.
+	// also controls vignetting and screen dirt in dust storms,
+	// so we can make all of this more transparent and still function
+	// while dramatically toning down that screen border stuff
+	void vh_2d (VS_2DInOut i, out VS_2DInOut o)
+	{
+		o.position.xy	= (i.position.xy - VIEWPORT_RDR_CENTER) / VIEWPORT_HALF_SIZE;
+		// DX divide XYZ by W. We multiply by W to keep XY untouched.
+
+		o.position.z	= ProjectZ(i.position.z);
+		o.position.w	= i.position.z;
+		o.position.xy	*= o.position.w;
+
+		o.diffuse		= i.diffuse;
+		o.color			= i.color;
+		o.color.rgb		*= 2.0;	// moved here from pixel shader
+		o.color.a		*= UI_TRANSPARENCY;
+//o.color.r *= 10; // make whatever this impacts bright red to highlight
+	}
+	
+
+	// Vertex shader for Vertex2D_Z without viewport scale, normalized coord
+// not sure what this does
+// (every now and then I'll see a flash of bright red, like
+// 2 or 3 leaves blowing in the wind, so maybe this does some kind
+// of bugs or something? Not sure.. but gonna switch off red
+// highlighting just in case.)
+	void vh_2d_norm (VS_2DInOut i, out VS_2DInOut o)
+	{
+		o.position.xy	= i.position.xy;
+		o.position.z	= ProjectZ(i.position.z);
+		o.position.w	= i.position.z;
+		o.position.xy	*= o.position.w;
+		o.diffuse		= i.diffuse;
+		o.color			= i.color;
+//o.color.a *= 10;
+	}
+
+
+	// not sure what this handles.. tried red-highlighting it, and couldnt' see anything
+	void vh_passthru(VS_2DInOut i, out VS_2DInOut o)
+	{
+		o.position		= i.position;
+		o.diffuse		= i.diffuse;
+		o.color			= i.color;
+		o.color.rgb		*= 2.0;
+//o.color.a *= 10;
+	}
+	
+	
+	// UI Radar
+	void vh_2d_useralpha (VS_2DInOut i, out VS_2DOutUserAlpha o)
+	{
+		o.blend.xy		= (i.position.xy - C_USER0.xy) / C_USER0.zw;
+		o.blend.xy		+= C_HALF;
+		o.position.xy	= (i.position.xy - VIEWPORT_RDR_CENTER) / VIEWPORT_HALF_SIZE;
+
+		// DX divide XYZ by W. We multiply by W to keep XY untouched.
+
+		o.position.z	= ProjectZ(i.position.z);
+		o.position.w	= i.position.z;
+		o.position.xy	*= o.position.w;
+
+		o.diffuse		= i.diffuse;
+		o.color			= i.color;
+		o.color.rgb		*= 2.0;	// moved here from pixel shader
+		o.color.a		*= RADAR_TRANSPARENCY;
+	}
+
+
+//-------------------------------------
+//	Pixel shaders
+//-------------------------------------
+
+	// (omni occlusion underneath wandering trucks and AI vehicles)
+// do extinction & inscatter?
+	float4 ph_3d (VS_3DOut i) : COLOR0
+	{
+				i.color 	*= tex2D(sDiffuse, i.diffuse);
+				i.color.rgb = lerp(i.color.rgb, i.fog.rgb, i.fog.a);
+		return	i.color;
+	}
+
+
+	// this handles game title / menu screens,
+	// vignetting around screen border,
+	// and annoying mud caked on screen during dust storms
+	// there's no way to disable screen mud here w/o impacting everything else
+	float4 ph_2d(VS_2DInOut i) : COLOR0
+	{
+				i.color 	*= tex2D(sDiffuse, i.diffuse);
+		return	i.color;
+	}
+
+	// this seems to impact map and radar overlays
+	// in that when I have the color.b += 0.5, then
+	// dirt roads on maps/radar look purple (red+blue)
+	float4 ph_2d_useralpha(VS_2DOutUserAlpha i) : COLOR0
+	{
+				i.color 	*= tex2D(sDiffuse, i.diffuse);
+				i.color.a	*= tex2D(sSpecular, i.blend.xy).r;	// this adds the slight circle shading around the radar map
+		return 	i.color;
+	}
+
+#endif

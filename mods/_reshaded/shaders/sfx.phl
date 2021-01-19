@@ -1,0 +1,400 @@
+#ifndef	__SFX_PHL__
+#define	__SFX_PHL__
+
+#include "hlsl_math.h"
+#include "hlsl_shadow.h"
+#include "sfx.h"
+#include "_pixel.h"
+
+//-------------------------------------------
+/*
+	I overload some functions below in order to separate out
+	processing of different elements using the same shader.
+
+	EG: snow and rain both use ph_sfxBase function. This means
+	if I wanted to do something to rain, it would also impact
+	snow. And vice-versa. This makes it tricky to isolate elements
+	to tweak.
+
+	You can overload the functions, but HLSL won't let you simply make
+	a new struct to do so. The functions look at struct contents,
+	not struct names. So, you have to make a copy of the old struct
+	and add a bogus variable to it to "flag" it as a new struct.
+
+	EG: to isolate snow processing, I made a copy of the
+	VS_SfxOut struct, called it VS_SfxOutSnow, and added
+	a bogus "bool snow" variable in it to just flag it as
+	a "unique" struct in the eyes of the overloaded functions.
+
+	But, even then.. it still finds the old function to run
+	the new struct through.. so, the snow struct was still processing
+	through the old snow/rain ph_sfxBase.
+
+	Only work-around I found to this was to add a bool flag to
+	the struct that's shared, and flag what I'm doing with it.
+
+	EG: on the snow/rain struct, I added a "rain" bool to flag
+	if it's coming from a rain vertex shader. When it hits the
+	ph_sfxBase function, an if branch does extra rain processing
+	if it's rain = true.
+
+	Really hackish.. plus adds in branching, which you want to avoid
+	in shaders. But.. it works, and seems to have minimal impact
+	on small shaders like this. (Wouldn't do it on scat_mesh.phl
+	though. That thing dies with if statements.)
+*/
+//-------------------------------------------
+
+void sfxGetZBuffer(float4 SamplePos, out float ZInBuffer, out float CurrentZ)
+{
+	float4	samplePos		= SamplePos;
+			samplePos		/= samplePos.w;
+
+	// Remap from [-1,1] to [0,1] / Invert Y
+			samplePos.xy	= samplePos.xy * 0.5 + 0.5f;
+			samplePos.y		= 1 - samplePos.y;
+
+	float2	screenUV		= samplePos.xy;
+			samplePos.xy	= samplePos.xy * gViewportScaleOffset2.zw + gViewportScaleOffset2.xy;
+
+	float	storedZ			= texDepth2D( sZBuffer, samplePos.xy );
+	float	curZ			= samplePos.z;
+
+	float4	screenPos		= float4( samplePos.xy, storedZ, 1.f);
+	float4	viewPos			= mul(screenPos, gInvProjMatrix);
+			storedZ			= viewPos.z/viewPos.w;
+
+			screenPos		= float4( samplePos.xy, curZ, 1.f);
+			viewPos			= mul(screenPos, gInvProjMatrix);
+			curZ			= viewPos.z/viewPos.w;
+
+	ZInBuffer = storedZ;
+	CurrentZ = curZ;
+}
+
+
+float sfxGetZBufferSample(float4 SamplePos)
+{
+	float storedZ, curZ;
+			sfxGetZBuffer(SamplePos, storedZ, curZ);
+	return	storedZ - curZ;
+}
+
+float sfxGetAlphaValueForSoftParticle(float4 SamplePos, float scale)
+{
+	float	ZBufferSample, ZAtPosition;
+			sfxGetZBuffer(SamplePos, ZBufferSample, ZAtPosition);
+
+	float	ZSample	= ZBufferSample - ZAtPosition;
+	float	alphaZ	= saturate(ZSample * scale);
+	return	alphaZ;
+}
+
+
+
+
+//-----------------------------------------
+// SCREEN EFFECTS
+//-----------------------------------------
+//	screen effects (mud fling, water splash, dirt border)
+//	(note, dirt border here doesn't cover sandstorms, though)
+//
+//	Asobo didn't implement Anti-Aliasing in FUEL, so these sfx
+//	serve double-duty in that they add sfx, but also help hide
+//	the lack of AA a bit.
+
+
+//-------------------------------------------
+// SCREEN WATER SPOTS
+//-------------------------------------------
+// flings water splashes on screen as vehicle drives through water
+// this always uses the bNormal flag, so trimmed off non-bNormal parts
+
+float4 ph_screenwater ( VS_SfxWaterOut i ) : COLOR
+{
+	#if ( SCREEN_WATER == 1 )
+		float3	normal			= tex2D ( sNormal, i.uv ).wyz;
+		float	alphaNormal		= normal.z;
+		float	threshold		= i.diffuse.a;
+		bool	alphaLess		= step ( alphaNormal, threshold );	// alphaNormal < threshold
+
+//				alphaNormal		= alphaLess ? 0 : 0.5;			// controlling water transparency on screen here
+//				alphaNormal		= lerp( 0.5, 0, alphaLess );			// controlling water transparency on screen here
+				alphaNormal		= Select(0.5, 0, alphaLess);			// controlling water transparency on screen here
+
+		// finish normal
+				normal.xy			= normal.xy * 2.0 - 1.0;		// do *2-1 here to make splash more blurry and natural looking
+				normal.z			= 1 - abs( normal.x - normal.y );	// manhattan or euclid dist based on __setup.h
+				normal				= normalize ( normal );
+
+		// determine lighting & luminance
+		float	lightingLuminance	= dot ( normal, i.screenvector );	// luminance dot
+		float	lightingImportance	= 0.9 + ( lightingLuminance * 0.1 );
+				lightingImportance	= saturate ( lightingImportance );
+
+		// refraction value
+		float2	uvscreen			= i.uvscreen.xy + ( normal.xy * alphaNormal );
+		float4	refraction;
+				refraction.rgb		= tex2D ( sRenderTarget, uvscreen ).rgb;
+				refraction.rgb		*= lightingImportance;
+				refraction.a		= alphaNormal;
+		return	refraction;
+	#else
+		return	0.0;
+	#endif
+}
+
+
+
+
+//-------------------------------------------
+// SCREEN DIRT BORDER
+//-------------------------------------------
+// cakes / removes border of screen in dirt as vehicle gets more/less dirty
+// this handles normal dirt buildup; doesn't handle dust storms or tornadoes.
+// that's handled by a base.vhl routine that's on/off (and also handles
+// other stuff like vignetting, menus, etc, so can't just turn it off like
+// we can with this.)
+
+float4 ph_screendirt (VS_SfxOutDirt i) : COLOR
+{
+#if ( SCREEN_DIRT == 1 )
+	float4	color		= tex2D(sDiffuse, i.uv.xy);
+	float3	diff		= i.diffuse.rgb * color.a;
+	float	alphaVal;
+
+	float	alpha1		= lerp(0, color.r, i.diffuse.a );
+	float	alpha2		= lerp(color.r, color.g, i.diffuse.a - 1 );
+
+//			alphaVal	= step ( i.diffuse.a, 1) ? alpha1 : alpha2;
+			alphaVal	= lerp( alpha2, alpha1, step ( i.diffuse.a, 1 ) );
+
+//	if (i.diffuse.a <= 1)
+//			alphaVal 	= lerp(0, color.r, i.diffuse.a );
+//	else
+//			alphaVal 	= lerp(color.r, color.g, i.diffuse.a - 1 );
+
+	return	float4( diff, alphaVal);
+#else
+	return	0;
+#endif
+}
+
+
+//-------------------------------------------
+// SCREEN MUD SPOTS
+//-------------------------------------------
+// flings mud on screen as vehicle off-roads
+// both screen mud and dirt screen border use same
+// vertex shader to pipe values into these pixel shaders
+// so, we need to be careful what values we move from
+// pixel shaders to vertex shaders
+
+float4 ph_screenmud (VS_SfxOutDirt i) : COLOR
+{
+	#if ( SCREEN_MUD == 1 )
+		float4	color		= tex2D(sDiffuse, i.uv) * i.diffuse;
+				color.rgb	*= 2;		// only flinging mud has this, so keep it here instead of vertex shader
+		return	color;
+	#else
+		return	0.0;
+	#endif
+}
+
+
+//-------------------------------------------
+// LIGHTNING
+//-------------------------------------------
+
+// added horizon scattering to lightning, so it
+// will be hazy in distance ... gets too blotted
+// out at night, so using full brightness at night, though
+
+float4 ph_lightning (VS_LightningOut i) : COLOR
+{
+	//(asobo) alpha channel contains the alpha map for lightning without fog, red channel lightning with fog (blurred)
+	// so that one texture sample is enough to get both values
+
+	float4	texSample	= tex2D(sDiffuse, i.uvFog.xy);
+	bool	night		= IS_NIGHT;
+
+	// during day, use asobo's usual fogged lightning
+	// at night use unfogged alpha to keep it very distinct
+//			i.diffuse.a		*= night ? texSample.a : lerp ( texSample.a, texSample.r, i.uvFog.z );
+
+			texSample.r		= lerp ( texSample.a, texSample.r, i.uvFog.z );
+//			i.diffuse.a		*= lerp( texSample.r, texSample.a, night );
+//			i.diffuse.a		*= night ? texSample.a : texSample.r;
+			i.diffuse.a		*= Select( texSample.r, texSample.a, night );
+
+
+
+	// day lighting is impacted by horizon blue'ing & extinction
+	// night lightning is just bright and flashy, cutting through the night
+	// extinction makes night lightning look dull red, so keep extinction
+	// calc here (since can't determine night time in vertex shader)
+
+	float3	colorDay		= i.diffuse.rgb * i.extinction.rgb + i.inscatter.rgb;
+//	float3	colorDay		= i.diffuse.rgb + i.inscatter.rgb;
+	float3	colorNight		= NIGHT_LIGHTEN2 ( i.diffuse.rgb, night );	// just pure, bright lightning at night
+
+//			i.inscatter.rgb	= NIGHT_LIGHTEN ( i.inscatter.rgb );	// brighten lightning at night to negate darker nights
+//			i.diffuse.rgb	= lerp ( colorDay, colorNight, night );	// use night or day color based on night flag
+//			i.diffuse.rgb	= night ? colorNight : colorDay;		// use night or day color based on night flag
+			i.diffuse.rgb	= Select( colorDay, colorNight, night );	// use night or day color based on night flag
+
+
+//	float4	color		= i.diffuse;
+//			color.a		*= lerp(texSample.a, texSample.r, i.uvFog.z);
+//			color.rgb	*= i.extinction.rgb;	// can do this in vertex shader (but keep it here, so we can avoid doing it at night)
+//			color.rgb	+= i.inscatter.rgb;
+//	return	color;
+	return	i.diffuse;
+}
+
+
+//-------------------------------------------
+// RAIN / SNOW
+//-------------------------------------------
+
+// handles both rain and snow, so can't impact one w/o the other
+// so, can't make rain more transparent or such, since it impacts snow
+float4 ph_sfxBase (VS_SfxOutRainSnow i) : COLOR
+{
+	float4	color		= tex2D(sDiffuse, i.uv) * i.diffuse;
+//	float	alpha		= i.rain ? ( 0.5 + gGlobalWetness * 0.5 ) : 1;
+//	float	alpha		= lerp( 1, ( 0.5 + gGlobalWetness * 0.5 ), i.rain );
+//			color.a		= i.rain ? color.a * ( 0.5 + gGlobalWetness * 0.5 ) : color.a;
+
+			color.a		= Select( color.a, color.a * ( 0.5 + gGlobalWetness * 0.5 ), i.rain );
+
+//	if ( i.rain )
+//	{
+//			color.a		*= ( 0.5 + gGlobalWetness * 0.5 );	// if ground's not wet, tone down rainfall visibility
+//	}
+	return	color;
+}
+
+
+
+
+//-------------------------------------------
+// HUD
+//-------------------------------------------
+// lines pointing to vistas, races, etc,
+// and GPS routing arrows during races.
+
+float4 ph_billboard (VS_SfxOutHUD i) : COLOR
+{
+			i.diffuse		*= tex2D(sDiffuse, i.uv);
+	return	i.diffuse;
+}
+
+
+//-------------------------------------------
+// SPARKS
+//-------------------------------------------
+// when vehicle hits something sparks fly off
+// possibly handles headlight/tailight glow at night, too (?)
+
+float4 ph_soft_nolighting (VS_SfxSoftNoLightingOut i) : COLOR0
+{
+	float4	color	= tex2D(sDiffuse, i.uv) * i.diffuse;
+			color.a	*= saturate(sfxGetZBufferSample(i.uvscreen));
+	return	color;
+}
+
+
+
+
+//-------------------------------------------
+// SKY CLOUDS OVERLAY & BLOWING LEAVES
+//-------------------------------------------
+// the clouds in the sky are overlay fx, and the blowing
+// leaves are the things swirling around your car in storms.
+
+float4 ph_sfxScattering (VS_SfxScatteringOut i) : COLOR0
+{
+	float4	color		= tex2D(sDiffuse, i.uv);
+			color.a 	*= i.sunlight.a;
+
+	float	night		= IS_NIGHT;
+
+	// lighten clouds at night to make them stand-out when lightning
+	// flashes in them during storms and darker nights
+			color.rgb	= NIGHT_LIGHTEN2 ( color.rgb, night );
+
+	// tried making blowing leaves impacted by shadows,
+	// b/c when in shadow of mountains they stick out
+	// like sore thumb due to how bright they are.
+	// but, bShadow seems to be disabled for this, and
+	// forcing it on just creates extra work for cloud
+	// processing. So, not going to do it.
+
+	// can't darken clouds more then other things, or they
+	// stick out on horizon (wanted to make darker storm clouds).
+	// so just darken inscatter, not sunlight
+
+			color.rgb 	*= i.sunlight.rgb;
+			color.rgb 	+= NIGHT_DARKEN2 ( i.inscatter.rgb, night );
+	return	color;
+}
+
+
+
+
+//-------------------------------------------
+// DUST FX
+//-------------------------------------------
+// primary processing routine for the
+// "wheel fx" and "dust clouds" routines below
+
+float4 DustCloudSFX ( VS_SfxSoftOut i, float clipvalue )
+{
+	float	bias			= 0;
+
+	#ifdef	bShadowMap
+	int		slice			= 0;
+	float	shadow			= SHADOW_VTX_BIL( slice );
+			bias			= SET_BIAS( slice );	// do this after shadow, b/c shadow sets slice
+			i.sunlight.rgba	= lerp( i.skylight.rgba, i.sunlight.rgba, SOFTEN_SHADOW( shadow ) );
+	#endif
+
+	// wheel dust and stuff are soft particles, so already blurry / smudgy.
+	// so, we can bias them more in distance to gain a bit more performance.
+
+	float4	color			= tex2DB( sDiffuse, i.uv, bias * 2 );
+			color.rgba		*= i.sunlight.rgba;
+			color.rgb		+= NIGHT_DARKEN ( i.inscatter.rgb );
+			color.a			*= sfxGetAlphaValueForSoftParticle( i.uvscreen, clipvalue );
+	return	color;
+}
+
+
+//-------------------------------------------
+// WHEEL FX (Player & AI)
+//-------------------------------------------
+// dust, smoke, water splash, & grass clippings kicked up by tires.
+// both the player & opponent vertex functions pipe into this
+
+float4 ph_billboard_soft (VS_SfxSoftOut i) : COLOR0
+{
+	float4	color	= DustCloudSFX( i, 4 );
+//			color.r	*= 10 ;	// debug ... red-highlight anything this impacts
+	return	color;
+}
+
+//-------------------------------------------
+// DUST CLOUDS
+//-------------------------------------------
+// billowy dust clouds that blow towards
+// screen during tornadoes and sand storms
+
+float4 ph_soft_large (VS_SfxSoftOut i) : COLOR0
+{
+	float4	color	= DustCloudSFX( i, 0.02 );
+//			color.r	*= 10 ;	// debug ... red-highlight anything this impacts
+	return	color;
+}
+
+#endif

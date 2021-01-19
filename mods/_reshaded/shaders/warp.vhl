@@ -1,0 +1,84 @@
+#ifndef	__WARP_VHL__
+#define	__WARP_VHL__
+
+#include "_vertex_const.h"
+#include "warp.h"
+#include "_vertex_scatter.h"
+
+//--------------------------------------------------
+
+	struct VS_WarpInput {
+		float4	position	: POSITION;
+		float2	uv			: TEXCOORD0;
+	};
+
+	struct VS_SkyInput {
+		float4	position	: POSITION;
+	};
+
+	struct VS_SunInput {
+		float4	position	: POSITION;
+		float2	uv			: TEXCOORD0;
+	};
+
+	struct VS_WarpOutput {
+		float4	position	: POSITION;
+		float2	diffuse		: TEXCOORD0;
+		float4  light		: COLOR0;
+	};
+
+//--------------------------------------------------
+
+	// ??? "air" color ???
+	void vh_warp(VS_WarpInput i, out VS_WarpOutput o)
+	{
+		o.diffuse.xy			= MaterialMat(i.uv.xy);
+		o.position				= ProjectVertex(i.position);
+		o.light					= MTL_EMISSIVE + MTL_DIFFUSE;
+	}
+
+	// sky
+	void vh_sky(VS_SkyInput i, out VS_SkyOutput o)
+	{
+		float4	wPos;
+		float3	extinction;
+				o.position		= WorldAndProjectVertex(i.position, wPos); 
+				scatteringbase(wPos, extinction, o.inscatter.xyz);
+				o.inscatter.w	= C_UNIT;	// set it to 1 here, so we can just pass-thru in the pixel shader
+	}
+
+	// sun / moon disc
+	void vh_skysun(VS_SunInput i, out VS_SkysunOutput o)   
+	{
+		float4	wPos;
+				o.position		= WorldAndProjectVertex(i.position, wPos);
+				o.uv			= i.uv;
+
+		float3	sunlight, skylight, extinction;
+				scattering(wPos, extinction, o.inscatter, sunlight, skylight);
+
+		// since sun / moon disc is a flat plane created by vertices
+		// we can do the lighting here to save about 3 calc's from doing
+		// it in pixel shader
+
+//				sunlight		+= skylight;	// skip this.. moon looks much better w/o sky color mixed in
+				sunlight		+= AMBIENT_OCCLUSION_COLOR;
+				extinction		*= sunlight;
+				o.suncolor		= extinction * 1000;// * sunlight;	// oversaturates disc to make bright sun
+				o.mooncolor		= extinction; //* 10;
+//								* float3( 3, 4, 0.75 );	// make moon a bit more natural / yellowish
+//								* 2;//
+	}
+
+// light buffer
+// ( not sure why sky needs a deferred light buffer, b/c usually it's for headlights )
+	void vh_sky_gbuffer( VS_SkyInput i, out VS_SkyGBuffer_Output o)
+	{
+		o.position		= ProjectVertex(i.position); 
+		o.position2		= o.position;
+//		o.position2.x 	= o.position.z / i.position.w;
+//		o.position2.yz	= 0;
+//		o.position2.w	= 1;
+	}
+
+#endif

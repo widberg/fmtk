@@ -1,0 +1,99 @@
+#ifndef	__SCAT_PART_VHL__
+#define	__SCAT_PART_VHL__
+
+#include "hlsl_math.h"
+#include "hlsl_shadow.h"
+#include "_vertex_const.h"
+#include "scat_part.h"
+#include "_vertex_scatter.h"
+
+//-------------------------------------
+
+	struct VS_InputScatPart {
+		float4	position 	: POSITION0;	// world position (xyz) | quad id (w)
+		float4	color	 	: COLOR0;
+		float3	scalexyrot	: TEXCOORD0;	// scale(xy) | roat (z)
+		float	id			: BLENDINDICES;
+	};
+
+//-------------------------------------
+
+void vh_base(VS_InputScatPart i, inout VS_ScatPart o)
+{
+	float4	wPos;
+			wPos.xyz	= i.position.xyz;
+			wPos.w		= C_UNIT;
+	
+	float2	vUV			= c[i.id].zw;	//Quad UV
+	float2	vXY			= c[i.id].xy;	//Quad Delta
+	float3	aX			= C_USER4.xyz;	//Cam X
+	float3	aY			= C_USER5.xyz;	//Cam Y	
+
+			o.uv		= MaterialMat(vUV);
+	
+	float2 	_sincos		= Sincos(i.scalexyrot.z);
+	float2	scale		= vXY * i.scalexyrot.xy;
+	float2	vRotXY;
+// original ... this is doing .x & .y opposite of GetScaleRotation
+			vRotXY.x	= scale.x * _sincos.y + scale.y * _sincos.x;
+			vRotXY.y	= scale.y * _sincos.y - scale.x * _sincos.x;
+
+
+// !!! disabling.. making flare smoke not appear !!!
+// refernece from smoke.vhl
+//			scale.x		= i.uvscale.z * _sincos.y - i.uvscale.w * _sincos.x;
+//			scale.y		= i.uvscale.z * _sincos.x + i.uvscale.w * _sincos.y;
+//			scale 		= GetScaleRotation( i.uvscale.zw, _sincos.xy );
+
+// ...so we just swizzle .xy to .yx to capture correct output in correct position
+//			vRotXY.yx	= GetScaleRotation( scale.xy, _sincos.xy );
+// !!! disabling.. making flare smoke not appear !!!
+
+
+
+	float4	vPos		= WorldToViewVertex(wPos);
+			vPos.xyz	+= vRotXY.x * aX + vRotXY.y * aY;
+			o.position	= ProjVertex(vPos);
+
+	#ifdef	bShadowMap
+	float3	tcproj = vPos.xyz;
+	float4	fromVS = float4(tcproj.xyz, C_UNIT);
+			o.shadowtcproj0.xyz		= mul( fromVS, SLICE_MAT0 ).xyz;
+			o.shadowtcproj1.xyz		= mul( fromVS, SLICE_MAT1 ).xyz;
+			o.shadowtcproj2.xyz		= mul( fromVS, SLICE_MAT2 ).xyz;
+			o.shadowtcproj3.xyz		= mul( fromVS, SLICE_MAT3 ).xyz;
+			o.shadowtcproj0.w		= tcproj.z;
+	#endif
+	
+	float3	extinction;
+	scattering(wPos, extinction, o.inscatter.xyz, o.sunlight.xyz, o.skylight.xyz);
+
+			extinction.xyz	*= GOURAUD_DFLT.xyz;	// pre-mul'ing this, since vcolor & emissive both use it
+			o.inscatter.xyz	*= MTL_ADDSOUS_NULL;	//Matiere Additif ou Soustractif on vire !
+
+	float3	emissive		= MTL_EMISSIVE * DLIGHT_INVINTENSITY * extinction.xyz;
+			emissive		+= AMBIENT_OCCLUSION_COLOR;
+
+			o.skylight.xyz	+= emissive.xyz;	// moving here to see if it tones down moving mist brightness on tarmac on white flats airport at night
+
+	// keep this? otherwise dust is really bright
+	float	sundot			= saturate( DLIGHT_DIR.y );
+			o.sunlight.xyz	= o.sunlight.xyz * sundot + o.skylight.xyz;	// test
+//			o.sunlight.xyz	= o.sunlight.xyz * sundot + emissive.xyz;	// test- don't add skylight to sun .. some things too dark
+
+	float3	vcolor			= i.color.xyz * MTL_DIFFUSE * extinction.xyz;
+			o.skylight.w	= i.color.w   * MTL_OPACITY * GOURAUD_DFLT.w;
+			o.sunlight.xyz	*= vcolor;
+			o.skylight.xyz	*= vcolor;
+
+			// emissive is added to final light in pixel shader
+			// but light in pixel shader is just lerp between
+			// sun & sky (both unaltered from what they are here).
+			// so we can just pre-add emissive to sky here,
+			// and it'll be in whatever lerp mix finalizes in pixel shader.
+
+//			o.sunlight.xyz	+= emissive.xyz;
+//			o.skylight.xyz	+= emissive.xyz;
+}
+
+#endif

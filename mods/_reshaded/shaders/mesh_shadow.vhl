@@ -1,0 +1,50 @@
+#ifndef	__MESH_SHADOW_VHL__
+#define	__MESH_SHADOW_VHL__
+
+#include "_vertex_const.h"
+#include "hlsl_math.h"
+#include "hlsl_shadow.h"
+
+//--------------------------------------------
+/*
+	These are used to determine object shadow map projections,
+	EG: disabling them means vehicles won't project shadows on ground.
+*/
+//--------------------------------------------
+
+struct VS_Input_Shadow
+{
+	float4	position	: POSITION0;
+	float3	normal		: NORMAL0;
+	float2	uv			: TEXCOORD0;
+};
+
+//--------------------------------------------
+
+void vh_shadow(VS_Input_Shadow i, inout VS_Output_ShadowMap o)
+{
+	float3	normal		= i.normal * C_TWO - C_UNIT;
+	float4	wPos		= i.position;
+			wPos		+= ( ReAddShadowBiasNormal(normal) / GetWorldScale() );
+			o.position	= ProjectVertex(wPos);
+			o.uvzw.xy	= MaterialMat(i.uv);
+			o.uvzw.zw	= o.position.zw;
+}
+
+void vh_rshadow(VS_Input_Shadow i, inout VS_Output_ShadowMap o)
+{
+	vh_shadow ( i, o );
+}
+
+void vh_mshadow(VS_Input_Shadow i, float3 morph_d0 : POSITION2, inout VS_Output_ShadowMap o)
+{
+	float	pixelmorph;
+	float3	normal		= i.normal * C_TWO - C_UNIT;
+	float4	wPos		= TargetMorph(i.position, morph_d0, pixelmorph);
+			wPos		+= ( ReAddShadowBiasNormal(normal) / GetWorldScale() );
+			o.position	= ProjectVertex(wPos);
+			o.uvzw.xy	= MaterialMat(i.uv);
+			o.uvzw.zw	= o.position.zw;
+}
+
+#endif

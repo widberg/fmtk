@@ -1,0 +1,61 @@
+#ifndef	__SNOW_VHL__
+#define	__SNOW_VHL__
+
+#include "_vertex_const.h"
+#include "hlsl_math.h"
+#include "hlsl_shadow.h"
+#include "sfx.h"
+
+//-------------------------------------------
+
+struct VS_SfxIn_Snow
+{
+	float4	positionRotation			: POSITION;
+	float4	uvscale						: TEXCOORD0;
+//	float4	rgba						: TEXCOORD1;
+};
+
+//-------------------------------------------
+
+// does this need inscatter & instinction?
+
+void vh_snow (VS_SfxIn_Snow i, out VS_SfxOutRainSnow o)
+{
+	float4	SnowColor;
+			SnowColor.xyz		= C_USER0.xyz;
+			SnowColor.w			= 0.3;
+	float3	Speed				= C_USER1.xyz * 0.6;
+	float	TankScale			= C_USER1.w;
+	float	ParticleScale		= C_USER2.x;
+	float	WaveAmplitude		= C_USER2.y;
+	float	WaveFrequency		= C_USER2.z;
+//	float	ParticleAspectRatio = C_USER2.w;
+	float	scaleRatio			= C_USER3.x;
+	float3	adjustment			= C_USER4.xyz;
+//	float3	Wind				= C_USER6.xyz;
+
+	float3	currentPosition		= i.positionRotation.xyz + Speed;
+	float4	position;
+			position.xyz		= MapTankCoordinate(currentPosition, adjustment, TankScale);
+			position.w			= C_UNIT;
+
+	float	angle				= WaveFrequency * length(currentPosition)
+								+ WaveFrequency * i.positionRotation.w;
+	float2	_sincos				= Sincos(angle);
+	float3	sinDisp				= WaveAmplitude * float3(_sincos.y - _sincos.x, _sincos.x - _sincos.y, _sincos.x + _sincos.y);
+			position.xyz		+= sinDisp;
+
+	float4	vPos				= WorldToViewVertex( position );
+
+	float	depth				= abs(vPos.z / TankScale);
+			ParticleScale		*= (C_UNIT + scaleRatio * depth);
+			vPos.xy				+= ParticleScale * i.uvscale.zw;
+
+			o.position			= ProjVertex(vPos);
+			o.diffuse			= SnowColor;
+			o.diffuse.rgb		*= 2;					// from pixel shader
+			o.uv				= i.uvscale.xy;
+			o.rain				= false;
+}
+
+#endif

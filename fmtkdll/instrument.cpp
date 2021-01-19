@@ -173,6 +173,8 @@ FUNCTION(ScriptManagerInit, 0x0081cdb0, void, __fastcall, DWORD x, DWORD y, DWOR
 	LOG(trace, FMTK, "Setting our callback");
 
 	Bridge_RegisterCommand(*pGlobalCommandState, FMTKEmitEventCallback, "FMTKEmitEvent");
+
+	ScriptingEmitEvent(EventType::COMMAND_INIT);
 }
 
 NAKEDFUNCTION(Load, 0x00689256)

@@ -1,0 +1,4 @@
+// Disabled Code
+
+	struct VS_Blank{float4	position : POSITION;};
+	void vh_vizquery ( out VS_Blank o) {o.position = 0;}

@@ -1,0 +1,44 @@
+#ifndef	__SHADOW_PHL__
+#define	__SHADOW_PHL__
+
+#include "hlsl_shadow.h"
+
+sampler2D	sDiffuseShadowMap;
+
+//---------------------------------------------
+// don't fuck with below...
+// the #ifndef bShadowNoUV has no output in the return section
+// but the clip() function still runs and preemptively kills
+// shadow pixels from objects that have translucent parts in
+// textures... eg: the trees have 2D billboard branches that,
+// if seen in an art program look like a square texture with
+// translucent alpha channel on the parts light should go through.
+// if we don't use the clip() function below, then it will act
+// like there's no translucency, and the entire texture will
+// block light. So, the clip() kills off shadows in areas
+// where the light should be going through the texture due
+// to translucency.
+//---------------------------------------------
+
+
+float4 ph_shadow ( VS_Output_ShadowMap i ) : COLOR0
+{
+	#ifndef	bShadowNoUV
+		float2	uv			= i.uvzw.xy;
+
+		#ifdef	bBroken
+				uv.x		*= 0.5;	// halfuv
+		#endif
+
+		float	tDiffuse	= tex2D ( sDiffuseShadowMap, uv ).a;
+		   clip(tDiffuse - 0.5);	// 0.5 kill shadow pixels in spots where texture is translucent and light should shine through
+//		   clip(tDiffuse - 0.75);	// increasing it doesn't help fill light gaps in shadows on ground
+
+	#endif
+
+			i.uvzw.w		= 1.0;
+	return	i.uvzw.zzzw;
+}
+
+
+#endif

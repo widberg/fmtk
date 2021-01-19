@@ -188,8 +188,11 @@ bool ScriptingInit()
 		}
 	};
 
-	std::filesystem::path modDirectory = std::filesystem::absolute("mods");
-	autorun(modDirectory);
+	if (std::filesystem::exists("mods\\"))
+	{
+		std::filesystem::path modDirectory = std::filesystem::absolute("mods");
+		autorun(modDirectory);
+	}
 	
 	lua["FMTK_CURRENT_DIR"] = sol::lua_nil;
 

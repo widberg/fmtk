@@ -1,0 +1,79 @@
+#ifndef	__FX_BLUR_PHL__
+#define	__FX_BLUR_PHL__
+
+
+#include "hlsl_math.h"
+#include "__setup.h"
+
+//--------------------------------------
+
+	sampler2D	s0 : register(s0);
+
+	// motion blur only uses 8 elements, so we can limit the array size
+//	const float3					gSampleOffsetWeight[16];  // xy <=> offset, z <=> weight
+	const float3					gSampleOffsetWeight[8];   // xy <=> offset, z <=> weight
+
+	const float4					gMotionBlurSettings0;
+	#define MBLUR_FALLOFF_SCALE		gMotionBlurSettings0.x
+	#define MBLUR_FALLOFF_OFFSET	gMotionBlurSettings0.y
+	#define MBLUR_FALLOFF_DECAY		gMotionBlurSettings0.z
+	#define MBLUR_SCALE 			gMotionBlurSettings0.w
+
+//--------------------------------------
+
+#if	( DOWNSAMPLE_POSTPROCESSING == 1 )
+	// default bias amount, so no need to send in bias on these
+	#define	DOWNSAMPLE_POSTPROCESSING_AMOUNT	2
+	#define	tex2DBP(_sample_, _uv_)	tex2Dbias( _sample_, float4(_uv_, 0, DOWNSAMPLE_POSTPROCESSING_AMOUNT) )
+#else
+	#define	tex2DBP(_sample_, _uv_)	tex2D( _sample_, _uv_)
+#endif
+
+//--------------------------------------
+
+	float4 ph_motionblurvelocity(in float2 vScreenPosition : TEXCOORD0) : COLOR0
+	{
+	#if ( MOTION_BLUR == 1 )
+		return	float4(0, 0, 0, 1);
+	#else
+		return	0;
+	#endif
+	}
+
+
+	float4 ph_motionblur ( float2 vScreenPosition : TEXCOORD0 ) : COLOR0
+	{
+	#if ( MOTION_BLUR == 1 )
+		float2	velocity		= vScreenPosition.xy * 2.0 - 1.0;
+		float	velocityAmp 	= length ( velocity );
+//		float	velocityAmp 	= MANHATTAN_LENGTH ( velocity );	// makes the blur levels too distinct / causes banding
+				velocity		/= velocityAmp;
+				velocityAmp 	= velocityAmp * MBLUR_FALLOFF_SCALE + MBLUR_FALLOFF_OFFSET;	// MAD
+				velocityAmp 	= saturate ( velocityAmp );
+				velocityAmp		= pow ( velocityAmp, 3.0 );	//MBLUR_FALLOFF_DECAY );
+				velocityAmp 	*= MBLUR_SCALE;
+				velocityAmp 	*= pow( vScreenPosition.y, 1.5 ) ; //Less blur on top of screen (sky) (higher pow = less blur)
+				velocity		*= -velocityAmp;
+
+		float4	vSample			= 0.0;
+		float2	uv				= vScreenPosition + velocity;	// add velocity to initial uv?
+
+				// add in screen sample, then add velocity to uv before pulling next screen sample
+				vSample.rgb		+= tex2DBP ( s0, uv ).rgb * gSampleOffsetWeight[0].z;		uv	+= velocity;
+				vSample.rgb		+= tex2DBP ( s0, uv ).rgb * gSampleOffsetWeight[1].z;		uv	+= velocity;
+				vSample.rgb		+= tex2DBP ( s0, uv ).rgb * gSampleOffsetWeight[2].z;		uv	+= velocity;
+				vSample.rgb		+= tex2DBP ( s0, uv ).rgb * gSampleOffsetWeight[3].z;		uv	+= velocity;
+				vSample.rgb		+= tex2DBP ( s0, uv ).rgb * gSampleOffsetWeight[4].z;		uv	+= velocity;
+				vSample.rgb		+= tex2DBP ( s0, uv ).rgb * gSampleOffsetWeight[5].z;		uv	+= velocity;
+				vSample.rgb		+= tex2DBP ( s0, uv ).rgb * gSampleOffsetWeight[6].z;		uv	+= velocity;
+				vSample.rgb		+= tex2DBP ( s0, uv ).rgb * gSampleOffsetWeight[7].z;
+
+				vSample.a		= 1;
+		return	vSample;
+	#else
+		// send frame through w/o processing
+		return	tex2DBP( s0, vScreenPosition);
+	#endif
+	}
+
+#endif

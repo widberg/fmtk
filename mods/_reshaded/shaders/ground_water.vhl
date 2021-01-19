@@ -1,0 +1,174 @@
+#ifndef	__GROUND_WATER_VHL__
+#define	__GROUND_WATER_VHL__
+
+	#include "_vertex_const.h"
+	#include "hlsl_math.h"
+	#include "hlsl_shadow.h"
+	#include "ground_water.h"
+	#include "_vertex_scatter.h"
+
+//-----------------------------------------------
+/*
+	shader compilation blows up if you create any sub-proc's
+	in this shader to offload common code to from the 
+	methods below. Not sure why. But, it's annoying. So,
+	basically have to just write the code in each method
+	separately and keep it that way. Only seems to happen
+	with this water vertex shader, though. Weird.
+
+	Also, water shadows look better starting with the
+	smudgy 2nd shadow band (to look like water diffusing
+	the edges of the shadows naturally), but shadows
+	near player in water bork up when doing that. Not
+	sure how to work around that. So, disabled doing
+	that for now.
+*/
+//-----------------------------------------------
+
+	struct VS_Input_Water {
+		float4	position	: POSITION;
+		float4	color		: COLOR0;
+		float2	uv			: TEXCOORD0;
+	};
+
+//-----------------------------------------------
+// animated shore goes up and down like waves ... lakes, ocean
+	void vh_water_anim( VS_Input_Water i, out VS_GroundWaterOutput_Z o)
+	{
+		float4	wPos			= i.position;
+
+// need to find some way to kill wave undulation at long distance
+// because it looks tacky to see the water texels dancing around smudgily
+// when looking down from mountains
+
+		// undulating wave
+		// just need sine, so get it and skip processing cosine
+		float	angle			= -wPos.x * C_WATER3.x + C_WATER3.z * C_ATIME;
+		float	_sin			= sin( angle );
+				_sin			= _sin * C_HALF + C_HALF;
+				wPos.y			-= C_WATER3.y * _sin;
+
+		float4	vPos			= WorldToViewVertex( wPos );
+				o.position		= ProjVertex( vPos );
+				o.zBuffUV		= o.position;
+				o.eyevec.xyz	= EYE_WORLD.xyz - wPos.xyz;
+				o.diffuse		= i.color;
+				o.diffuse.a		*= 0.1;	// pre-mul'ing value from pixel shader
+				o.uv.xy			= i.uv.xy *  C_WATER1.z + C_WATER1.xy * C_ATIME;
+				o.uv.zw			= i.uv.xy *  C_WATER2.z + C_WATER2.xy * C_ATIME;
+
+		#ifdef	bShadowMap
+			#ifdef VERTEX_SHADOW_SLICES
+				float3 tcproj = vPos.xyz;
+				float4 fromVS = float4(tcproj.xyz,C_UNIT);
+				o.shadowtcproj0.xyz = mul( fromVS, SLICE_MAT0 ).xyz;
+				o.shadowtcproj1.xyz = mul( fromVS, SLICE_MAT1 ).xyz;
+				o.shadowtcproj2.xyz = mul( fromVS, SLICE_MAT2 ).xyz;
+				o.shadowtcproj3.xyz = mul( fromVS, SLICE_MAT3 ).xyz;
+//				o.shadowtcproj0.xyz = o.shadowtcproj1.xyz;				// make water start with smudgy shadows instead of distinct
+				o.shadowtcproj0.w = tcproj.z;
+			#else
+				o.shadowtcproj = vPos.xyz;
+			#endif
+		#endif
+
+		#ifdef	bOmni
+	// only filling 3 floats on omni.xyz
+	// DirectX is column-major, so mul wPos.xyzw by 4 columns (xyzw) of 3 rows and skip processing 4th
+	// since we don't have a .w to stuff it in
+		float3	omni			= mul(wPos, C_OMNI_0_WORLDTOLOCAL).xyz * C_HALF + C_HALF;
+				o.eyevec.w		= omni.x;
+				o.inscatter.w	= omni.y;
+				o.extinction.w	= omni.z;	
+		#endif
+
+		scatteringbase(wPos, o.extinction.xyz, o.inscatter.xyz);
+	}
+
+	void vh_water_noanim( VS_Input_Water i,out VS_GroundWaterOutput_Z o)
+	{
+		float4	wPos			= i.position;
+		float4	vPos			= WorldToViewVertex( wPos );
+				o.position		= ProjVertex( vPos );
+				o.zBuffUV		= o.position;
+				o.eyevec.xyz	= EYE_WORLD.xyz - wPos.xyz;
+				o.diffuse		= i.color;
+				o.diffuse.a		*= 0.1;	// pre-mul'ing value from pixel shader
+				o.uv.xy			= i.uv.xy *  C_WATER1.z + C_WATER1.xy * C_ATIME;
+				o.uv.zw			= i.uv.xy *  C_WATER2.z + C_WATER2.xy * C_ATIME;
+				o.uv.yw			+= C_ATIME * C_QUARTER;
+
+		#ifdef	bShadowMap
+			#ifdef VERTEX_SHADOW_SLICES
+				float3 tcproj = vPos.xyz;
+				float4 fromVS = float4(tcproj.xyz,C_UNIT);
+				o.shadowtcproj0.xyz = mul( fromVS, SLICE_MAT0 ).xyz;
+				o.shadowtcproj1.xyz = mul( fromVS, SLICE_MAT1 ).xyz;
+				o.shadowtcproj2.xyz = mul( fromVS, SLICE_MAT2 ).xyz;
+				o.shadowtcproj3.xyz = mul( fromVS, SLICE_MAT3 ).xyz;
+//				o.shadowtcproj0.xyz = o.shadowtcproj1.xyz;				// make water start with smudgy shadows instead of distinct
+				o.shadowtcproj0.w = tcproj.z;
+			#else
+				o.shadowtcproj = vPos.xyz;
+			#endif
+		#endif
+
+		#ifdef	bOmni
+	// only filling 3 floats on omni.xyz
+	// DirectX is column-major, so mul wPos.xyzw by 4 columns (xyzw) of 3 rows and skip processing 4th
+	// since we don't have a .w to stuff it in
+		float3	omni			= mul(wPos, C_OMNI_0_WORLDTOLOCAL).xyz * C_HALF + C_HALF;
+				o.eyevec.w		= omni.x;
+				o.inscatter.w	= omni.y;
+				o.extinction.w	= omni.z;	
+		#endif
+
+		scatteringbase(wPos, o.extinction.xyz, o.inscatter.xyz);
+	}
+
+	void vh_water_puddle( VS_Input_Water i,out VS_GroundWaterOutput_Z o)
+	{
+		float4	wPos			= i.position;
+		float4	vPos			= WorldToViewVertex( wPos );
+				o.position		= ProjVertex( vPos );
+				o.zBuffUV		= o.position;
+				o.eyevec.xyz	= EYE_WORLD.xyz - wPos.xyz;
+				o.diffuse		= i.color;
+				o.diffuse.a		*= 5;	// pre-mul'ing value from pixel shader
+		float	time			= C_ATIME * C_QUARTER;
+				o.uv.xy			= i.uv.xy *  C_WATER1.z + C_WATER1.xy * time;
+				o.uv.zw			= i.uv.xy *  C_WATER2.z + C_WATER2.xy * time;
+
+		#ifdef	bShadowMap
+			#ifdef VERTEX_SHADOW_SLICES
+				float3 tcproj = vPos.xyz;
+				float4 fromVS = float4(tcproj.xyz,C_UNIT);
+				o.shadowtcproj0.xyz = mul( fromVS, SLICE_MAT0 ).xyz;
+				o.shadowtcproj1.xyz = mul( fromVS, SLICE_MAT1 ).xyz;
+				o.shadowtcproj2.xyz = mul( fromVS, SLICE_MAT2 ).xyz;
+				o.shadowtcproj3.xyz = mul( fromVS, SLICE_MAT3 ).xyz;
+//				o.shadowtcproj0.xyz = o.shadowtcproj1.xyz;				// make water start with smudgy shadows instead of distinct
+				o.shadowtcproj0.w = tcproj.z;
+			#else
+				o.shadowtcproj = vPos.xyz;
+			#endif
+		#endif
+
+		#ifdef	bOmni
+	// only filling 3 floats on omni.xyz
+	// DirectX is column-major, so mul wPos.xyzw by 4 columns (xyzw) of 3 rows and skip processing 4th
+	// since we don't have a .w to stuff it in
+		float3	omni			= mul(wPos, C_OMNI_0_WORLDTOLOCAL).xyz * C_HALF + C_HALF;
+				o.eyevec.w		= omni.x;
+				o.inscatter.w	= omni.y;
+				o.extinction.w	= omni.z;	
+		#endif
+
+		scatteringbase(wPos, o.extinction.xyz, o.inscatter.xyz);
+	}
+	
+	void vh_water_lake( VS_Input_Water i,out VS_GroundWaterOutput_Z o)		{vh_water_anim( i, o );}
+	void vh_water_ocean( VS_Input_Water i,out VS_GroundWaterOutput_Z o)		{vh_water_anim( i, o );}
+	void vh_water_river( VS_Input_Water i,out VS_GroundWaterOutput_Z o)		{vh_water_noanim( i, o );}	
+
+#endif

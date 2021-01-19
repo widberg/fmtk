@@ -1,0 +1,115 @@
+#ifndef	__WIND_VHL__
+#define	__WIND_VHL__
+
+#include "_vertex_const.h"
+#include "sfx.h"
+#include "_vertex_scatter.h"
+
+//---------------------------------------------------
+
+struct VS_SfxIn_Wind
+{
+	float4	positionRotation			: POSITION;
+	float4	uvscale						: TEXCOORD0;
+	float4	rgba						: TEXCOORD1;
+};
+
+//---------------------------------------------------
+
+// not sure what this impacts.. but every now and then I'll
+// see a bright red flash, like 2 or 3 leaves blowing across
+// screen.. so maybe this impacts that.. switching off red
+// highlighting just in case
+
+void vh_wind (VS_SfxIn_Wind i, out VS_SfxOutRainSnow o)
+{
+		float3	adjustment		= C_USER0.xyz;
+		float3	Speed			= C_USER1.xyz;
+		float	TankScale		= C_USER1.w;
+		float	ParticleScale	= C_USER2.x;
+		float	WaveFrequency	= C_USER2.y;
+		float	WaveAmplitude	= C_USER2.z;
+		float	DistanceScaleRatio = 0.6;//C_USER2.w;
+
+		float3	currentPosition	= i.positionRotation.xyz + Speed;
+		float4	wPos;
+				wPos.xyz		= MapTankCoordinate(currentPosition, adjustment, TankScale);
+				wPos.w			= C_UNIT;
+
+		float	angle			= WaveFrequency * length(currentPosition)
+								+ WaveFrequency * i.positionRotation.w;
+		float2	_sincos			= Sincos(angle);
+		float3	sinDisp			= WaveAmplitude * float3(_sincos.y - _sincos.x, _sincos.x - _sincos.y, _sincos.x + _sincos.y);
+				wPos.xyz		+= sinDisp;
+
+		float4	vPos			= WorldToViewVertex( wPos );
+
+		float	depth			= abs(vPos.z / TankScale);
+				ParticleScale	*= (C_UNIT + DistanceScaleRatio * depth);
+				vPos.x			+= ParticleScale * (i.uvscale.z * _sincos.y - i.uvscale.w * _sincos.x);
+				vPos.y			+= ParticleScale * (i.uvscale.z * _sincos.x + i.uvscale.w * _sincos.y);
+		float	ParticleAlpha	= C_UNIT - saturate(distance(wPos.xyz, adjustment) / (TankScale * C_TWO)) ;
+
+				o.position		= ProjVertex(vPos);
+				o.diffuse		= i.rgba;
+				o.diffuse.a		*= ParticleAlpha;
+				o.uv			= i.uvscale.xy;
+				o.rain			= false;
+
+//o.diffuse.r *= 10;	// highlight what this impacts
+}
+
+//-----------------------------------------
+// blowing leaves in wind in front of camera
+
+void vh_debris(VS_SfxIn_Wind i, out VS_SfxScatteringOut o)
+{
+	float3	adjustment		= C_USER0.xyz;
+	float	ParticleAlpha	= C_USER0.w;
+	float3	Speed			= C_USER1.xyz;
+	float	TankScale		= C_USER1.w;
+	float	ParticleScale	= C_USER2.x;
+	float	WaveFrequency	= C_USER2.y;
+	float	WaveAmplitude	= C_USER2.z;
+	float	DistanceScaleRatio = C_USER2.w;
+
+
+	float3	currentPosition	= i.positionRotation.xyz + Speed;
+	float4	wPos;
+			wPos.xyz		= MapTankCoordinate(currentPosition, adjustment, TankScale);
+			wPos.w			= C_UNIT;
+
+	float	angle			= WaveFrequency * length(currentPosition)
+							+ WaveFrequency * i.positionRotation.w;
+	float2	_sincos			= Sincos(angle);
+	float3	sinDisp			= WaveAmplitude * float3(_sincos.y - _sincos.x, _sincos.x - _sincos.y, _sincos.x + _sincos.y);
+			wPos.xyz		+= sinDisp;
+
+	float4	vPos			= WorldToViewVertex( wPos );
+
+	float	depth			= abs(vPos.z / TankScale);
+			ParticleScale	*= (C_UNIT + DistanceScaleRatio * depth);
+	float2	scale			= GetScaleRotation ( i.uvscale.zw, _sincos.xy );
+			vPos.xy			+= ParticleScale * scale.xy;
+			o.position		= ProjVertex(vPos);
+
+			ParticleAlpha	= C_UNIT - saturate(distance(wPos.xyz, adjustment) / (TankScale * C_TWO)) ;
+			ParticleAlpha	*= ParticleAlpha;
+
+	float4	diffuse			= i.rgba;
+			diffuse.a		*= ParticleAlpha;
+
+
+	float3	skylight;
+	float3	extinction;
+			scattering( wPos, extinction.xyz, o.inscatter.xyz, o.sunlight.xyz, skylight.xyz);
+
+			o.sunlight.xyz	+= skylight.xyz;
+//			o.sunlight.xyz	+= AMBIENT_OCCLUSION_COLOR;
+			o.sunlight.xyz	*= diffuse.rgb * extinction.xyz;
+			o.sunlight.w	= diffuse.a;
+
+			o.uv			= i.uvscale.xy;
+}
+
+#endif

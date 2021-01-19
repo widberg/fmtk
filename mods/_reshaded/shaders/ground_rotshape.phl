@@ -1,0 +1,242 @@
+#ifndef	__GROUND_ROTSHAPE_PHL__
+#define	__GROUND_ROTSHAPE_PHL__
+
+#include "ground_rotshape.h"
+#include "hlsl_shadow.h"
+#include "_vertex_const.h"
+#include "hlsl_math.h"
+#include "__setup.h"
+#include "_pixel.h"
+#include "scattering_light.h"
+
+//----------------------------------
+/*
+	plants originally used vertex shadow matrices, so they had the
+	bNoSlice flags sent in from the game engine. So, we can use those
+	to flip processing from better lighting when plants are near player
+	vs. cheaper lighting when they're further out on the horizon.
+
+	This impacts trees only, as they're the ones with the bNoSlice3.
+	So, distant trees can get processed with cheaper lighting while
+	grass will always process with nice lighting.
+*/
+//----------------------------------
+
+#if ( CHEAPER_PLANTS == 1 )
+	#ifdef	bNoSlice3
+		#define	HIGH_QUALITY_LIGHTING	// do high-quality lighting in shadow slice 0 & 1 (nearest player vehicle)
+	#endif
+#else
+		#define	HIGH_QUALITY_LIGHTING	// if not doing cheaper plants, always do high-quality lighting
+#endif
+
+//---------------------------------------------------
+
+float4 ph_base(VS_GroundRotShapeOutput i, float2 vPos : VPOS) : COLOR0
+{
+	int		slice			= 0;
+	float	shadow			= SHADOW_PXL_TRI( slice );
+	float	bias			= SET_BIAS( slice );	// do this after shadow, b/c shadow sets slice
+
+
+// can't downsample plant diffuse texture
+// or plants look alpha transparent around
+// edges showing sky through ground
+
+	float4	tDiffuse		= tex2D(sDiffuse, i.uv.xy);
+			tDiffuse		*= i.vcolor;
+
+	// the if statement here was trying to reduce lighting processing,
+	// but only impacted a very tiny part of the "grass circle" perimeter
+	// where the grass was first starting to grow. Not really worth it
+	// for the logic branch hit.
+	//
+	// Since this shader gets the bNoSlice3 flag from the game engine,
+	// (b/c used to do vertex matrices shadows), we can use that compiler-
+	// time flag to branch processing much better.. essentially two
+	// shaders are being made... one that has high-quality lighting
+	// (because bNoSlice3 is true, which means we're in shadow slice
+	// 0 or 1), and one shader with low-quality lighting (bNoSlice3
+	// is false, b/c in shadow slice 1 or 2). Game engine picks shader
+	// to run as grass / trees hit LOD phasing distance. This makes
+	// decision offload to CPU, not GPU, and impacts performance better.
+	// not so much for the grass (since "grass circle" seems to follow
+	// player in shadow slice 0 & 1 area), but more so for trees
+	// out on the horizon in shadow slice 2 & 3 where they lack detail
+	// and thus don't need high-quality specular lighting with rain
+	// and stuff just wasting processing on them.
+
+
+	float	stepatt			= step( 0.5, tDiffuse.w );
+	if ( stepatt )
+//	if(tDiffuse.w > 0.5)
+	{
+
+	float3	omni			= GetDeferredLights(vPos.xy, bias) * 2;	// headlights
+	float	night			= IS_NIGHT;
+
+
+//----------------------------------
+#ifdef	HIGH_QUALITY_LIGHTING	// high-quality lighting with specular, rain, etc
+//----------------------------------
+
+	float	occlusion		= i.occlusion;
+	float	spccol			= 0.075;
+
+	// (asobo) The omni which serves as an ambient occlusion of cars on the ground.
+	#ifdef	bOmni
+			occlusion		*= GetOmniOcclusion( i.omni.xyz, bias );
+	#endif
+
+			occlusion		= SaturateOcclusion ( occlusion, shadow );	// AO only occurs in shadows
+
+	// even though lighting is done more vertex-side,
+	// standardize the lighting with the lights struct
+	lights	light;
+			light.sky		= i.skylight.rgb;
+			light.sun		= i.sunlight.rgb;
+//			light.spc		= lerp( light.sky, light.sun, shadow );//sun;	// spccol is float, so use base sun color here
+			light.spc		= light.sun;//sun;	// spccol is float, so use base sun color here
+			light.amb		= AMBIENT_OCCLUSION_COLOR;
+
+			i.dots.z		*= spccol;		// spccol is a float, so mul it by spcdot
+
+		#if ( AO_SOFTEN == 1 )
+	float	occ				= max( occlusion, 1 - AO_AMOUNT );
+		#else
+	float	occ				= occlusion;
+		#endif
+
+			i.dots.yz		*= occ;
+			light.sky		= ShadowHighlight( light.sky, i.dots.xy );	// .x = dotEyeNormal pre-calc'ed in vertex shader
+
+	// do rain sheen after shadow highlight,
+	// or shadow highlight negates sheen
+	#if ( RAIN_SHEEN == 1 )
+	float3	reflection			= GetCubeMap( i.spcref, bias );
+
+	//	spccol for both plants & non-asphalt ground = 0.075 in order to sync up
+	//	ground wetness = light.spc.x * 0.5 + 0.25;
+	//	so we can pre-calc plant wetness as follows...
+	//		wetness			= light.spc.x * 0.5 + 0.25;
+	//		wetness			= 0.075 * 0.5 + 0.25;
+	//		wetness			= 0.2875;
+	float	wetness			= 0.2875;
+			light			= SetLightWetness( light, reflection, wetness, night );
+	#endif
+
+			light			= lightcols( i.dots, light, shadow, omni );
+
+			// cheaper faux rain sheen that doesn't "band" like cubemap reflection
+			// don't do.. sticks out from ground like sore thumb in rain
+//			light.spc		*= ( 1 + gGlobalWetness * 2 );
+
+			// add light to base color & then add in weather scatter & extinction
+			tDiffuse.rgb	= tDiffuse.rgb * light.sun + light.spc;			// MAD
+
+//----------------------------------
+#else	// do basic lighting
+//----------------------------------
+
+	// even though lighting is done more vertex-side,
+	// standardize the lighting with the lights struct
+	lights3	light;
+			light.sky		= i.skylight.rgb;
+			light.sun		= i.sunlight.rgb;
+			light.amb		= AMBIENT_OCCLUSION_COLOR;
+			light			= lightcols( i.dots, light, shadow, omni );
+
+			// add light to base color & then add in weather scatter & extinction
+			tDiffuse.rgb	= tDiffuse.rgb * light.sun;
+
+//----------------------------------
+#endif
+//----------------------------------
+
+
+			tDiffuse.rgb 	+= NIGHT_DARKEN2 ( i.inscatter.rgb, night );
+
+	}// if(tDiffuse.w>0.5)
+
+/*
+	// everything's red
+	#if !defined(bNoSlice1)
+		tDiffuse.r *= 10;
+	#else
+		tDiffuse.g *= 10;
+	#endif
+*/
+/*
+	// this seems to act as a differentiator between
+	// grass and trees
+	#if !defined(bNoSlice2)			// Slice 2
+		tDiffuse.r *= 10;			// trees turn red
+	#else
+		tDiffuse.g *= 10;			// grass turns green
+	#endif
+*/
+/*
+	// slice 0/1 & 2/3 differentiator
+	#if defined(bNoSlice3)
+		tDiffuse.r *= 10;	// slice 0, 1 turn red
+	#else
+		tDiffuse.g *= 10;	// slice 2, 3 turn green
+	#endif
+*/
+
+
+/*
+	// everything's red
+	#if !defined(bNoSlice1)
+		tDiffuse.r *= 10;
+	#else
+		tDiffuse.g *= 10;
+	#endif
+*/
+/*
+	// this seems to act as a differentiator between
+	// grass and trees
+	#if !defined(bNoSlice2)			// Slice 2
+		tDiffuse.r *= 10;			// trees turn red
+	#else
+		tDiffuse.g *= 10;			// grass turns green
+	#endif
+*/
+/*
+	// slice 0/1 & 2/3 differentiator
+	#if !defined(bNoSlice3)
+		tDiffuse.r *= 10;	// slice 2, 3 turn red
+	#else
+		tDiffuse.g *= 10;	// slice 0, 1 turn green
+	#endif
+*/
+	return	tDiffuse;
+}
+
+
+
+void ph_gbuffer(VS_GroundRotShapeGBuffer_Output i, out PS_GBuffer o)
+{
+	float	tDiffuseAlpha	= tex2D(sDiffuse, i.uvax.xy).a
+							* i.uvax.z;
+
+	float	stepatt			= step( 0.5, tDiffuseAlpha );
+	if ( stepatt )
+//	if(tDiffuseAlpha > 0.5 )
+	{
+	// Store normal in view space
+	float3	normal			= i.normal.xyz;
+			normal			= mul( normal, gViewRotMatrix ).xyz;
+			normal			= normalize( normal );
+			normal			= normal * 0.5 + 0.5;
+			o.Normal.xyz	= normal.xyz;
+			o.Normal.w		= tDiffuseAlpha;
+
+			// keep calc's here, don't move to vertex
+			o.Depth.x		= i.position2.z / i.position2.w;
+			o.Depth.yz		= 0;
+			o.Depth.w		= 1;
+	}
+}
+
+#endif

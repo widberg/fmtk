@@ -1,0 +1,331 @@
+#ifndef	__GROUND_VHL__
+#define	__GROUND_VHL__
+
+#include "_vertex_const.h"
+#include "hlsl_math.h"
+#include "ground.h"
+#include "hlsl_shadow.h"
+#include "_vertex_scatter.h"
+//#include "__setup.h"
+
+//----------------------------------------------------
+
+	struct VS_GroundInput {
+		float4	position0	: POSITION;
+		float4	normal0		: POSITION1;
+		float4	position1	: POSITION2;
+		float4	t0001		: POSITION3;
+		float4	color0		: POSITION4;
+		float4	normal1		: POSITION5;
+		float4	color1		: POSITION6;
+		float4	t1011		: POSITION7;
+		float4	t0212		: POSITION8;
+		float4	t0313		: POSITION9;
+	};
+
+	struct VS_GroundInputShadow {
+		float4	position0	: POSITION;
+		float4	normal0		: POSITION1;
+		float4	position1	: POSITION2;
+		float4	t0001		: POSITION3;
+	};
+
+//----------------------------------------------------
+// Tweening - Interpolation positions
+//----------------------------------------------------
+
+	/*
+		The part where the distance is formulated with C_INV16384
+		determines the LOD blending distance of everything ground-
+		related that's multiplied by tweens later. You can't just
+		alter the formula to increase LOD detail, though. The game
+		engine seems to have LOD distance hard-set. So, for eg, if
+		you just comment out the "(d - t01.x) * t01.y * C_INV16384"
+		part, you won't magically increase LOD detail distance. You'll
+		just see very tacky near-texture pop-in as LOD textures
+		fade then "pop" as they disappear revealing the near texture.
+		Essentially, the far LOD textures act as a "blanket" that
+		covers the entire game world. The near textures are only
+		generated/used when player vehicle gets within a certain
+		distance. This is to save processing power by not drawing
+		detailed textures over the entire world, only in the sphere
+		around the player. As the player vehicle moves, the LOD
+		"blanket" slowly fades and the near textures slowly generate
+		and reveal, giving the appearance of landscape becoming
+		more defined. It's smart, but it's just annoying that there
+		doesn't seem to be any place to control LOD levels in the
+		shaders. It's all in the game .cfg file (I assume) and I
+		can't figure out how to crack that nut and alter things.
+		So, stuck with just working on shaders and doing the best
+		I can.
+	*/
+
+	// tweens.x = tweenf
+	// tweens.y = itweenf (inverse tweenf)
+	float2 GetGroundTweens ( float4 pos, float2 t01 )
+	{
+		// d = distance from texel to camera .. and only cares about xz axis,
+		// because only determining distance away from car in 360 radius around car
+		// so y axis (up) doesn't matter in this case
+
+		// don't use manhattan distance, or tearing on ground mesh seams becomes
+		// very apparent...
+
+		// which means this controls the landscape vertex meshes matching up on the seems
+		// so if we tweak it some maybe distant mesh seems won't tear and will line up better?
+		float	d			= distance( pos.xyz, EYE_WORLD.xyz );
+				d			-= t01.x;
+				d			*= t01.y * C_INV16384;	// keep as-is (sets texture blending distance; can't control LOD here, it's hard-set in game engine)
+//				d			= clamp ( d, C_NULL, C_UNIT );
+				d			= saturate( d );
+		float2	tweens;
+				tweens.x	= d;			// regular
+				tweens.y	= 1 - d;	// inverse
+//				tweens.y	= C_UNIT - d;	// inverse
+		return	tweens;
+	}
+
+
+//----------------------------------------------------
+// Interpolate Compressed Normals
+//----------------------------------------------------
+
+	float3 GetGroundTextureNormal ( VS_GroundInput i, float2 tweens )
+	{
+/*
+		// original
+		float3	normal0	= i.normal0.xyz * C_TWO - C_UNIT;
+		float3	normal1	= i.normal1.xyz * C_TWO - C_UNIT;
+		float3	normal	= normal0 * tweens.y	//itweenf
+						+ normal1 * tweens.x;	//tweenf;
+				normal	= normalize ( normal );	// doing fine w/o this.. probably normalized before piping into vertex shader
+*/
+		// new .. seems to work fine by tweening first, then * C_TWO - C_UNIT
+		float3	normal	= i.normal0.xyz * tweens.y	// itweenf
+						+ i.normal1.xyz * tweens.x;	// tweenf
+				normal	= normal * C_TWO - C_UNIT;
+//				normal	= normalize ( normal );	// doing fine w/o this.. probably normalized before piping into vertex shader
+		return	normal;
+	}
+
+
+//----------------------------------------------------
+// Ground Texture Light Matrix
+//----------------------------------------------------
+
+// 1 = Asobo's old way, but using cross() to replace their manual math
+// 2 = new way that uses tan() to get tangent off normal, the uses it to generate vTangent, et.al.
+// 2nd way works better, b/c it makes the built-in bump maps of the textures work properly
+// along with the speculars.. Asobo's old way seemed to flatten it all out and killed speculars
+
+// keep this transposed at the end, otherwise light goes dark on angles on the ground.
+// for some reason asobo decided to calculate the TBN differently then in other shaders,
+// so it needs to transpose at the end to be correct.
+
+
+#define	DoGroundMatrixCode	1
+
+//--------------------------------
+#if ( DoGroundMatrixCode == 1 )
+//--------------------------------
+
+	// Old Asobo Way
+	// doesn't take the tangent handedness into account?
+	// keeping as reference
+	float3x3 GetGroundTextureMatrix( VS_GroundInput i, float2 tweens )
+	{
+		float3	rx, ry, rz;
+
+		rz	= float3(C_NULL, C_NULL, C_UNIT);
+//		rz	= C_FRONT.xyz;	// C_NULL, C_NULL, C_UNIT
+		ry	= GetGroundTextureNormal ( i, tweens );	// already normalized
+
+//		rx	= rz.zxy * ry.yzx - rz.yzx * ry.zxy;	// Asobo's original
+//		rx	= ry.yzx * rz.zxy - ry.zxy * rz.yzx;	// Me matching HLSL "cross" func swizzles to see where each goes
+		rx	= cross ( ry, rz );
+//		rx	= cross ( rx, ry );
+//		rx	= normalize(rx);
+//		rz	= rx.yzx * ry.zxy - rx.zxy * ry.yzx;	// Asobo's original
+		rz	= cross ( rx, ry );
+//		rz	= normalize(rz);
+
+		// usually you do tangent, binormal, normal (TBN),
+		// but asobo is using the normal (ry) in the binormal position .. maybe it was the binormal?
+		return	transpose ( float3x3 ( rx, ry, rz ) );	// xxx, yyy, zzz
+//		return	float3x3 ( rx, ry, rz );	// xxx, yyy, zzz
+	}
+
+//--------------------------------
+#elif ( DoGroundMatrixCode == 2 )
+//--------------------------------
+// using tan function to determine tangent
+// this one seems to look the best
+// makes bumps and speculars work properly
+
+	float3x3 GetGroundTextureMatrix( VS_GroundInput i, float2 tweens )
+	{
+		float3	rx, ry, rz;
+
+		rz	= float3(C_NULL, C_NULL, C_UNIT);
+//		rz	= C_FRONT.xyz;	// C_NULL, C_NULL, C_UNIT
+		ry	= GetGroundTextureNormal ( i, tweens );	// already normalized
+		rx	= tan ( ry );
+		rx	= cross ( rx, rz );
+//		rx	= normalize( rx );
+		rz	= cross ( rx, ry );
+//		rz	= normalize ( rz );
+		return	transpose ( float3x3 ( rx, ry, rz ) );	// xxx, yyy, zzz
+//		return	float3x3 ( rx, ry, rz );	// xxx, yyy, zzz
+	}
+#endif
+
+//----------------------------------------------------
+
+void vh_base(VS_GroundInput i, inout VS_GroundOutput o)
+{
+	float2	t00 = i.t0001.xy;
+	float2	t01 = i.t0001.zw;
+	float2	t10 = i.t1011.xy;
+	float2	t11 = i.t1011.zw;
+
+	float2	tweens		= GetGroundTweens ( i.position0, t01 );
+	float2	tweens256	= tweens * C_INV256;	// pre-mul the modifier, since used in multiple places
+
+	//Interpol Position
+	float4	wPos		= i.position0 * tweens.y	// itweenf
+						+ i.position1 * tweens.x;	// tweenf
+	float4	vPos		= WorldToViewVertex(wPos);
+			o.position	= ProjVertex(vPos);
+
+
+	#ifdef	bOmni
+	// only filling 3 floats on omni.xyz
+	// DirectX is column-major, so mul wPos.xyzw by 4 columns (xyzw) of 3 rows and skip processing 4th
+	// since we don't have a .w to stuff it in
+		o.omni.xyz = mul(wPos, C_OMNI_0_WORLDTOLOCAL).xyz * C_HALF + C_HALF;
+
+	#endif
+
+	#ifdef	bShadowMap
+		o.shadowtcproj = vPos.xyz;
+	#endif
+
+
+	// modify specular depending on surface type
+//	float	specular		= (t10.x * tweens.y + t10.y * tweens.x) * C_INV256;
+	float	specular		= dot(t10.xy, tweens256.yx);
+	bool	asphalt			= specular;					// if spec > 0 (ie: is asphalt), then 1, else 0
+			specular		= max ( specular, 0.075 );	// if no specular, add small default amount
+
+
+	// Variables Bump & Specular
+//	SetSpecular(o, (t10.x * tweens.y + t10.y * tweens.x) * C_INV256);
+	SetSpecular(o, specular);
+	SetBump1Lerp(o, i.color0.w);
+	SetBump2Lerp(o, i.color1.w);
+
+
+	//Color Lerp
+		o.color.xyz		= i.color0.xyz * tweens.y
+						+ i.color1.xyz * tweens.x;
+		o.color.w 		= tweens.y;	// Fade
+
+
+	float3x3 mLight			= GetGroundTextureMatrix( i, tweens );
+
+	// Sun, sky and eye vector
+    // sun and eye vectors (pre-mul'ing light matrix, b/c not enough DX9 variable slots left to pass matrix to pixel shader)
+			o.eyevec.xyz 	= EYE_WORLD.xyz - wPos.xyz;
+			o.sundir.xyz 	= DLIGHT_DIR.xyz;
+			o.eyevec.xyz 	= mul(o.eyevec.xyz, mLight);
+			o.sundir.xyz 	= mul(o.sundir.xyz, mLight);
+//			o.eyevec.w	 	= (t11.x * tweens.y + t11.y * tweens.x) * C_INV256;
+			o.eyevec.w	 	= dot(t11.xy, tweens256.yx);
+			o.sundir.w		= asphalt;	// carry the asphalt flag over to pixel shader
+
+
+			// uv's 	// .xy = diffuse	// .zw = bump maps
+			o.uv.zw			= i.t0313.xy * tweens256.y
+							+ i.t0313.zw * tweens256.x;
+			o.uv.xy			= i.t0212.xy * tweens.y
+							+ i.t0212.zw * tweens.x;
+			o.uv.xy			*= C_INV4096;
+
+//	float	occlusion		= (t00.x * tweens.y + t00.y * tweens.x) * C_INV256;
+	float	occlusion		= dot(t00.xy, tweens256.yx);
+
+	// Ambient occlusion
+	SetOcclusion(o,occlusion);
+
+	scatteringbase(wPos, o.extinction.xyz, o.inscatter.xyz);
+
+#if ( FADED_ROADS == 1 )
+	// fade the yellow/white lines on asphalt roads (which also lets river
+	// wash-out areas look like they wet the road while passing),
+	// and fade dusty tire tracks on dirt roads to let more dirt color through
+	// (otherwise every dirt tire track looks white)
+//			o.eyevec.w		*= asphalt ? 0.30 : 0.75;	// fade asphalt painted lines a lot, fade dirt road tire tracks a little
+//			o.eyevec.w		*= lerp( 0.75, 0.30, asphalt );	// fade asphalt painted lines a lot, fade dirt road tire tracks a little
+			o.eyevec.w		*= Select( 0.75, 0.30, asphalt );	// fade asphalt painted lines a lot, fade dirt road tire tracks a little
+#endif
+}
+
+
+//---------------------------------------
+// Shadows
+//---------------------------------------
+// ground shadows itself (eg: hills casting shadows on other land)
+
+void vh_shadow(VS_GroundInputShadow i, inout VS_Output_ShadowMap o)
+{
+	float2	t01				= i.t0001.zw;
+	float2	tweens			= GetGroundTweens ( i.position0, t01 );
+	float3	normal			= i.normal0.xyz * C_TWO - C_UNIT;		// don't normalize or ground shadows bork up
+	float4	wPos;
+			wPos.xyz		= i.position0.xyz * tweens.y	//itweenf
+							+ i.position1.xyz * tweens.x	//tweenf;
+							+ ReAddShadowBiasNormal(normal).xyz;
+			wPos.w			= C_UNIT;
+			o.position		= WorldToProjVertex( wPos ); 
+			o.uvzw.xyzw		= o.position.zzzw;
+}
+
+
+//---------------------------------------
+// Headlights Deferred Lighting
+//---------------------------------------
+
+void vh_gbuffer( VS_GroundInput i, out VS_GroundGBuffer_Output o)
+{
+	// Tweening - Interpolate position
+	float2	t01			= i.t0001.zw;
+	float2	tweens		= GetGroundTweens ( i.position0, t01 );
+	float4	wPos		= i.position0 * tweens.y	// itweenf
+						+ i.position1 * tweens.x;	// tweenf
+	
+	float4	vPos		= WorldToViewVertex(wPos);
+			o.position	= ProjVertex(vPos);
+	
+	// old .. keep like this or can bork stuff up
+				o.position2 = o.position;
+
+	// new
+//			o.position2.x	= o.position.z / o.position.w;	// don't think position2 changes between
+//			o.position2.yz	= 0.0;							// vertex to pixel shader, so moved all
+//			o.position2.w	= 1.0;							// this stuff here
+
+	// light matrix
+			o.iTBNmatrix	= GetGroundTextureMatrix( i, tweens );	// xyz, xyz, xyz
+			o.iTBNmatrix	= transpose(o.iTBNmatrix);				// xxx, yyy, zzz
+//			o.iTBNmatrix	= transpose(o.iTBNmatrix);				// zyx, zyx, zyx ... ImLight ... inverted mLight for headlights
+
+	// Bump (.xy) & Diffuse UVs (.zw)
+			o.variables.x	= i.color0.w;
+			o.variables.y	= i.color1.w;
+			o.variables.zw	= i.t0313.xy * tweens.y		//itweenf
+							+ i.t0313.zw * tweens.x;	//tweenf;
+			o.variables.zw 	*= C_INV256;
+}
+
+
+#endif

@@ -1,0 +1,215 @@
+#ifndef	__GROUND_ROTSHAPE_VHL__
+#define	__GROUND_ROTSHAPE_VHL__
+
+#include "_vertex_const.h"
+#include "ground_rotshape.h"
+#include "hlsl_shadow.h"
+#include "_vertex_scatter.h"
+	
+//----------------------------------------------
+
+#define V_WINDX		i.t13.x
+#define V_WINDZ		i.t13.y
+
+//----------------------------------------------
+
+	struct VS_Input_GroundRotShape {
+		float4	position	: POSITION;
+		float4	normal		: NORMAL;
+		float4	normal2		: POSITION3;
+		float4	color		: COLOR0;
+		float4	t02			: POSITION1;
+		float4	t13			: POSITION2;
+	};
+
+	struct VS_Input_Shadow_GroundRotShape {
+		float4	position	: POSITION;
+		float4	t02			: POSITION1;
+		float4	normal2		: POSITION3;
+		float4	t13			: POSITION2;
+	};
+
+//----------------------------------------------
+
+// Z Bias for vh_shadow (only used in ground_rotshape.vhl, so putting here)
+float4 ReAddShadowBias(  float4 pos )
+{ 
+	float4	retpos		= pos;
+	float	bias		= SHADOWMAP_VERTEX_ADDBIAS;
+			retpos.xyz	-= bias * DLIGHT_DIR.xyz;
+	return	retpos;
+}
+
+float3 calcrotshapepoint(float3 normal2, float4 t02)
+{
+	//Génération du point
+	float3	up			= normal2 * C_TWO - C_UNIT;
+	float	downratio	= dot(up.xyz, CAM_WSIDE.xyz);
+	float3	down		= float3(C_NULL, -C_UNIT, C_NULL);
+//	float3	down		= C_UP.xyz;
+//			down.y		= -down.y;	// invert y-axis from up to down
+	float3	side		= CAM_WSIDE.xyz * (C_UNIT - downratio) + down * downratio;
+			side		= normalize(side);
+			t02.zw		*= C_INV256;	// pre-mul'ing this should save us a calculation
+	float3	lPos		= side * t02.z
+						+   up * t02.w;
+	return	lPos;
+}
+
+float3 calcrotshapenormal(float4 t13, float3 normal, float3 eyevec, float3 lPos)
+{
+	// (asobo) Sometimes the lPos can be zero vector.
+	float	norm		= length(lPos) + C_INV16384;
+	float3	normal2		= ( lPos / norm )
+						+ eyevec + normal;
+			normal2		= normalize(normal2);
+			normal		= normal  * (C_UNIT - t13.z)
+						+ normal2 * t13.z;
+	return	normal;
+}
+
+// grass fade / shrink & tree LOD phasing from low-res to high-res models
+float calcrotshapeattenuation(VS_Input_GroundRotShape i)
+{
+	float3	delta		= i.position - EYE_WORLD;
+	float	dist		= length(delta.xz);
+	float	att			= C_UNIT - saturate((dist - C_GROUND_FADE_MIN) * C_GROUND_FADE_OVERMAXMIN);
+	return	att;
+}
+
+
+//----------------------------------------------
+// mains
+//----------------------------------------------
+
+void vh_base(VS_Input_GroundRotShape i, inout VS_GroundRotShapeOutput o)
+{
+	float	att				= calcrotshapeattenuation( i );
+	float3	normal			= i.normal.xyz * C_TWO - C_UNIT;
+	float4	wPos			= i.position;
+	float3	eyevec;
+
+	// keep the if here, b/c it seems to help with trees
+	// phasing from low-res to high-res at LOD in distance.
+	// if removed, you'll notice both at the same time before
+	// low-res disappears.
+
+	float	stepatt			= step( C_HALF, att );
+	if ( stepatt )
+//	if (att>C_HALF)
+	{
+	float3	lPos			= calcrotshapepoint(i.normal2, i.t02);
+			wPos.xyz		+= lPos
+							+ C_GROUND_WINDX.xyz * V_WINDX
+							+ C_GROUND_WINDZ.xyz * V_WINDZ;
+			// do eyevec for calcrotshapenormal & lighting dots below
+			eyevec			= normalize(EYE_WORLD.xyz - wPos.xyz);
+			normal			= calcrotshapenormal(i.t13, normal, eyevec, lPos);
+	}
+	else
+	{
+			// do eyevec for lighting dots only below
+			eyevec			= normalize(EYE_WORLD.xyz - wPos.xyz);
+	}
+
+
+
+	float4	vPos			= WorldToViewVertex(wPos);
+			o.position		= ProjVertex(vPos);
+	
+	#ifdef	bShadowMap
+			o.shadowtcproj = vPos.xyz;
+	#endif
+
+			o.uv.xy			= i.t02.xy * C_INV16384;
+
+	float3	extinction;
+			scattering(wPos, extinction.xyz, o.inscatter.xyz, o.sunlight.xyz, o.skylight.xyz);
+
+			o.spcref		= reflect( -eyevec, normal );
+//	float	spccol			= 0.075;
+	float	spcpow			= 15;
+
+
+			// .x = sky (shadow) // .y = sun (direct) // .z = specular (shine)
+			o.dots.x		= dot( normal,   eyevec );					// for velour shadow highlights if turned on
+			o.dots.y		= dot( normal,   DLIGHT_DIR.xyz );
+			o.dots.z		= dot( o.spcref, DLIGHT_DIR.xyz );
+			o.dots			= saturate( o.dots );
+			o.dots.yz		= lit ( o.dots.y, o.dots.z, spcpow ).yz;	// process sun and specular dots
+
+
+// moved light dotting to pixel shader where we have more control over it
+// to single-float mul by shadow and occlusion before combining with light colors
+//			o.specular.xyz	= o.sunlight.xyz * spccol;	// specular mix
+//			o.specular.xyz	= spccol;					// specular mix
+//			o.sunlight.xyz	+= o.skylight.xyz;			// add sky to sun
+//			o.skylight.xyz	*= dots.x;					// apply light dir / dot
+//			o.sunlight.xyz	*= dots.y;					// apply light dir / dot
+//			o.specular.xyz	*= dots.z;					// apply light dir / dot
+
+			o.occlusion 	= i.color.w;
+
+			// keep occlusion and AO color calc's in pixel shader
+			// b/c need to use shadow to determine occlusion in shadows
+//				o.sunlight.xyz	+= 0.5;	// add base AO color after all processing
+//				o.skylight.xyz	+= 0.5;	// add base AO color after all processing
+
+			o.vcolor.xyz	= i.color.xyz * C_TWO * extinction.xyz;
+			o.vcolor.w		= att;	// keep this.. keeps grassing from just popping in fully formed
+
+
+	#ifdef	bOmni
+	// only filling 3 floats on omni.xyz
+	// DirectX is column-major, so mul wPos.xyzw by 4 columns (xyzw) of 3 rows and skip processing 4th
+	// since we don't have a .w to stuff it in
+		o.omni.xyz = mul(wPos, C_OMNI_0_WORLDTOLOCAL).xyz * C_HALF + C_HALF;
+
+	#endif
+}
+
+void vh_shadow(VS_Input_Shadow_GroundRotShape i, out VS_Output_ShadowMap o)
+{
+	float4	wPos			= i.position;
+	float3	lPos			= calcrotshapepoint(i.normal2, i.t02);
+			wPos.xyz		+= lPos
+							+ C_GROUND_WINDX.xyz * V_WINDX
+							+ C_GROUND_WINDZ.xyz * V_WINDZ;
+			o.position		= WorldToProjVertex( ReAddShadowBias(wPos) );
+			o.uvzw.xy		= i.t02.xy * C_INV16384;	// uv
+			o.uvzw.zw		= o.position.zw;
+}  
+
+
+void vh_gbuffer(VS_Input_GroundRotShape i,out VS_GroundRotShapeGBuffer_Output o)
+{
+	float	att				= calcrotshapeattenuation( i );
+	float3	normal			= i.normal.xyz * C_TWO - C_UNIT;
+	float4	wPos			= i.position;
+
+	// keep the if here, b/c it seems to help with trees
+	// phasing from low-res to high-res at LOD in distance.
+
+	float	stepatt			= step( C_HALF, att );
+	if ( stepatt )
+//	if (att>C_HALF)
+	{
+	float3	lPos			= calcrotshapepoint(i.normal2, i.t02);
+			wPos.xyz		+= lPos
+							+ C_GROUND_WINDX.xyz * V_WINDX
+							+ C_GROUND_WINDZ.xyz * V_WINDZ;
+			// do eyevec for calcrotshapenormal & lighting dots below
+	float3	eyevec			= normalize(EYE_WORLD.xyz - wPos.xyz);
+			normal			= calcrotshapenormal(i.t13, normal, eyevec, lPos);
+	}
+
+	float4	vPos			= WorldToViewVertex(wPos);
+			o.position		= ProjVertex(vPos);
+			o.position2		= o.position;
+			o.uvax.w		= C_NULL;
+			o.uvax.z		= att;
+			o.normal.xyz	= normal;
+			o.uvax.xy		= i.t02.xy * C_INV16384;
+}
+
+#endif

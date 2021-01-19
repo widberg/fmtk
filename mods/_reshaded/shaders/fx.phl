@@ -1,0 +1,345 @@
+#ifndef	__FX_PHL__
+#define	__FX_PHL__
+
+#include "__setup.h"
+#include "hlsl_math.h"
+
+	static float2	HALFUV				= float2 ( 0.5, 0.5 );
+
+	// Sampling offsets and weights for filter kernels
+	// we only use 0 to 10, so we just need array of 11 elements, not 16
+//	const float3 gSampleOffsetWeight[16];  // xy <=> offset, z <=> weight
+	const float3 gSampleOffsetWeight[11];  // xy <=> offset, z <=> weight
+
+	const float4 gTintLerp;	// color shifts menu screen // .rgb = color // .a tracks when paused / menu is up 
+
+	sampler2D	s0 : register(s0);
+	sampler2D	s1 : register(s1);
+	sampler2D	s2 : register(s2);
+	sampler2D	s3 : register(s3);
+	sampler2D	s4 : register(s4);
+
+	const float4 				gToneMapping;
+	#define _gToneGrayLevel		gToneMapping.x
+	#define _gToneWhiteLevel	gToneMapping.y
+	#define _gToneMinExposure	gToneMapping.z
+	#define _gToneMaxExposure	gToneMapping.w
+
+
+	const float4 				gHDRSettings;
+	#define	SCREENLUMINANCE		gHDRSettings.y
+	#define	DTIME_HDR			gHDRSettings.x
+
+//-------------------------------------------------------
+
+#if	( DOWNSAMPLE_POSTPROCESSING == 1 )
+	// default bias amount, so no need to send in bias on these
+	#define	DOWNSAMPLE_POSTPROCESSING_AMOUNT	2
+	#define	tex2DBP(_sample_, _uv_)	tex2Dbias( _sample_, float4(_uv_, 0, DOWNSAMPLE_POSTPROCESSING_AMOUNT) )
+#else
+	#define	tex2DBP(_sample_, _uv_)	tex2D( _sample_, _uv_)
+#endif
+
+//-------------------------------------------------------
+// Color Saturation Boost
+//-------------------------------------------------------
+
+#if ( BRIGHTER_COLORS == 1 )
+	float3 ColorSaturation ( float3 vSample, float ColorAmount )
+	{
+		float	vSaturated	= saturate ( dot( vSample, 0.2 ) );				// get our saturated dot sample value
+				vSample		= lerp ( vSaturated, vSample, ColorAmount );	// saturate sample by amount passed
+//				vSample		/= sqrt ( ColorAmount );						// tone down brightness of color saturation impact
+				vSample		/= 1.414213562373095;	// ColorAmount in is always 2, so we can pre-sqrt to get 1.4 here
+		return	vSample;
+	}
+#endif
+
+
+	//-------------------------------------------------------
+	// Luminance (Dynamic Eye Adaptation to Light / Shadow)
+	//-------------------------------------------------------
+
+	float4 getLums ( float2 vScreenPosition )
+	{
+		float4	Lums;
+				Lums.x		= tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[0].xy ).r;
+				Lums.y		= tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[1].xy ).r;
+				Lums.z		= tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[2].xy ).r;
+				Lums.w		= tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[3].xy ).r;
+		return	Lums;
+	}
+
+
+	float4 endLums ( float4 Lums )
+	{
+		float	Lum			= dot ( Lums, 0.25 );			// avg the samples
+				Lums.xyz	= Lum;
+				Lums.w		= 1.0;
+		return	Lums;
+	}
+
+
+	float4 ph_lumlogavg ( float2 vScreenPosition : TEXCOORD0 ) : COLOR0
+	{
+	#if ( DYNAMIC_LUMINANCE == 1 )
+		float4	Lums		= getLums( vScreenPosition );
+				Lums		= log ( max ( Lums, 0.001 ) );	// (asobo) using max to avoid log(0)
+				Lums		= endLums( Lums );
+		return	Lums;
+	#else
+		return	1;
+	#endif
+	}
+
+	float4 ph_lumavg ( float2 vScreenPosition : TEXCOORD0 ) : COLOR0
+	{
+	#if ( DYNAMIC_LUMINANCE == 1 )
+		float4	Lums		= getLums( vScreenPosition );
+				Lums		= endLums( Lums );
+		return	Lums;
+	#else
+		return	1;
+	#endif
+	}
+
+
+	float4	ph_lumadaptation() : COLOR0
+	{
+	#if ( DYNAMIC_LUMINANCE == 1 )
+		// since we're doing 1 / _gToneMaxExposure & 1/ _gToneMinExposure,
+		// it reverses them so the min is now max and vice-versa
+		// eg: if min was 0.25 and max was 0.5,
+		// 		1 / 0.25 = 4
+		//		1 / 0.50 = 2
+		// hence in the code below we flip the min and max positions on the clamp ( clamp x, 1/max, 1/min)
+//				currentLum		= clamp ( currentLum, 1 / _gToneMaxExposure, 1 / _gToneMinExposure );
+
+		// leveraging hlsl per-component math to do both divisions in 1 shot
+		float2	toneExposure	= 1.0 / gToneMapping.zw;	// .z = _gToneMinExposure // .w = _gToneMaxExposure
+
+		float2	lum;
+				lum.x			= tex2DBP ( s0, HALFUV ).r;	// current lum
+				lum.y			= tex2DBP ( s1, HALFUV ).r;	// adapted lum
+				lum.y			= 1.0 / lum.y;
+				lum.x			= 2.0 * exp ( lum.x ) / SCREENLUMINANCE;		// 1.5 too much, 4 not enough.. somewhere in between
+//				lum.x			= 1.5 * exp ( lum.x ) / SCREENLUMINANCE;		// 1.5 too much, 4 not enough.. somewhere in between
+				lum.x			= clamp ( lum.x, toneExposure.y, toneExposure.x );	// .y = 1/max // .x = 1/min
+
+		// get logs of each lum
+		float2	lumLogs			= log ( lum );
+								// ( adap log - curr log )  * DTIME_HDR + curr log
+				lum.y			= ( lumLogs.y - lumLogs.x ) * DTIME_HDR + lumLogs.x;
+
+//				lum.y			= 1.0 / exp ( lum.y );
+//				lum.x			= 1.0 / lum.x;
+
+				lum.y			= exp ( lum.y );
+				lum.xy			= 1.0 / lum.xy;
+
+
+		// step function is more gpu-friendly logic test
+		float4	boundA;						float4	boundB;
+				boundA.x		= 0.01;				boundB.x	= lum.y;	// 0.01 < adaptedLum
+				boundA.y		= lum.y;			boundB.y	= 100.0;	// adaptedLum < 100
+				boundA.z		= lum.y;			boundB.z	= 0.01;		// adaptedLum < 0.01
+				boundA.w		= 100.0;			boundB.w	= lum.y;	// 100 < adpatedLum
+
+								//step	 boundA < boundB
+		bool4	Bounds			= step ( boundA , boundB );
+
+		bool2	OutofBounds;
+				OutofBounds.x	= !all ( Bounds.xy );	//"not all" (ie: not meeting both criteria)
+				OutofBounds.y	= any  ( Bounds.zw );	// meeting any of the two criteria
+
+//				lum.y			= any ( OutofBounds ) ? lum.x : lum.y;
+//				lum.y			= lerp( lum.y, lum.x, any ( OutofBounds ) );	// try lerp performance
+				lum.y			= Select( lum.y, lum.x, any ( OutofBounds ) );	// try lerp performance
+		return	lum.y;
+	#else
+	// toss ph_lumadaptationinit code into ph_lumadaptation to keep a steady luminance,
+	// and also help with day/night transitions (need to have this bare-
+	// minimum or screen will just be pitch black during game play).
+		float	currentLum = tex2DBP ( s0, HALFUV ).r;
+				currentLum = exp ( currentLum );
+		return	SCREENLUMINANCE / currentLum;
+	#endif
+	}
+
+
+	float4 ph_lumadaptationinit() : COLOR0
+	{
+	#if ( DYNAMIC_LUMINANCE == 1 )
+		float	currentLum = tex2DBP ( s0, HALFUV ).r;
+				currentLum = exp ( currentLum );
+		return	SCREENLUMINANCE / currentLum;
+	#else
+		return	1;
+	#endif
+	}
+
+
+	//-------------------------------------------------------
+	//	Bloom
+	//-------------------------------------------------------
+
+	const float4			gBloom;
+	#define BLOOM_LUMSCALE	gBloom.x	// 1.f
+	#define BLOOM_BIAS		gBloom.y	// 1.f
+	#define BLOOM_SCALE		gBloom.z	// 0.01f
+	#define STAR_AMOUNT		gBloom.w	// 2.f
+
+	float4	ph_hdrbloominit ( float2 vScreenPosition : TEXCOORD0 ) : COLOR0
+	{
+	#if ( BLOOM_HAZE == 1 )
+		float	bloomLum	= BLOOM_LUMSCALE / SCREENLUMINANCE * tex2DBP ( s1, HALFUV ).x;
+		float4	vSample;
+				vSample.rgb = tex2DBP ( s0, vScreenPosition ).rgb;
+				vSample.rgb	= ( vSample.rgb * bloomLum - BLOOM_BIAS ) * BLOOM_SCALE;
+				vSample.rgb = max ( 0.0, vSample.rgb );
+				vSample.a	= 1.0;
+		return	vSample;
+	#else
+		return	1;
+	#endif
+	}
+
+	// do it all at once to avoid lots of var declarations and updates
+	float4 ph_hdrbloom ( float2 vScreenPosition : TEXCOORD0 ) : COLOR0
+	{
+	#if ( BLOOM_HAZE == 1 )
+		float4	vSample		= 0.0;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[0].xy  ).rgb * gSampleOffsetWeight[0].z;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[1].xy  ).rgb * gSampleOffsetWeight[1].z;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[2].xy  ).rgb * gSampleOffsetWeight[2].z;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[3].xy  ).rgb * gSampleOffsetWeight[3].z;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[4].xy  ).rgb * gSampleOffsetWeight[4].z;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[5].xy  ).rgb * gSampleOffsetWeight[5].z;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[6].xy  ).rgb * gSampleOffsetWeight[6].z;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[7].xy  ).rgb * gSampleOffsetWeight[7].z;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[8].xy  ).rgb * gSampleOffsetWeight[8].z;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[9].xy  ).rgb * gSampleOffsetWeight[9].z;
+				vSample.rgb += tex2DBP ( s0, vScreenPosition + gSampleOffsetWeight[10].xy ).rgb * gSampleOffsetWeight[10].z;
+				vSample.a	= 1.0;
+		return	vSample;
+	#else
+		return	1;
+	#endif
+	}
+
+
+
+	//-------------------------------------------------------
+	// Final pass - Tone mapping
+	//-------------------------------------------------------
+	
+	// Adapt luminance of the scene
+	float4 ph_tonemapping(in float2 vScreenPosition : TEXCOORD0) : COLOR0
+	{
+		// constants only used in main routine
+	#if ( BLUER_NIGHTS == 1 ) || ( PAUSE_TINTING == 1 )
+		const float3	BLACKWHITE_VECTOR	= float3 ( 0.2125, 0.7154, 0.0721 );
+	#endif
+
+		int		night			= IS_NIGHT;	// used twice below, so just pull once
+
+		float4	vSample;
+
+		// add anti-aliasing if we're doing it
+	#if	( ANTI_ALIASING == 1 )
+				#include "fx_aa.phl"
+	#else
+				vSample.rgb		= tex2D ( s0, vScreenPosition ).rgb;
+	#endif
+
+				vSample.rgb		*= 1.25;
+
+
+		//-------------------------------------------------
+		// Blue shift
+		//-------------------------------------------------
+		// night blue'ing / darkening .. washes out colors in darkness at night
+	#if ( BLUER_NIGHTS == 1 )
+		float	blackandwhite	= dot ( vSample.rgb, BLACKWHITE_VECTOR );
+		float4	blue			= gBlueShift * blackandwhite;
+				blue.a			= 1.0 - min ( 1.0, blue.a );	// blueAmount
+				blue.a			= pow ( blue.a, 2.0 );
+				vSample.rgb 	= lerp ( vSample.rgb, blue.rgb, blue.a );
+	#endif
+
+
+
+		//-------------------------------------------------
+		// Dynamic Luminance
+		//-------------------------------------------------
+		// Eye Adaptation to changing luminance when moving from sunny / shaded areas
+		// need to keep this for initial luminance factor
+
+		// darken the adapted lum at night, otherwise it just
+		// brightens everything back up and negates the darker nights
+		float	fAdaptedLum		= tex2DBP ( s1, HALFUV ).r;
+				fAdaptedLum		= NIGHT_DARKEN2 ( fAdaptedLum, night );
+				vSample.rgb		*= fAdaptedLum;
+
+		//-------------------------------------------------
+		// Bloom
+		//-------------------------------------------------
+		// (asobo) The bloom on pc is shifting. It must add 2 pixels to center it.
+	#if ( BLOOM_HAZE == 1 )
+		float2	screenposBloom	= vScreenPosition + 0.0078125;
+		float3	vBloom 			= tex2DBP ( s2, screenposBloom ).rgb;
+		float3	vBloom1 		= tex2DBP ( s3, screenposBloom ).rgb
+								+ tex2DBP ( s4, screenposBloom ).rgb;
+				vBloom			= vBloom + vBloom1 * STAR_AMOUNT;
+				vBloom			= NIGHT_DARKEN2 ( vBloom, night );
+				vSample.rgb		+= vBloom.rgb;
+	#endif
+
+		
+		//-------------------------------------------------
+		// HDR & Contrast
+		//-------------------------------------------------
+		// (asobo) Map the high range of color values into a range appropriate for display
+/*
+				vSample.rgb		+= pow ( vSample.rgb, 2 )
+								+  pow ( vSample.rgb, 3 )
+								+  pow ( vSample.rgb, 4 );
+*/
+		// this way should MAD out a bit better and skip some MUL's
+				vSample.rgb		+= vSample.rgb * ( vSample.rgb 
+								+  vSample.rgb * ( vSample.rgb 
+								+  vSample.rgb * ( vSample.rgb ) ) );
+
+
+		// Doing the division below w/o the HDR calcs above will create a cheaper (less calc's)
+		// version of contrast control, but not as bright
+				vSample.rgb		= vSample.rgb / ( 1 + vSample.rgb );
+
+
+		//-------------------------------------------------
+		// Color Saturation Boost
+		//-------------------------------------------------
+	#if ( BRIGHTER_COLORS == 1 )
+				vSample.rgb		= ColorSaturation ( vSample.rgb, 2 );
+	#endif
+
+
+		//-------------------------------------------------
+		// Pause / Menu screen ... lerp between yellow tintcolor and normal color
+		//-------------------------------------------------
+	#if ( PAUSE_TINTING == 1 )
+		float	brightness		= dot ( vSample.rgb, BLACKWHITE_VECTOR );
+		float3	tintcolor		= gTintLerp.rgb * brightness;
+
+		// don't boolean branch this
+		// gTintLerp.a actually provides smooth transition
+				vSample.rgb		= lerp ( vSample.rgb, tintcolor, gTintLerp.a );
+	#endif
+
+		//-------------------------------------------------
+
+				vSample.a		= 1.0;
+        return	vSample;
+    }
+
+#endif
