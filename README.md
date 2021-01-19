@@ -1,8 +1,27 @@
-# fmtk
+# FMTK
+
 FUEL Modding Toolkit
 
-only the capital letters in each command name are required
+## Getting Started
 
-press y in game to open the console
+### Prerequisites
 
-The game is paused while the console is open so you have to close it for your commands to take effect in most cases
+* CMake
+* A Steam copy of FUEL
+
+### Checkout
+
+```sh
+git clone https://github.com/widberg/fmtk.git
+cd fmtk
+git submodule update --init --recursive
+```
+
+### Build
+
+```sh
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
