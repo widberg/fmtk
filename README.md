@@ -22,6 +22,6 @@ git submodule update --init --recursive
 ```sh
 mkdir build
 cd build
-cmake ..
+cmake .. -A Win32
 cmake --build .
 ```
