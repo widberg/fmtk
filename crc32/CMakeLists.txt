@@ -1,10 +1,8 @@
-add_executable(dpc
-	dpc.cpp
+add_executable(crc32
+	crc32.cpp
 )
 
-target_link_libraries(dpc PRIVATE nlohmann_json::nlohmann_json)
-
-set_target_properties(dpc PROPERTIES
+set_target_properties(crc32 PROPERTIES
 	VS_DEBUGGER_WORKING_DIRECTORY "${FUEL_DIR}"
 	
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

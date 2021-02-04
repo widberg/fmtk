@@ -26,6 +26,12 @@ void (* Real_##name)(void)                              \
 	= reinterpret_cast<decltype(Real_##name)>(address); \
 __declspec(naked) void FMTK_##name(void)
 
+#define NAKEDRETURN(name) \
+__asm                     \
+{                         \
+	jmp Real_##name       \
+}
+
 #define ATTACH(x)       DetourAttach(&(PVOID&)Real_##x, FMTK_##x)
 #define DETACH(x)       DetourDetach(&(PVOID&)Real_##x, FMTK_##x)
 
@@ -46,17 +52,43 @@ __asm                        \
 	mov backup_##reg, reg    \
 }
 
+#define BACKUP_REGISTERS() \
+BACKUP_REGISTER(eax);      \
+BACKUP_REGISTER(ecx);      \
+BACKUP_REGISTER(edx);      \
+BACKUP_REGISTER(ebx);      \
+BACKUP_REGISTER(esp);      \
+BACKUP_REGISTER(ebp);      \
+BACKUP_REGISTER(esi);      \
+BACKUP_REGISTER(edi);
+
 #define RESTORE_REGISTER(reg) \
 __asm                         \
 {                             \
 	mov reg, backup_##reg     \
 }
 
+#define RESTORE_REGISTERS() \
+RESTORE_REGISTER(eax);      \
+RESTORE_REGISTER(ecx);      \
+RESTORE_REGISTER(edx);      \
+RESTORE_REGISTER(ebx);      \
+RESTORE_REGISTER(esp);      \
+RESTORE_REGISTER(ebp);      \
+RESTORE_REGISTER(esi);      \
+RESTORE_REGISTER(edi);
+
 #define REG_TO_VAR(reg, type, var) \
 type var;                          \
 __asm                              \
 {                                  \
 	mov var, reg                   \
+};
+
+#define VAR_TO_REG(var, reg) \
+__asm                        \
+{                            \
+	mov reg, var             \
 };
 
 bool AttachDetoursXLive();
@@ -144,6 +176,26 @@ FUNCTION(CreateFileW, CreateFileW, HANDLE, WINAPI,
 	return rv;
 }
 
+FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
+	HANDLE       hFile,
+	LPVOID       lpBuffer,
+	DWORD        nNumberOfBytesToRead,
+	LPDWORD      lpNumberOfBytesRead,
+	LPOVERLAPPED lpOverlapped)
+{
+	//static TCHAR pszFilename[MAX_PATH + 1];
+
+	//if (GetFinalPathNameByHandleA(hFile, pszFilename, sizeof(pszFilename), FILE_NAME_NORMALIZED))
+	//{
+	//	std::filesystem::path path(pszFilename);
+
+	//	FMTK_HIGHLIGHT(lpBuffer);
+	//	FMTK_BREAKPOINT_IF(path.extension() == ".DPC");
+	//}
+
+	return Real_ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
+}
+
 FUNCTION(RegisterCommand, 0x0069a400, void, __usercall, const void* pThis, void* callback)
 {
 	REG_TO_VAR(edi, LPCSTR, name);
@@ -162,6 +214,33 @@ void Bridge_RegisterCommand(const void* pThis, void* callback, LPCSTR name)
 		push pThis
 		call Real_RegisterCommand
 	};
+}
+
+NAKEDFUNCTION(CRC32, 0x00669160)
+{
+	__asm {
+		push ebp
+		mov ebp, esp
+		sub esp, __LOCAL_SIZE
+	}
+
+	BACKUP_REGISTER(eax);
+	BACKUP_REGISTER(edx);
+
+	char* str;
+	__asm {
+		mov str, edx
+	}
+	LOG(trace, FMTK, "crc32: {}", str);
+
+	RESTORE_REGISTER(eax);
+	RESTORE_REGISTER(edx);
+	__asm {
+		mov esp, ebp
+		pop ebp
+	}
+
+	NAKEDRETURN(CRC32);
 }
 
 FUNCTION(ScriptManagerInit, 0x0081cdb0, void, __fastcall, DWORD x, DWORD y, DWORD z)
@@ -327,7 +406,7 @@ bool AttachDetoursXLive()
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
 
-	ATTACHXLIVE(ValidateMemory);
+	//ATTACHXLIVE(ValidateMemory);
 
 	ULONG result = DetourTransactionCommit();
 	
@@ -339,7 +418,7 @@ bool DetachDetoursXLive()
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
 
-	DETACHXLIVE(ValidateMemory);
+	//DETACHXLIVE(ValidateMemory);
 
 	return DetourTransactionCommit();
 }
@@ -355,8 +434,8 @@ LONG AttachDetours()
 	ATTACH(CreateFileW);
 	ATTACH(WinMain);
 	ATTACH(CoreMainLoop);
-	ATTACH(OutputDebugStringA);
-	ATTACH(OutputDebugStringW);
+	//ATTACH(OutputDebugStringA);
+	//ATTACH(OutputDebugStringW);
 	ATTACH(RunCommand);
 	ATTACH(D3DXCompileShaderFromFileA);
 	//ATTACH(CreateWindowExW);
@@ -365,6 +444,8 @@ LONG AttachDetours()
 	ATTACH(Load);
 	//ATTACH(IsCarInGame);
 	ATTACH(Death);
+	ATTACH(ReadFile);
+	//ATTACH(CRC32);
 
     LOG(trace, FMTK, "Ready to commit");
 
@@ -383,8 +464,8 @@ LONG DetachDetours()
 	DETACH(CreateFileW);
 	DETACH(WinMain);
 	DETACH(CoreMainLoop);
-	DETACH(OutputDebugStringA);
-	DETACH(OutputDebugStringW);
+	//DETACH(OutputDebugStringA);
+	//DETACH(OutputDebugStringW);
 	DETACH(RunCommand);
 	DETACH(D3DXCompileShaderFromFileA);
 	//DETACH(CreateWindowExW);
@@ -393,6 +474,8 @@ LONG DetachDetours()
 	DETACH(Load);
 	//DETACH(IsCarInGame);
 	DETACH(Death);
+	DETACH(ReadFile);
+	//DETACH(CRC32);
 
     LOG(trace, FMTK, "Ready to commit");
 

@@ -10,3 +10,6 @@
 [submodule "dependencies/luajit/LuaJIT"]
 	path = dependencies/luajit/LuaJIT
 	url = https://github.com/LuaJIT/LuaJIT.git
+[submodule "dependencies/json"]
+	path = dependencies/json
+	url = https://github.com/nlohmann/json.git

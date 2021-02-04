@@ -37,5 +37,16 @@ add_subdirectory(fmtk)
 
 add_subdirectory(dpc)
 add_subdirectory(dpcinfo)
+add_subdirectory(crc32)
+
+add_custom_target(package COMMAND
+    ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_CURRENT_BINARY_DIR}/fmtk-${fmtk_VERSION_MAJOR}_${fmtk_VERSION_MINOR}_${fmtk_VERSION_PATCH}_${fmtk_VERSION_TWEAK}.zip" --format=zip
+       "$<TARGET_FILE:fmtk>"
+	   "$<TARGET_FILE:fmtkdll>"
+	   "$<TARGET_FILE:secudll>"
+	WORKING_DIRECTORY "$<TARGET_FILE_DIR:fmtk>"
+	DEPENDS fmtk
+	BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/fmtk-${fmtk_VERSION_MAJOR}_${fmtk_VERSION_MINOR}_${fmtk_VERSION_PATCH}_${fmtk_VERSION_TWEAK}.zip"
+)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT fmtk)

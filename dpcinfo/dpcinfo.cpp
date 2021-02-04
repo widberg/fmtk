@@ -7,242 +7,484 @@
 #include <cassert>
 #include <cstddef>
 #include <bitset>
+#include <vector>
 
-struct DPCHeader
+unsigned indentationLevel = 0;
+
+void tab(std::ostream& out)
 {
-    char versionString[256];
-    std::uint32_t fileType;
-    std::uint32_t unitCount;
-    std::uint32_t u0;
-    std::uint32_t compressedSize;
-    std::uint32_t paddedSize;
-    std::uint32_t versionMinor;
-    std::uint32_t versionPatch;
+    for (unsigned i = 0; i < indentationLevel; ++i)
+    {
+        out << "\t";
+    }
+}
+
+void openBrace(std::ostream& out)
+{
+    tab(out);
+    out << "{\n";
+    indentationLevel++;
+}
+
+void closeBrace(std::ostream& out)
+{
+    indentationLevel--;
+    tab(out);
+    out << "},\n";
+}
+
+void pairString(std::ostream& out, const std::string& key, const std::string& value)
+{
+    tab(out);
+    out << "\"" << key << "\":\"" << value << "\",\n";
+}
+
+void pairU32(std::ostream& out, const std::string& key, std::uint32_t value)
+{
+    tab(out);
+    out << "\"" << key << "\":" << value << ",\n";
+}
+
+std::uint32_t calculatePaddedSize(std::uint32_t unpaddedSize)
+{
+    return (unpaddedSize + 0x7ff) & 0xfffff800;
+}
+
+std::uint32_t calculatePaddingSize(std::uint32_t unpaddedSize)
+{
+    return calculatePaddedSize(unpaddedSize) - unpaddedSize;
+}
+
+enum
+{
+    winlog = 14,
+    winsize = (1 << winlog),
+    winmask = (1 << winlog) - 1
 };
 
-struct UnitDescriptor
+std::vector<std::uint8_t> unLZ(const std::vector<std::uint8_t>& data)
 {
-    std::uint32_t fileType;
-    std::uint32_t subFiles;
-    std::uint32_t paddedSize;
+    std::uint8_t win[winsize];
+    std::uint32_t c, d, r, l, i, j, flag, flagmask, flagbit, pos, lenbits = 2;
+
+
+    const std::uint8_t* dp = data.data() + 28;
+
+    std::vector<std::uint8_t> decompressed;
+
+    for (i = 0; i < winsize; i++)
+        win[i] = 0;
+
+    l = *(std::uint32_t*)dp;
+    dp += sizeof(l);
+
+    std::uint32_t len = *(std::uint32_t*)data.data() + 24;
+
+    flagbit = 0;
+
+    for (pos = 0;;)
+    {
+
+        if (flagbit <= 1)
+        {
+            flagmask = *(dp++) << 24;
+            flagmask |= *(dp++) << 16;
+            flagmask |= *(dp++) << 8;
+            flagmask |= *(dp++);
+            flagbit = 32 - 1;
+            lenbits = winlog - (flagmask & 3);
+        }
+
+        flag = (flagmask >> flagbit) & 1;
+        flagbit--;
+
+        c = *(dp++);
+        if (dp >= data.data() + len)
+            break;
+
+        if (flag == 0)
+        {
+            // literal
+
+            win[(pos++) & winmask] = c;
+            decompressed.push_back(c);
+        }
+        else
+        {
+            // match
+
+            d = *(dp++);
+            j = (c << 8) + d;
+
+            l = (j >> lenbits) + 3;
+            d = (j & ((1 << lenbits) - 1)) + 1;
+
+            for (j = 0; j < l; j++)
+            {
+                c = win[(pos - d) & winmask];
+                win[(pos++) & winmask] = c;
+                decompressed.push_back(c);
+            }
+        }
+    }
+
+    return decompressed;
+}
+
+class Resource;
+class ResourceHeader
+{
+public:
+    friend std::istream& operator >> (std::istream& in, Resource& resource);
+    friend std::ostream& operator << (std::ostream& out, const ResourceHeader& resource_header);
+    friend std::istream& operator >> (std::istream& in, ResourceHeader& resource_header);
+private:
     std::uint32_t dataSize;
-    std::uint32_t u1;
-    std::uint32_t crc32;
-};
-
-struct UnitHeader
-{
-    std::uint32_t u0;
-    std::uint32_t u1;
-    std::uint32_t u2;
-    std::uint32_t u3;
-    std::uint32_t u4;
-    std::uint32_t crc32;
-    std::uint32_t decompressedCRC32;
-};
-
-struct FooHeader
-{
-    std::uint32_t paddedSize;
-    std::uint32_t alignment;
-    std::uint32_t count;
-    std::uint32_t u3;
-};
-
-struct ResourceHeader
-{
-    std::uint32_t dataSize;
-    std::uint32_t zero;
+    std::uint32_t unknown0;
     std::uint32_t decompressedSize;
     std::uint32_t compressedSize;
-    std::uint32_t resourceType;
+    std::uint32_t classCRC32;
     std::uint32_t crc32;
 };
 
-#define HEADER_SIZE (0x800U)
-
-#define READ(ifstream, variable) ifstream.read(reinterpret_cast<char*>(&variable), sizeof(variable))
-
-void analyze(const std::filesystem::path& path)
+std::ostream& operator << (std::ostream& out, const ResourceHeader& resource_header)
 {
-    std::ifstream dpc(path, std::ios::binary);
-    dpc.seekg(0, std::ios::end);
-    std::uint32_t fileSize = static_cast<std::uint32_t>(dpc.tellg());
-    dpc.seekg(0, std::ios::beg);
 
-    DPCHeader header;
-    READ(dpc, header);
 
-    std::cout <<
-        "path = " << path << "\n" <<
-        "fileSize = " << fileSize << "\n" <<
-        "fileSize - header = " << fileSize - HEADER_SIZE << "\n\n" <<
-        "versionString = " << header.versionString << "\n" <<
-        "fileType = " << header.fileType << "\n" <<
-        "unitCount = " << header.unitCount << "\n" <<
-        "u0 = " << header.u0 << "; u0 / 2048 = " << header.u0 / 2048 << "; " << std::bitset<32>(header.u0) << "\n" <<
-        "compressedSize = " << header.compressedSize << "; compressedSize / 2048 = " << header.compressedSize / 2048 << "\n" <<
-        "paddedSize = " << header.paddedSize << "\n" <<
-        "versionMinor = " << header.versionMinor << "\n" <<
-        "versionPatch = " << header.versionPatch << std::endl;
+    return out;
+}
 
-    assert((!std::strcmp(header.versionString, "v1.381.67.09 - Asobo Studio - Internal Cross Technology") && header.versionMinor == 272U && header.versionPatch == 380U ||
-        !std::strcmp(header.versionString, "v1.381.66.09 - Asobo Studio - Internal Cross Technology") && header.versionMinor == 272U && header.versionPatch == 380U ||
-        !std::strcmp(header.versionString, "v1.381.65.09 - Asobo Studio - Internal Cross Technology") && header.versionMinor == 271U && header.versionPatch == 380U ||
-        !std::strcmp(header.versionString, "v1.381.64.09 - Asobo Studio - Internal Cross Technology") && header.versionMinor == 271U && header.versionPatch == 380U ||
-        !std::strcmp(header.versionString, "v1.379.60.09 - Asobo Studio - Internal Cross Technology") && header.versionMinor == 269U && header.versionPatch == 380U ||
-        !std::strcmp(header.versionString, "v1.325.50.07 - Asobo Studio - Internal Cross Technology") && header.versionMinor == 262U && header.versionPatch == 326U ||
-        !std::strcmp(header.versionString, "v1.220.50.07 - Asobo Studio - Internal Cross Technology") && header.versionMinor == 262U && header.versionPatch == 221U ||
-        0) && "Invalid version");
+std::istream& operator >> (std::istream& in, ResourceHeader& resource_header)
+{
+    in.read(reinterpret_cast<char*>(&resource_header), sizeof(resource_header));
 
-    assert((header.fileType == 0U ||
-        header.fileType == 1U ||
-        0) && "Unexpected file type");
+    return in;
+}
 
-    assert((header.u0 % 2048 == 0) && "IDK what header.u0 is");
-    assert((header.compressedSize % 2048 == 0) && "IDK what header.u1 is");
+class Resource
+{
+public:
+    friend std::ostream& operator << (std::ostream& out, const Resource& resource);
+    friend std::istream& operator >> (std::istream& in, Resource& resource);
+private:
+    ResourceHeader resourceHeader;
+    std::vector<std::uint8_t> data;
+    std::vector<std::uint8_t> padding;
+};
 
-    std::uint32_t subFilesSum = 0;
-    std::uint32_t u1sum = 0;
-    std::uint32_t paddedSizeSum = 0;
-    std::uint32_t paddedSections = 0;
-    std::uint32_t offset = HEADER_SIZE;
+std::ostream& operator << (std::ostream& out, const Resource& resource)
+{
 
-    bool hasCompressed = false;
 
-    for (int i = 0; i < header.unitCount; ++i)
+    return out;
+}
+
+std::istream& operator >> (std::istream& in, Resource& resource)
+{
+    in >> resource.resourceHeader;
+
+    resource.data.resize(resource.resourceHeader.dataSize);
+    in.read(reinterpret_cast<char*>(resource.data.data()), resource.data.size());
+
+    resource.padding.resize(calculatePaddingSize(sizeof(ResourceHeader) + resource.resourceHeader.dataSize));
+    in.read(reinterpret_cast<char*>(resource.padding.data()), resource.padding.size());
+
+    return in;
+}
+
+class TailUnknownStruct
+{
+public:
+    friend std::ostream& operator << (std::ostream& out, const TailUnknownStruct& tail_unknown_struct);
+    friend std::istream& operator >> (std::istream& in, TailUnknownStruct& tail_unknown_struct);
+private:
+    std::uint32_t unknown0;
+    std::uint32_t unknown1;
+    std::uint32_t unknown2;
+    std::uint32_t unknown3;
+    std::uint8_t padding[12];
+};
+
+std::ostream& operator << (std::ostream& out, const TailUnknownStruct& tail_unknown_struct)
+{
+
+
+    return out;
+}
+
+std::istream& operator >> (std::istream& in, TailUnknownStruct& tail_unknown_struct)
+{
+
+
+    return in;
+}
+
+class TailUnknownStructPascalArray
+{
+public:
+    friend std::ostream& operator << (std::ostream& out, const TailUnknownStructPascalArray& tail_unknown_struct_pascal_array);
+    friend std::istream& operator >> (std::istream& in, TailUnknownStructPascalArray& tail_unknown_struct_pascal_array);
+private:
+    std::uint32_t count;
+    std::vector<TailUnknownStruct> data;
+};
+
+std::ostream& operator << (std::ostream& out, const TailUnknownStructPascalArray& tail_unknown_struct_pascal_array)
+{
+
+
+    return out;
+}
+
+std::istream& operator >> (std::istream& in, TailUnknownStructPascalArray& tail_unknown_struct_pascal_array)
+{
+
+
+    return in;
+}
+
+class TailU32PascalArray
+{
+public:
+    friend std::ostream& operator << (std::ostream& out, const TailU32PascalArray& tail_u32_pascal_array);
+    friend std::istream& operator >> (std::istream& in, TailU32PascalArray& tail_u32_pascal_array);
+private:
+    std::uint32_t count;
+    std::vector<std::uint32_t> data;
+};
+
+std::ostream& operator << (std::ostream& out, const TailU32PascalArray& tail_u32_pascal_array)
+{
+
+
+    return out;
+}
+
+std::istream& operator >> (std::istream& in, TailU32PascalArray& tail_u32_pascal_array)
+{
+
+
+    return in;
+}
+
+class TailHeader
+{
+public:
+    friend std::ostream& operator << (std::ostream& out, const TailHeader& tail_header);
+    friend std::istream& operator >> (std::istream& in, TailHeader& tail_header);
+private:
+    std::uint32_t unused0;
+    std::uint32_t unused1;
+    std::uint32_t unused2;
+};
+
+std::ostream& operator << (std::ostream& out, const TailHeader& tail_header)
+{
+
+
+    return out;
+}
+
+std::istream& operator >> (std::istream& in, TailHeader& tail_header)
+{
+
+
+    return in;
+}
+
+class UnitResourceHeader
+{
+public:
+    friend std::ostream& operator << (std::ostream& out, const UnitResourceHeader& unit_resource_header);
+    friend std::istream& operator >> (std::istream& in, UnitResourceHeader& unit_resource_header);
+private:
+    std::uint32_t dataSize;
+    std::uint32_t unknown0;
+    std::uint32_t decompressedSize;
+    std::uint32_t compressedSize;
+    std::uint32_t classCRC32;
+    std::uint32_t crc32;
+};
+
+std::ostream& operator << (std::ostream& out, const UnitResourceHeader& unit_resource_header)
+{
+
+
+    return out;
+}
+
+std::istream& operator >> (std::istream& in, UnitResourceHeader& unit_resource_header)
+{
+
+
+    return in;
+}
+
+class UnitResource
+{
+public:
+    friend std::ostream& operator << (std::ostream& out, const UnitResource& unit_resource);
+    friend std::istream& operator >> (std::istream& in, UnitResource& unit_resource);
+private:
+    UnitResourceHeader resourceHeader;
+    std::vector<std::uint8_t> data;
+};
+
+std::ostream& operator << (std::ostream& out, const UnitResource& unit_resource)
+{
+
+
+    return out;
+}
+
+std::istream& operator >> (std::istream& in, UnitResource& unit_resource)
+{
+
+
+    return in;
+}
+
+class Unit
+{
+public:
+    friend std::ostream& operator << (std::ostream& out, const Unit& unit);
+    friend std::istream& operator >> (std::istream& in, Unit& unit);
+private:
+    std::vector<UnitResource> unitResources;
+};
+
+std::ostream& operator << (std::ostream& out, const Unit& unit)
+{
+
+
+    return out;
+}
+
+std::istream& operator >> (std::istream& in, Unit& unit)
+{
+    in.read(reinterpret_cast<char*>(&unit_description), sizeof(unit_description));
+
+    return in;
+}
+
+class UnitDescription
+{
+public:
+    friend std::ostream& operator << (std::ostream& out, const UnitDescription& unit_description);
+    friend std::istream& operator >> (std::istream& in, UnitDescription& unit_description);
+private:
+    std::uint32_t unitType;
+    std::uint32_t resourceCount;
+    std::uint32_t paddedSize;
+    std::uint32_t dataSize;
+    std::uint32_t unknown0;
+    std::uint32_t crc32;
+};
+
+std::ostream& operator << (std::ostream& out, const UnitDescription& unit_description)
+{
+
+
+    return out;
+}
+
+std::istream& operator >> (std::istream& in, UnitDescription& unit_description)
+{
+    in.read(reinterpret_cast<char*>(&unit_description), sizeof(unit_description));
+
+    return in;
+}
+
+class PrimaryHeader
+{
+public:
+    friend std::ostream& operator << (std::ostream& out, const PrimaryHeader& primary_header);
+    friend std::istream& operator >> (std::istream& in, PrimaryHeader& primary_header);
+private:
+    char versionString[256];
+    std::uint32_t isNotRTC;
+    std::uint32_t unitCount;
+    std::uint32_t unitWorkingBufferCapacity;
+    std::uint32_t resourceWorkingBufferCapacity;
+    std::uint32_t paddedSize;
+    std::uint32_t versionPatch;
+    std::uint32_t versionMinor;
+    UnitDescription unitDescriptions[64];
+    std::uint32_t zero;
+    std::uint32_t tailPaddedSize;
+    std::uint32_t tailOffset;
+    std::uint32_t tailUnused0;
+    std::uint32_t tailUnused1;
+    std::uint32_t tailUnused2;
+    std::uint32_t incrediBuilderUnused0;
+    std::uint32_t incrediBuilderUnused1;
+    std::uint32_t incrediBuilderUnused2;
+    char incrediBuilderString[128];
+    std::uint8_t padding[64];
+};
+
+std::ostream& operator << (std::ostream& out, const PrimaryHeader& primary_header)
+{
+
+
+    return out;
+}
+
+std::istream& operator >> (std::istream& in, PrimaryHeader& primary_header)
+{
+    in.read(reinterpret_cast<char*>(&primary_header), sizeof(primary_header));
+
+    return in;
+}
+
+class DPCFile
+{
+public:
+    DPCFile(const std::filesystem::path& path) : m_path(path)
     {
-        UnitDescriptor descriptor;
-        READ(dpc, descriptor);
+        std::ifstream file(m_path, std::ios::binary | std::ios::ate);
+        m_file_size = file.tellg();
+        file.seekg(0, std::ios::beg);
 
-        std::cout <<
-            "[" << i << "] " << offset << "\n" <<
-            "\tfileType = " << descriptor.fileType << "\n" <<
-            "\tsubFiles = " << descriptor.subFiles << "\n" <<
-            "\tpaddedSize = " << descriptor.paddedSize << "\n" <<
-            "\tdataSize = " << descriptor.dataSize << "\n" <<
-            "\tu1 = " << descriptor.u1 << "; u1 / 2048 = " << descriptor.u1 / 2048 << "\n" <<
-            "\tcrc32 = " << descriptor.crc32 << "\n" << std::endl;
+        file >> m_primary_header;
 
-        assert((descriptor.fileType == 0U ||
-            descriptor.fileType == 253U ||
-            descriptor.fileType == 144U ||
-            descriptor.fileType == 146U ||
-            descriptor.fileType == 252U ||
-            descriptor.fileType == 211U ||
-            descriptor.fileType == 249U ||
-            0) && "Unexpected file type");
+        for (;;)
+        {
 
-        assert((descriptor.u1 % 2048 == 0) && "IDK what descriptor.u1 is");
-
-        subFilesSum += descriptor.subFiles;
-        u1sum += descriptor.u1;
-        paddedSizeSum += descriptor.paddedSize;
-
-        if (descriptor.fileType == 0) hasCompressed = true;
-
-        std::streampos pos2 = dpc.tellg();
-        dpc.seekg(static_cast<std::streampos>(offset));
-
-        std::vector<char> data;
-        data.resize(descriptor.paddedSize);
-        dpc.read(data.data(), data.size());
-        std::ofstream file("dump\\" + path.stem().string() + "_" + std::to_string(i) + "_" + std::to_string(descriptor.crc32) + "." + std::to_string(descriptor.fileType), std::ios::binary);
-        file.write(data.data(), data.size());
-        dpc.seekg(pos2);
-
-        UnitHeader unitHeader;
-        std::streampos pos = dpc.tellg();
-        dpc.seekg(static_cast<std::streampos>(offset));
-        READ(dpc, unitHeader);
-
-        std::cout <<
-            "\tu0 = " << unitHeader.u0 << "\n" <<
-            "\tu1 = " << unitHeader.u1 << "\n" <<
-            "\tu2 = " << unitHeader.u2 << "\n" <<
-            "\tu3 = " << unitHeader.u3 << "\n" <<
-            "\tu4 = " << unitHeader.u4 << "\n" <<
-            "\tcrc32 = " << unitHeader.crc32 << "\n" <<
-            "\tdecompressedCRC32 = " << unitHeader.decompressedCRC32 << (unitHeader.crc32 == unitHeader.decompressedCRC32 ? " !=!" : "") << "\n" << std::endl;
-
-        assert((unitHeader.u3 ? unitHeader.u0 == unitHeader.u1 + unitHeader.u3 : unitHeader.u0 == unitHeader.u1 + unitHeader.u2) && "u0-3 relation does not hold");
-        // assert((unitHeader.u4 == 0x57B1F99E || unitHeader.u4 == 0x52B12EB5) && "u4 is not expected");
-        assert((unitHeader.crc32 == descriptor.crc32) && "crc32 does not match");
-
-        dpc.seekg(pos);
-        offset += descriptor.paddedSize;
+        }
     }
 
-    assert((paddedSizeSum == header.paddedSize) && "Unexpected padded size");
-    assert(((hasCompressed == 0) == (header.compressedSize == 0)) && "Has uncompressed size but no compressed files");
+    friend std::ostream& operator << (std::ostream& out, const DPCFile& dpcFile);
+private:
+    std::filesystem::path m_path;
+    std::uint32_t m_file_size;
+    PrimaryHeader m_primary_header;
+};
 
-    std::uint64_t zero;
-    READ(dpc, zero);
+std::ostream& operator << (std::ostream& out, const DPCFile& dpcFile)
+{
+    openBrace(out);
 
-    assert(zero == 0 && "Invalid DPC header");
+    pairString(out, "path", dpcFile.m_path.string());
+    pairU32(out, "fileSize", dpcFile.m_file_size);
+    pairU32(out, "fileSize - headerSize", dpcFile.m_file_size - sizeof(dpcFile.m_primary_header));
 
-    dpc.seekg(offset);
-    FooHeader fooHeader;
-    READ(dpc, fooHeader);
+    out << dpcFile.m_primary_header;
 
-    if (!dpc.eof())
-    {
-        std::cout << "[foo] " << offset << "\n" <<
-            "\tpaddedSize = " << fooHeader.paddedSize << "; paddedSize / 2048 = " << fooHeader.paddedSize / 2048 << "\n" <<
-            "\talignment = " << fooHeader.alignment << "\n" <<
-            "\tcount = " << fooHeader.count << "\n" <<
-            "\tu3 = " << fooHeader.u3 << "\n" << std::endl;
+    closeBrace(out);
 
-        assert((fooHeader.paddedSize % 2048 == 0) && "should be a multiple of 2048");
-        assert((fooHeader.paddedSize == 524288) && "should be 524288");
-        assert((fooHeader.alignment == 2048) && "should be 2048");
-    }
-
-    //dpc.seekg(0x800);
-    //std::uint64_t pad;
-    //bool arePad = false;
-    //while (dpc.read((char*)&pad, sizeof(pad)) && !dpc.eof())
-    //{
-    //    if (arePad && pad != std::numeric_limits<std::uint64_t>::max() && dpc.tellg() % 2048 == 0)
-    //    {
-    //        paddedSections++;
-    //    }
-
-    //    arePad = pad == std::numeric_limits<std::uint64_t>::max();
-    //}
-
-    //std::cout << "\n" <<
-    //    "subFilesSum = " << subFilesSum << "\n" <<
-    //    "u1sum = " << u1sum << "\n" <<
-    //    "padded sections = " << paddedSections << "\n";
-
-    std::cout << "------------------------\n" << std::endl;
-
-
-
-    //dpc.seekg(0, std::ios::end);
-    //std::uint32_t length = static_cast<std::uint32_t>(dpc.tellg());
-    //std::uint32_t size = length - offset;
-    //if (size > 0)
-    //{
-    //    dpc.seekg(static_cast<std::uint32_t>(offset));
-    //    std::vector<char> data;
-    //    data.resize(size);
-    //    dpc.read(data.data(), size);
-    //    std::ofstream file("dump\\" + path.stem().string() + "_data.dat");
-    //    file.write(data.data(), data.size());
-    //}
+    return out;
 }
 
 int main()
 {
-    std::filesystem::create_directory("dump\\");
+    std::ofstream json("fmtk.json");
 
     for (const auto& file : std::filesystem::recursive_directory_iterator("."))
     {
         if (file.path().extension() == ".DPC")
         {
-            analyze(file.path());
+            json << DPCFile(file.path()) << "," << std::endl;
         }
     }
 }

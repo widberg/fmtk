@@ -1,0 +1,79 @@
+[T] [CORE] Resuming SecuLauncher
+[T] [CORE] SecuLauncher resumed
+[T] [DETOURS] [00080000..6C221170..EC1A1170]
+[T] [DETOURS]  Looking for free region in 00080000..6C220000 from 6C210000:
+[T] [DETOURS]   Try 6C210000
+[T] [DETOURS]   Try 6C210000 => 6C210000..6C24FFFF   1000
+[T] [DETOURS]   Try 6C1F0000
+[T] [DETOURS]   Try 6C1F0000 => 6C1F0000..6C1FFFFF  10000
+[T] [DETOURS]   Allocated region 6C1F0000..6C1FFFFF
+
+[T] [DETOURS] detours: pbTramp=6C1F00D8, pDetour=64751032
+[T] [DETOURS]  DetourCopyInstruction(6C1F00D8,6C221170)
+[T] [DETOURS]  DetourCopyInstruction() = 6C221172 (2 bytes)
+[T] [DETOURS]  DetourCopyInstruction(6C1F00DA,6C221172)
+[T] [DETOURS]  DetourCopyInstruction() = 6C221173 (1 bytes)
+[T] [DETOURS]  DetourCopyInstruction(6C1F00DB,6C221173)
+[T] [DETOURS]  DetourCopyInstruction() = 6C221175 (2 bytes)
+[T] [DETOURS]  detours: rAlign [[T] [DETOURS]  2/2[T] [DETOURS]  3/3[T] [DETOURS]  5/5[T] [DETOURS]  ]
+[T] [DETOURS] detours: pbTarget=6C221170: 8b ff 55 8b ec 83 e4 f8 81 ec a4 00
+[T] [DETOURS] detours: pbTramp =6C1F00D8: 8b ff 55 8b ec e9 93 10 03 00 cc cc
+[T] [DETOURS] detours: pbTramp =6C1F00D8, pbRemain=6C221175, pbDetour=64751032, cbRestore=5
+[T] [DETOURS] detours: pbTarget=6C221170: 8b ff 55 8b ec 83 e4 f8 81 ec a4 00 [before]
+[T] [DETOURS] detours: pbTarget=6C221170: e9 bd fe 52 f8 83 e4 f8 81 ec a4 00 [after]
+[T] [DETOURS] detours: pbTramp =6C1F00D8: 8b ff 55 8b ec e9 93 10 03 00 cc cc
+[T] [DETOURS] DetourUpdateProcessWithDll(000005B4,dlls=1)
+[T] [DETOURS] 00400000  machine=014c magic=010b
+[T] [DETOURS] 00400000  Found EXE
+[T] [DETOURS] 77530000  machine=014c magic=010b
+[T] [DETOURS]     32BitExe=1 32BitProcess
+[T] [DETOURS] DetourUpdateProcessWithDllEx(000005B4,00400000,dlls=1)
+[T] [DETOURS]     32BitExe=1 32BitProcess
+[T] [DETOURS] IDH: 00400000..00400040
+[T] [DETOURS] INH: 00400128..004002E8
+[T] [DETOURS] ish[0] : va=00001000 sr=5144576
+[T] [DETOURS] ish[1] : va=004e9000 sr=1105920
+[T] [DETOURS] ish[2] : va=005f7000 sr=225280
+[T] [DETOURS] ish[3] : va=00680000 sr=413696
+[T] [DETOURS] ish[4] : va=006e5000 sr=266240
+[T] [DETOURS]      Imports: 009F4B14..009F4CCC
+[T] [DETOURS] pbBase = 00AD4000
+[T] [DETOURS] Free region 00B26000..77530000
+[T] [DETOURS] [00B30000..00B301EC] Allocated for import table.
+[T] [DETOURS] IMPORT_DIRECTORY perms=0
+[T] [DETOURS] obBaseBef = 005f4b14..005f4ccc
+[T] [DETOURS] obBaseAft = 00730000..007301ec
+[T] [DETOURS] WriteProcessMemory(idh:00400000..00400040)
+[T] [DETOURS] WriteProcessMemory(inh:00400128..00400220)
+[T] [DETOURS] Copied 2096 byte payload into target process at 001D0000
+[T] [CORE] SecuLauncher exited with code: 0x0
+[T] [DETOURS] DetourUpdateProcessWithDll(000000E8,dlls=1)
+[T] [DETOURS] 00400000  machine=014c magic=010b
+[T] [DETOURS] 00400000  Found EXE
+[T] [DETOURS] 77530000  machine=014c magic=010b
+[T] [DETOURS]     32BitExe=1 32BitProcess
+[T] [DETOURS] DetourUpdateProcessWithDllEx(000000E8,00400000,dlls=1)
+[T] [DETOURS]     32BitExe=1 32BitProcess
+[T] [DETOURS] IDH: 00400000..00400040
+[T] [DETOURS] INH: 00400D70..00400FF8
+[T] [DETOURS] ish[0] : va=00001000 sr=32768
+[T] [DETOURS] ish[1] : va=00009000 sr=12288
+[T] [DETOURS] ish[2] : va=0000c000 sr=12288
+[T] [DETOURS] ish[3] : va=00012000 sr=4096
+[T] [DETOURS] ish[4] : va=00013000 sr=3842048
+[T] [DETOURS] ish[5] : va=00744000 sr=32768
+[T] [DETOURS] ish[6] : va=0074c000 sr=446464
+[T] [DETOURS] ish[7] : va=007b9000 sr=700416
+[T] [DETOURS] ish[8] : va=00a3c000 sr=24576
+[T] [DETOURS] ish[9] : va=00a42000 sr=925696
+[T] [DETOURS]      Imports: 00E4AF29..00E4AFDD
+[T] [DETOURS] pbBase = 00F24000
+[T] [DETOURS] Free region 00F24000..00F30000
+[T] [DETOURS] Free region 01430000..77530000
+[T] [DETOURS] [01430000..014300E4] Allocated for import table.
+[T] [DETOURS] IMPORT_DIRECTORY perms=0
+[T] [DETOURS] obBaseBef = 00a4af29..00a4afdd
+[T] [DETOURS] obBaseAft = 01030000..010300e4
+[T] [DETOURS] WriteProcessMemory(idh:00400000..00400040)
+[T] [DETOURS] WriteProcessMemory(inh:00400D70..00400E68)
+[T] [DETOURS] Copied 2096 byte payload into target process at 000D0000

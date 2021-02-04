@@ -59,6 +59,11 @@ add_buildvm_target(jit/vmdef.lua  libvm  ${LJLIB_C})
 ## LuaJIT Library
 set(LJCORE_C
 	${CMAKE_CURRENT_BINARY_DIR}/lj_vm.obj
+	${CMAKE_CURRENT_BINARY_DIR}/lj_ffdef.h
+	${CMAKE_CURRENT_BINARY_DIR}/lj_bcdef.h
+	${CMAKE_CURRENT_BINARY_DIR}/lj_folddef.h
+	${CMAKE_CURRENT_BINARY_DIR}/lj_recdef.h
+	${CMAKE_CURRENT_BINARY_DIR}/lj_libdef.h
 
 	${LUAJIT_DIR}/lib_aux.c
 	${LUAJIT_DIR}/lib_base.c
