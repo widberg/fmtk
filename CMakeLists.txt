@@ -36,7 +36,6 @@ add_subdirectory(fmtkdll)
 add_subdirectory(fmtk)
 
 add_subdirectory(dpc)
-add_subdirectory(dpcinfo)
 add_subdirectory(crc32)
 
 add_custom_target(package COMMAND
