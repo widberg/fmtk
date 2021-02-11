@@ -6,6 +6,10 @@
 #include <cstdint>
 #include <iostream>
 #include <cstring>
+#include <unordered_set>
+
+std::unordered_set<std::uint32_t> classCRC32s;
+std::unordered_set<std::uint32_t> heights;
 
 #define FIELD(name) { #name, name }
 
@@ -33,6 +37,7 @@ std::vector<std::uint8_t> unLZ(const std::vector<std::uint8_t>& data)
     dp += sizeof(l);
 
     std::uint32_t len = *(std::uint32_t*)(data.data() + 4);
+    std::uint32_t decompLen = *(std::uint32_t*)(data.data());
 
     flagbit = 0;
 
@@ -53,7 +58,7 @@ std::vector<std::uint8_t> unLZ(const std::vector<std::uint8_t>& data)
         flagbit--;
 
         c = *(dp++);
-        if (dp >= data.data() + len)
+        if (decompLen == decompressed.size())
             break;
 
         if (flag == 0)
@@ -84,7 +89,6 @@ std::vector<std::uint8_t> unLZ(const std::vector<std::uint8_t>& data)
 
     return decompressed;
 }
-
 
 std::uint32_t calculatePaddedSize(std::uint32_t unpaddedSize)
 {
@@ -216,6 +220,8 @@ struct Resource
 
     nlohmann::json to_json() const
     {
+        classCRC32s.insert(resourceHeader.classCRC32);
+
         return
         {
             { "resourceHeader", resourceHeader.to_json() },
@@ -227,13 +233,16 @@ struct Resource
 struct UnitResource
 {
     ResourceHeader resourceHeader;
+    std::vector<std::uint8_t> classObject;
     std::vector<std::uint8_t> data;
 
     nlohmann::json to_json() const
     {
-        if (resourceHeader.classCRC32 == 4096629181 && !resourceHeader.compressedSize)
+        /*classCRC32s.insert(resourceHeader.classCRC32);*/
+
+        if (resourceHeader.classCRC32 == 4096629181)
         {
-            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
 
             nlohmann::json gameObj;
 
@@ -259,38 +268,41 @@ struct UnitResource
                 }
             }
 
-            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
-            std::uint32_t childCount = *pData;
-            gameObj["childCount"] = childCount;
-            pData++;
-
-            gameObj["children"] = nlohmann::json::array();
-
-            for (std::uint32_t i = 0; i < childCount; ++i)
+            if (data.size())
             {
-                nlohmann::json child;
-                std::uint32_t strLen = *pData;
-                child["strLen"] = strLen;
-                pData++;
-                child["str"] = (char*)pData;
-                pData = (std::uint32_t*)((char*)pData + strLen);
-
-                child["u0"] = *pData;
+                pData = reinterpret_cast<const std::uint32_t*>(data.data());
+                std::uint32_t childCount = *pData;
+                gameObj["childCount"] = childCount;
                 pData++;
 
-                std::uint32_t crc32Count = *pData;
-                child["crc32Count"] = crc32Count;
-                pData++;
+                gameObj["children"] = nlohmann::json::array();
 
-                child["crc32s"] = nlohmann::json::array();
-
-                for (std::uint32_t j = 0; j < crc32Count; ++j)
+                for (std::uint32_t i = 0; i < childCount; ++i)
                 {
-                    child["crc32s"].push_back(*pData);
+                    nlohmann::json child;
+                    std::uint32_t strLen = *pData;
+                    child["strLen"] = strLen;
                     pData++;
-                }
+                    child["str"] = (char*)pData;
+                    pData = (std::uint32_t*)((char*)pData + strLen);
 
-                gameObj["children"].push_back(child);
+                    child["u0"] = *pData;
+                    pData++;
+
+                    std::uint32_t crc32Count = *pData;
+                    child["crc32Count"] = crc32Count;
+                    pData++;
+
+                    child["crc32s"] = nlohmann::json::array();
+
+                    for (std::uint32_t j = 0; j < crc32Count; ++j)
+                    {
+                        child["crc32s"].push_back(*pData);
+                        pData++;
+                    }
+
+                    gameObj["children"].push_back(child);
+                }
             }
 
             return
@@ -299,6 +311,1901 @@ struct UnitResource
                 { "$GameObj_Z", gameObj },
             };
         }
+        if (resourceHeader.classCRC32 == 2245010728)
+        {
+            nlohmann::json node;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                node["parentNodeCRC32"] = *pData;
+            }
+            else if (resourceHeader.classObjectSize == 8)
+            {
+                node["parentNodeCRC32"] = *pData;
+                pData++;
+                node["zero"] = *pData;
+            }
+            else if (resourceHeader.classObjectSize == 12)
+            {
+                node["parentNodeCRC32"] = *pData;
+                pData++;
+                node["u0"] = *pData;
+                pData++;
+                node["zero"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            if (data.size())
+            {
+                pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+                node["u00"] = *pData;
+                pData++;
+                node["u01"] = *pData;
+                pData++;
+                node["u02"] = *pData;
+                pData++;
+                node["u03"] = *pData;
+                pData++;
+                node["u04"] = *pData;
+                pData++;
+                node["u05"] = *pData;
+                pData++;
+                node["u06"] = *pData;
+                pData++;
+                node["u07"] = *pData;
+                pData++;
+                node["u08"] = *pData;
+                pData++;
+                node["u09"] = *pData;
+                pData++;
+            }
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Node_Z", node },
+            };
+        }
+        if (resourceHeader.classCRC32 == 1471281566)
+        {
+            nlohmann::json bitmap;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
+
+            if (resourceHeader.classObjectSize == 32)
+            {
+                bitmap["crc32"] = *pData;
+                pData++;
+
+                std::uint8_t* p8 = (std::uint8_t*)pData;
+
+                bitmap["u00"] = *p8;
+                p8++;
+                bitmap["u01"] = *p8;
+                p8++;
+
+                pData = (std::uint32_t*)p8;
+
+                std::uint32_t x = *pData;
+                bitmap["width"] = x;
+                pData++;
+                std::uint32_t y = *pData;
+                bitmap["height"] = y;
+                pData++;
+
+                p8 = (std::uint8_t*)pData;
+
+                bitmap["u02"] = *p8;
+                p8++;
+                bitmap["u03"] = *p8;
+                p8++;
+                bitmap["u04"] = *p8;
+                p8++;
+                bitmap["u05"] = *p8;
+                p8++;
+                heights.insert(*p8);
+                bitmap["u06"] = *p8;
+                p8++;
+                bitmap["bitmapType"] = *p8;
+                p8++;
+                bitmap["u08"] = *p8;
+                p8++;
+                bitmap["u09"] = *p8;
+                p8++;
+                bitmap["u10"] = *p8;
+                p8++;
+                bitmap["u11"] = *p8;
+                p8++;
+                bitmap["u12"] = *p8;
+                p8++;
+                bitmap["u13"] = *p8;
+                p8++;
+                bitmap["u14"] = *p8;
+                p8++;
+                bitmap["mipMapCount"] = *p8;
+                p8++;
+                bitmap["u16"] = *p8;
+                p8++;
+                bitmap["u17"] = *p8;
+                p8++;
+                bitmap["u18"] = *p8;
+                p8++;
+                bitmap["u19"] = *p8;
+                p8++;
+            }
+            else if (resourceHeader.classObjectSize == 13)
+            {
+                bitmap["_crc32"] = *pData;
+                pData++;
+
+                std::uint8_t* p8 = (std::uint8_t*)pData;
+
+                bitmap["u00"] = *p8;
+                p8++;
+                bitmap["u01"] = *p8;
+                p8++;
+                bitmap["u02"] = *p8;
+                p8++;
+                bitmap["u03"] = *p8;
+                p8++;
+                bitmap["u04"] = *p8;
+                p8++;
+                bitmap["u05"] = *p8;
+                p8++;
+                bitmap["u06"] = *p8;
+                p8++;
+                bitmap["u07"] = *p8;
+                p8++;
+                bitmap["u08"] = *p8;
+                p8++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Bitmap_Z", bitmap },
+            };
+        }
+        /*else if (resourceHeader.classCRC32 == 1387343541 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json mesh;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            mesh["nameCRC32"] = *pData;
+            pData++;
+            mesh["meshDataCRC32"] = *pData;
+            pData++;
+            mesh["u0"] = *pData;
+            pData++;
+            mesh["u1"] = *pData;
+            pData++;
+            mesh["u2"] = *pData;
+            pData++;
+            mesh["u3"] = *pData;
+            pData++;
+            mesh["u4"] = *pData;
+            pData++;
+            mesh["u5"] = *pData;
+            pData++;
+            mesh["u6"] = *pData;
+            pData++;
+            mesh["u7"] = *pData;
+            pData++;
+            mesh["u8"] = *pData;
+            pData++;
+            mesh["u9"] = *pData;
+            pData++;
+            mesh["u10"] = *pData;
+            pData++;
+            mesh["u11"] = *pData;
+            pData++;
+            mesh["u12"] = *pData;
+            pData++;
+            mesh["u13"] = *pData;
+            pData++;
+            mesh["u14"] = *pData;
+            pData++;
+            mesh["u15"] = *pData;
+            pData++;
+            mesh["u16"] = *pData;
+            pData++;
+            mesh["u17"] = *pData;
+            pData++;
+            mesh["u18"] = *pData;
+            pData++;
+            mesh["u19"] = *pData;
+            pData++;
+            mesh["u20"] = *pData;
+            pData++;
+            mesh["u21"] = *pData;
+            pData++;
+            mesh["u22"] = *pData;
+            pData++;
+            mesh["u23"] = *pData;
+            pData++;
+            mesh["u24"] = *pData;
+            pData++;
+            mesh["u25"] = *pData;
+            pData++;
+            mesh["u26"] = *pData;
+            pData++;
+            mesh["u27"] = *pData;
+            pData++;
+            mesh["u28"] = *pData;
+            pData++;
+            mesh["u29"] = *pData;
+            pData++;
+            mesh["u30"] = *pData;
+            pData++;
+            mesh["u31"] = *pData;
+            pData++;
+            mesh["u32"] = *pData;
+            pData++;
+            mesh["u33"] = *pData;
+            pData++;
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Mesh_Z", mesh },
+            };
+        }*/
+        if (resourceHeader.classCRC32 == 848525546)
+        {
+            nlohmann::json lightData;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                lightData["u0"] = *pData;
+            }
+            else if (resourceHeader.classObjectSize == 8)
+            {
+                lightData["u0"] = *pData;
+                pData++;
+                lightData["u1"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            assert(resourceHeader.decompressedSize == 56);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$LightData_Z", lightData },
+            };
+        }
+        /*else if (resourceHeader.classCRC32 == 3626109572 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json meshData;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                meshData["u0"] = *pData;
+            }
+            else if (resourceHeader.classObjectSize == 8)
+            {
+                meshData["u0"] = *pData;
+                pData++;
+                meshData["u1"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            assert(resourceHeader.decompressedSize == 20);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$MeshData_Z", meshData },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 954499543 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json particleData;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                particleData["u0"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            assert(resourceHeader.decompressedSize == 38 || resourceHeader.decompressedSize == 40 || resourceHeader.decompressedSize == 42 || resourceHeader.decompressedSize == 44);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$ParticlesData_Z", particleData },
+            };
+        }*/
+        if (resourceHeader.classCRC32 == 3747817665)
+        {
+            nlohmann::json surfaceDatas;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                surfaceDatas["u0"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            if (data.size())
+            {
+                pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+                surfaceDatas["u1"] = *pData;
+            }
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$SurfaceDatas_Z", surfaceDatas },
+            };
+        }
+        /*else if (resourceHeader.classCRC32 == 3412401859 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json lodData;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                lodData["u0"] = *pData;
+            }
+            else if (resourceHeader.classObjectSize == 8)
+            {
+                lodData["u0"] = *pData;
+                pData++;
+                lodData["u1"] = *pData;
+                pData++;
+            }
+            else if (resourceHeader.classObjectSize == 12)
+            {
+                lodData["u0"] = *pData;
+                pData++;
+                lodData["u1"] = *pData;
+                pData++;
+                lodData["u2"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$LodData_Z", lodData },
+            };
+        }*/
+        if (resourceHeader.classCRC32 == 1391959958)
+        {
+            nlohmann::json userDefine;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                userDefine["nameCRC32"] = *pData;
+            }
+            else if (resourceHeader.classObjectSize == 8)
+            {
+                userDefine["nameCRC32"] = *pData;
+                pData++;
+                userDefine["zero"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            if (data.size())
+            {
+                pData = reinterpret_cast<const std::uint32_t*>(data.data());
+            
+                std::uint32_t strLen = *pData;
+                pData++;
+                userDefine["strLen"] = strLen;
+                std::string str;
+                str.resize(strLen);
+                memcpy_s(str.data(), str.size(), (char*)pData, strLen);
+                userDefine["str"] = str;
+            }
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$UserDefine_Z", userDefine },
+            };
+        }
+        /*else if (resourceHeader.classCRC32 == 1175485833 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json animation;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                animation["u0"] = *pData;
+            }
+            else if (resourceHeader.classObjectSize == 8)
+            {
+                animation["u0"] = *pData;
+                pData++;
+                animation["u1"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Animation_Z", animation },
+            };
+        }*/
+        if (resourceHeader.classCRC32 == 705810152)
+        {
+            nlohmann::json rtc;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                rtc["u0"] = *pData;
+            }
+            else if (resourceHeader.classObjectSize == 8)
+            {
+                rtc["u0"] = *pData;
+                pData++;
+                rtc["u1"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Rtc_Z", rtc },
+            };
+        }
+        /*else if (resourceHeader.classCRC32 == 968261323 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json world;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                world["u0"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$World_Z", world },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 1536002910 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json fonts;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                fonts["u0"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Fonts_Z", fonts },
+            };
+        }*/
+        if (resourceHeader.classCRC32 == 1625945536)
+        {
+            nlohmann::json rotShapeData;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                rotShapeData["u0"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$RotShapeData_Z", rotShapeData },
+            };
+        }
+        if (resourceHeader.classCRC32 == 1114947943)
+        {
+            nlohmann::json warp;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                warp["u0"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Warp_Z", warp },
+            };
+        }
+        /*else if (resourceHeader.classCRC32 == 849861735 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json materialObj;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                materialObj["u0"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$MaterialObj_Z", materialObj },
+            };
+        }*/
+        if (resourceHeader.classCRC32 == 849267944)
+        {
+            nlohmann::json sound;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
+
+            if (resourceHeader.classObjectSize == 8)
+            {
+                sound["crc32"] = *pData;
+                pData++;
+                sound["zero"] = *pData;
+                pData++;
+            }
+            else if (resourceHeader.classObjectSize == 14)
+            {
+                sound["crc32"] = *pData;
+                pData++;
+                sound["sampleRate"] = *pData;
+                pData++;
+                sound["dataSize"] = *pData;
+                pData++;
+                std::uint16_t* p16 = (std::uint16_t*)pData;
+                sound["u0"] = *p16;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Sound_Z", sound },
+            };
+        }
+        /*else if (resourceHeader.classCRC32 == 549480509 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json omni;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                omni["u0"] = *pData;
+                pData++;
+                omni["u1"] = *pData;
+                pData++;
+                omni["u2"] = *pData;
+                pData++;
+                omni["u3"] = *pData;
+                pData++;
+                omni["u4"] = *pData;
+                pData++;
+                omni["u5"] = *pData;
+                pData++;
+                omni["u6"] = *pData;
+                pData++;
+                omni["u7"] = *pData;
+                pData++;
+                omni["u8"] = *pData;
+                pData++;
+                omni["u9"] = *pData;
+                pData++;
+                omni["u10"] = *pData;
+                pData++;
+                omni["u11"] = *pData;
+                pData++;
+                omni["u12"] = *pData;
+                pData++;
+                omni["u13"] = *pData;
+                pData++;
+                omni["u14"] = *pData;
+                pData++;
+                omni["u15"] = *pData;
+                pData++;
+                omni["u16"] = *pData;
+                pData++;
+                omni["u17"] = *pData;
+                pData++;
+                omni["u18"] = *pData;
+                pData++;
+                omni["u19"] = *pData;
+                pData++;
+                omni["u20"] = *pData;
+                pData++;
+                omni["u21"] = *pData;
+                pData++;
+                omni["u22"] = *pData;
+                pData++;
+                omni["u23"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Omni_Z", omni },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 838505646 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json genWorld;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                genWorld["u0"] = *pData;
+                pData++;
+                genWorld["u1"] = *pData;
+                pData++;
+                genWorld["u2"] = *pData;
+                pData++;
+                genWorld["u3"] = *pData;
+                pData++;
+                genWorld["u4"] = *pData;
+                pData++;
+                genWorld["u5"] = *pData;
+                pData++;
+                genWorld["u6"] = *pData;
+                pData++;
+                genWorld["u7"] = *pData;
+                pData++;
+                genWorld["u8"] = *pData;
+                pData++;
+                genWorld["u9"] = *pData;
+                pData++;
+                genWorld["u10"] = *pData;
+                pData++;
+                genWorld["u11"] = *pData;
+                pData++;
+                genWorld["u12"] = *pData;
+                pData++;
+                genWorld["u13"] = *pData;
+                pData++;
+                genWorld["u14"] = *pData;
+                pData++;
+                genWorld["u15"] = *pData;
+                pData++;
+                genWorld["u16"] = *pData;
+                pData++;
+                genWorld["u17"] = *pData;
+                pData++;
+                genWorld["u18"] = *pData;
+                pData++;
+                genWorld["u19"] = *pData;
+                pData++;
+                genWorld["u20"] = *pData;
+                pData++;
+                genWorld["u21"] = *pData;
+                pData++;
+                genWorld["u22"] = *pData;
+                pData++;
+                genWorld["u23"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$GenWorld_Z", genWorld },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 866453734 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json rotShape;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                rotShape["u0"] = *pData;
+                pData++;
+                rotShape["u1"] = *pData;
+                pData++;
+                rotShape["u2"] = *pData;
+                pData++;
+                rotShape["u3"] = *pData;
+                pData++;
+                rotShape["u4"] = *pData;
+                pData++;
+                rotShape["u5"] = *pData;
+                pData++;
+                rotShape["u6"] = *pData;
+                pData++;
+                rotShape["u7"] = *pData;
+                pData++;
+                rotShape["u8"] = *pData;
+                pData++;
+                rotShape["u9"] = *pData;
+                pData++;
+                rotShape["u10"] = *pData;
+                pData++;
+                rotShape["u11"] = *pData;
+                pData++;
+                rotShape["u12"] = *pData;
+                pData++;
+                rotShape["u13"] = *pData;
+                pData++;
+                rotShape["u14"] = *pData;
+                pData++;
+                rotShape["u15"] = *pData;
+                pData++;
+                rotShape["u16"] = *pData;
+                pData++;
+                rotShape["u17"] = *pData;
+                pData++;
+                rotShape["u18"] = *pData;
+                pData++;
+                rotShape["u19"] = *pData;
+                pData++;
+                rotShape["u20"] = *pData;
+                pData++;
+                rotShape["u21"] = *pData;
+                pData++;
+                rotShape["u22"] = *pData;
+                pData++;
+                rotShape["u23"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$RotShape_Z", rotShape },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 1396791303 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json skin;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                skin["u0"] = *pData;
+                pData++;
+                skin["u1"] = *pData;
+                pData++;
+                skin["u2"] = *pData;
+                pData++;
+                skin["u3"] = *pData;
+                pData++;
+                skin["u4"] = *pData;
+                pData++;
+                skin["u5"] = *pData;
+                pData++;
+                skin["u6"] = *pData;
+                pData++;
+                skin["u7"] = *pData;
+                pData++;
+                skin["u8"] = *pData;
+                pData++;
+                skin["u9"] = *pData;
+                pData++;
+                skin["u10"] = *pData;
+                pData++;
+                skin["u11"] = *pData;
+                pData++;
+                skin["u12"] = *pData;
+                pData++;
+                skin["u13"] = *pData;
+                pData++;
+                skin["u14"] = *pData;
+                pData++;
+                skin["u15"] = *pData;
+                pData++;
+                skin["u16"] = *pData;
+                pData++;
+                skin["u17"] = *pData;
+                pData++;
+                skin["u18"] = *pData;
+                pData++;
+                skin["u19"] = *pData;
+                pData++;
+                skin["u20"] = *pData;
+                pData++;
+                skin["u21"] = *pData;
+                pData++;
+                skin["u22"] = *pData;
+                pData++;
+                skin["u23"] = *pData;
+                pData++;
+            }
+            else if (resourceHeader.classObjectSize == 106)
+            {
+                skin["u0"] = *pData;
+                pData++;
+                skin["u1"] = *pData;
+                pData++;
+                skin["u2"] = *pData;
+                pData++;
+                skin["u3"] = *pData;
+                pData++;
+                skin["u4"] = *pData;
+                pData++;
+                skin["u5"] = *pData;
+                pData++;
+                skin["u6"] = *pData;
+                pData++;
+                skin["u7"] = *pData;
+                pData++;
+                skin["u8"] = *pData;
+                pData++;
+                skin["u9"] = *pData;
+                pData++;
+                skin["u10"] = *pData;
+                pData++;
+                skin["u11"] = *pData;
+                pData++;
+                skin["u12"] = *pData;
+                pData++;
+                skin["u13"] = *pData;
+                pData++;
+                skin["u14"] = *pData;
+                pData++;
+                skin["u15"] = *pData;
+                pData++;
+                skin["u16"] = *pData;
+                pData++;
+                skin["u17"] = *pData;
+                pData++;
+                skin["u18"] = *pData;
+                pData++;
+                skin["u19"] = *pData;
+                pData++;
+                skin["u20"] = *pData;
+                pData++;
+                skin["u21"] = *pData;
+                pData++;
+                skin["u22"] = *pData;
+                pData++;
+                skin["u23"] = *pData;
+                pData++;
+                skin["u24"] = *pData;
+                pData++;
+                skin["u25"] = *pData;
+                pData++;
+            }
+            else if (resourceHeader.classObjectSize == 102)
+            {
+                skin["u0"] = *pData;
+                pData++;
+                skin["u1"] = *pData;
+                pData++;
+                skin["u2"] = *pData;
+                pData++;
+                skin["u3"] = *pData;
+                pData++;
+                skin["u4"] = *pData;
+                pData++;
+                skin["u5"] = *pData;
+                pData++;
+                skin["u6"] = *pData;
+                pData++;
+                skin["u7"] = *pData;
+                pData++;
+                skin["u8"] = *pData;
+                pData++;
+                skin["u9"] = *pData;
+                pData++;
+                skin["u10"] = *pData;
+                pData++;
+                skin["u11"] = *pData;
+                pData++;
+                skin["u12"] = *pData;
+                pData++;
+                skin["u13"] = *pData;
+                pData++;
+                skin["u14"] = *pData;
+                pData++;
+                skin["u15"] = *pData;
+                pData++;
+                skin["u16"] = *pData;
+                pData++;
+                skin["u17"] = *pData;
+                pData++;
+                skin["u18"] = *pData;
+                pData++;
+                skin["u19"] = *pData;
+                pData++;
+                skin["u20"] = *pData;
+                pData++;
+                skin["u21"] = *pData;
+                pData++;
+                skin["u22"] = *pData;
+                pData++;
+                skin["u23"] = *pData;
+                pData++;
+                skin["u24"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Skin_Z", skin },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 1706265229 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json surface;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                surface["u0"] = *pData;
+                pData++;
+                surface["u1"] = *pData;
+                pData++;
+                surface["u2"] = *pData;
+                pData++;
+                surface["u3"] = *pData;
+                pData++;
+                surface["u4"] = *pData;
+                pData++;
+                surface["u5"] = *pData;
+                pData++;
+                surface["u6"] = *pData;
+                pData++;
+                surface["u7"] = *pData;
+                pData++;
+                surface["u8"] = *pData;
+                pData++;
+                surface["u9"] = *pData;
+                pData++;
+                surface["u10"] = *pData;
+                pData++;
+                surface["u11"] = *pData;
+                pData++;
+                surface["u12"] = *pData;
+                pData++;
+                surface["u13"] = *pData;
+                pData++;
+                surface["u14"] = *pData;
+                pData++;
+                surface["u15"] = *pData;
+                pData++;
+                surface["u16"] = *pData;
+                pData++;
+                surface["u17"] = *pData;
+                pData++;
+                surface["u18"] = *pData;
+                pData++;
+                surface["u19"] = *pData;
+                pData++;
+                surface["u20"] = *pData;
+                pData++;
+                surface["u21"] = *pData;
+                pData++;
+                surface["u22"] = *pData;
+                pData++;
+                surface["u23"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Surface_Z", surface },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 3312018398 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json particles;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                particles["u0"] = *pData;
+                pData++;
+                particles["u1"] = *pData;
+                pData++;
+                particles["u2"] = *pData;
+                pData++;
+                particles["u3"] = *pData;
+                pData++;
+                particles["u4"] = *pData;
+                pData++;
+                particles["u5"] = *pData;
+                pData++;
+                particles["u6"] = *pData;
+                pData++;
+                particles["u7"] = *pData;
+                pData++;
+                particles["u8"] = *pData;
+                pData++;
+                particles["u9"] = *pData;
+                pData++;
+                particles["u10"] = *pData;
+                pData++;
+                particles["u11"] = *pData;
+                pData++;
+                particles["u12"] = *pData;
+                pData++;
+                particles["u13"] = *pData;
+                pData++;
+                particles["u14"] = *pData;
+                pData++;
+                particles["u15"] = *pData;
+                pData++;
+                particles["u16"] = *pData;
+                pData++;
+                particles["u17"] = *pData;
+                pData++;
+                particles["u18"] = *pData;
+                pData++;
+                particles["u19"] = *pData;
+                pData++;
+                particles["u20"] = *pData;
+                pData++;
+                particles["u21"] = *pData;
+                pData++;
+                particles["u22"] = *pData;
+                pData++;
+                particles["u23"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Particles_Z", particles },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 2906362741 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json worldRef;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                worldRef["u0"] = *pData;
+                pData++;
+                worldRef["u1"] = *pData;
+                pData++;
+                worldRef["u2"] = *pData;
+                pData++;
+                worldRef["u3"] = *pData;
+                pData++;
+                worldRef["u4"] = *pData;
+                pData++;
+                worldRef["u5"] = *pData;
+                pData++;
+                worldRef["u6"] = *pData;
+                pData++;
+                worldRef["u7"] = *pData;
+                pData++;
+                worldRef["u8"] = *pData;
+                pData++;
+                worldRef["u9"] = *pData;
+                pData++;
+                worldRef["u10"] = *pData;
+                pData++;
+                worldRef["u11"] = *pData;
+                pData++;
+                worldRef["u12"] = *pData;
+                pData++;
+                worldRef["u13"] = *pData;
+                pData++;
+                worldRef["u14"] = *pData;
+                pData++;
+                worldRef["u15"] = *pData;
+                pData++;
+                worldRef["u16"] = *pData;
+                pData++;
+                worldRef["u17"] = *pData;
+                pData++;
+                worldRef["u18"] = *pData;
+                pData++;
+                worldRef["u19"] = *pData;
+                pData++;
+                worldRef["u20"] = *pData;
+                pData++;
+                worldRef["u21"] = *pData;
+                pData++;
+                worldRef["u22"] = *pData;
+                pData++;
+                worldRef["u23"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$WorldRef_Z", worldRef },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 1910554652 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json splineGraph;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                splineGraph["u0"] = *pData;
+                pData++;
+                splineGraph["u1"] = *pData;
+                pData++;
+                splineGraph["u2"] = *pData;
+                pData++;
+                splineGraph["u3"] = *pData;
+                pData++;
+                splineGraph["u4"] = *pData;
+                pData++;
+                splineGraph["u5"] = *pData;
+                pData++;
+                splineGraph["u6"] = *pData;
+                pData++;
+                splineGraph["u7"] = *pData;
+                pData++;
+                splineGraph["u8"] = *pData;
+                pData++;
+                splineGraph["u9"] = *pData;
+                pData++;
+                splineGraph["u10"] = *pData;
+                pData++;
+                splineGraph["u11"] = *pData;
+                pData++;
+                splineGraph["u12"] = *pData;
+                pData++;
+                splineGraph["u13"] = *pData;
+                pData++;
+                splineGraph["u14"] = *pData;
+                pData++;
+                splineGraph["u15"] = *pData;
+                pData++;
+                splineGraph["u16"] = *pData;
+                pData++;
+                splineGraph["u17"] = *pData;
+                pData++;
+                splineGraph["u18"] = *pData;
+                pData++;
+                splineGraph["u19"] = *pData;
+                pData++;
+                splineGraph["u20"] = *pData;
+                pData++;
+                splineGraph["u21"] = *pData;
+                pData++;
+                splineGraph["u22"] = *pData;
+                pData++;
+                splineGraph["u23"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$SplineGraph_Z", splineGraph },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 2398393906 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json collisionVol;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                collisionVol["u0"] = *pData;
+                pData++;
+                collisionVol["u1"] = *pData;
+                pData++;
+                collisionVol["u2"] = *pData;
+                pData++;
+                collisionVol["u3"] = *pData;
+                pData++;
+                collisionVol["u4"] = *pData;
+                pData++;
+                collisionVol["u5"] = *pData;
+                pData++;
+                collisionVol["u6"] = *pData;
+                pData++;
+                collisionVol["u7"] = *pData;
+                pData++;
+                collisionVol["u8"] = *pData;
+                pData++;
+                collisionVol["u9"] = *pData;
+                pData++;
+                collisionVol["u10"] = *pData;
+                pData++;
+                collisionVol["u11"] = *pData;
+                pData++;
+                collisionVol["u12"] = *pData;
+                pData++;
+                collisionVol["u13"] = *pData;
+                pData++;
+                collisionVol["u14"] = *pData;
+                pData++;
+                collisionVol["u15"] = *pData;
+                pData++;
+                collisionVol["u16"] = *pData;
+                pData++;
+                collisionVol["u17"] = *pData;
+                pData++;
+                collisionVol["u18"] = *pData;
+                pData++;
+                collisionVol["u19"] = *pData;
+                pData++;
+                collisionVol["u20"] = *pData;
+                pData++;
+                collisionVol["u21"] = *pData;
+                pData++;
+                collisionVol["u22"] = *pData;
+                pData++;
+                collisionVol["u23"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$CollisionVol_Z", collisionVol },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 1943824915 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json lod;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                lod["u0"] = *pData;
+                pData++;
+                lod["u1"] = *pData;
+                pData++;
+                lod["u2"] = *pData;
+                pData++;
+                lod["u3"] = *pData;
+                pData++;
+                lod["u4"] = *pData;
+                pData++;
+                lod["u5"] = *pData;
+                pData++;
+                lod["u6"] = *pData;
+                pData++;
+                lod["u7"] = *pData;
+                pData++;
+                lod["u8"] = *pData;
+                pData++;
+                lod["u9"] = *pData;
+                pData++;
+                lod["u10"] = *pData;
+                pData++;
+                lod["u11"] = *pData;
+                pData++;
+                lod["u12"] = *pData;
+                pData++;
+                lod["u13"] = *pData;
+                pData++;
+                lod["u14"] = *pData;
+                pData++;
+                lod["u15"] = *pData;
+                pData++;
+                lod["u16"] = *pData;
+                pData++;
+                lod["u17"] = *pData;
+                pData++;
+                lod["u18"] = *pData;
+                pData++;
+                lod["u19"] = *pData;
+                pData++;
+                lod["u20"] = *pData;
+                pData++;
+                lod["u21"] = *pData;
+                pData++;
+                lod["u22"] = *pData;
+                pData++;
+                lod["u23"] = *pData;
+                pData++;
+            }
+            else if (resourceHeader.classObjectSize == 102)
+            {
+                lod["u0"] = *pData;
+                pData++;
+                lod["u1"] = *pData;
+                pData++;
+                lod["u2"] = *pData;
+                pData++;
+                lod["u3"] = *pData;
+                pData++;
+                lod["u4"] = *pData;
+                pData++;
+                lod["u5"] = *pData;
+                pData++;
+                lod["u6"] = *pData;
+                pData++;
+                lod["u7"] = *pData;
+                pData++;
+                lod["u8"] = *pData;
+                pData++;
+                lod["u9"] = *pData;
+                pData++;
+                lod["u10"] = *pData;
+                pData++;
+                lod["u11"] = *pData;
+                pData++;
+                lod["u12"] = *pData;
+                pData++;
+                lod["u13"] = *pData;
+                pData++;
+                lod["u14"] = *pData;
+                pData++;
+                lod["u15"] = *pData;
+                pData++;
+                lod["u16"] = *pData;
+                pData++;
+                lod["u17"] = *pData;
+                pData++;
+                lod["u18"] = *pData;
+                pData++;
+                lod["u19"] = *pData;
+                pData++;
+                lod["u20"] = *pData;
+                pData++;
+                lod["u21"] = *pData;
+                pData++;
+                lod["u22"] = *pData;
+                pData++;
+                lod["u23"] = *pData;
+                pData++;
+                lod["u24"] = *pData;
+                pData++;
+            }
+            else if (resourceHeader.classObjectSize == 110)
+            {
+                lod["u0"] = *pData;
+                pData++;
+                lod["u1"] = *pData;
+                pData++;
+                lod["u2"] = *pData;
+                pData++;
+                lod["u3"] = *pData;
+                pData++;
+                lod["u4"] = *pData;
+                pData++;
+                lod["u5"] = *pData;
+                pData++;
+                lod["u6"] = *pData;
+                pData++;
+                lod["u7"] = *pData;
+                pData++;
+                lod["u8"] = *pData;
+                pData++;
+                lod["u9"] = *pData;
+                pData++;
+                lod["u10"] = *pData;
+                pData++;
+                lod["u11"] = *pData;
+                pData++;
+                lod["u12"] = *pData;
+                pData++;
+                lod["u13"] = *pData;
+                pData++;
+                lod["u14"] = *pData;
+                pData++;
+                lod["u15"] = *pData;
+                pData++;
+                lod["u16"] = *pData;
+                pData++;
+                lod["u17"] = *pData;
+                pData++;
+                lod["u18"] = *pData;
+                pData++;
+                lod["u19"] = *pData;
+                pData++;
+                lod["u20"] = *pData;
+                pData++;
+                lod["u21"] = *pData;
+                pData++;
+                lod["u22"] = *pData;
+                pData++;
+                lod["u23"] = *pData;
+                pData++;
+                lod["u24"] = *pData;
+                pData++;
+                lod["u25"] = *pData;
+                pData++;
+                lod["u26"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Lod_Z", lod },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 4240844041 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json camera;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                camera["u0"] = *pData;
+                pData++;
+                camera["u1"] = *pData;
+                pData++;
+                camera["u2"] = *pData;
+                pData++;
+                camera["u3"] = *pData;
+                pData++;
+                camera["u4"] = *pData;
+                pData++;
+                camera["u5"] = *pData;
+                pData++;
+                camera["u6"] = *pData;
+                pData++;
+                camera["u7"] = *pData;
+                pData++;
+                camera["u8"] = *pData;
+                pData++;
+                camera["u9"] = *pData;
+                pData++;
+                camera["u10"] = *pData;
+                pData++;
+                camera["u11"] = *pData;
+                pData++;
+                camera["u12"] = *pData;
+                pData++;
+                camera["u13"] = *pData;
+                pData++;
+                camera["u14"] = *pData;
+                pData++;
+                camera["u15"] = *pData;
+                pData++;
+                camera["u16"] = *pData;
+                pData++;
+                camera["u17"] = *pData;
+                pData++;
+                camera["u18"] = *pData;
+                pData++;
+                camera["u19"] = *pData;
+                pData++;
+                camera["u20"] = *pData;
+                pData++;
+                camera["u21"] = *pData;
+                pData++;
+                camera["u22"] = *pData;
+                pData++;
+                camera["u23"] = *pData;
+                pData++;
+            }
+            else if (resourceHeader.classObjectSize == 102)
+            {
+                camera["u0"] = *pData;
+                pData++;
+                camera["u1"] = *pData;
+                pData++;
+                camera["u2"] = *pData;
+                pData++;
+                camera["u3"] = *pData;
+                pData++;
+                camera["u4"] = *pData;
+                pData++;
+                camera["u5"] = *pData;
+                pData++;
+                camera["u6"] = *pData;
+                pData++;
+                camera["u7"] = *pData;
+                pData++;
+                camera["u8"] = *pData;
+                pData++;
+                camera["u9"] = *pData;
+                pData++;
+                camera["u10"] = *pData;
+                pData++;
+                camera["u11"] = *pData;
+                pData++;
+                camera["u12"] = *pData;
+                pData++;
+                camera["u13"] = *pData;
+                pData++;
+                camera["u14"] = *pData;
+                pData++;
+                camera["u15"] = *pData;
+                pData++;
+                camera["u16"] = *pData;
+                pData++;
+                camera["u17"] = *pData;
+                pData++;
+                camera["u18"] = *pData;
+                pData++;
+                camera["u19"] = *pData;
+                pData++;
+                camera["u20"] = *pData;
+                pData++;
+                camera["u21"] = *pData;
+                pData++;
+                camera["u22"] = *pData;
+                pData++;
+                camera["u23"] = *pData;
+                pData++;
+                camera["u24"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Camera_Z", camera },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 2259852416 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json binary;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                binary["u0"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Binary_Z", binary },
+            };
+        }*/
+        if (resourceHeader.classCRC32 == 3845834591)
+        {
+            nlohmann::json gwRoad;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(classObject.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                gwRoad["u0"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$GwRoad_Z", gwRoad },
+            };
+        }
+        /*else if (resourceHeader.classCRC32 == 3834418854 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json materialAnim;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                materialAnim["u0"] = *pData;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$MaterialAnim_Z", materialAnim },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 2204276779 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json material;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                material["u0"] = *pData;
+            }
+            else if (resourceHeader.classObjectSize == 8)
+            {
+                material["u0"] = *pData;
+                pData++;
+                material["u1"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Material_Z", material },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 3611002348 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json skel;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 4)
+            {
+                skel["u0"] = *pData;
+            }
+            else if (resourceHeader.classObjectSize == 8)
+            {
+                skel["u0"] = *pData;
+                pData++;
+                skel["u1"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Skel_Z", skel },
+            };
+        }
+        else if (resourceHeader.classCRC32 == 1135194223 && !resourceHeader.compressedSize)
+        {
+            nlohmann::json spline;
+
+            const std::uint32_t* pData = reinterpret_cast<const std::uint32_t*>(data.data());
+
+            if (resourceHeader.classObjectSize == 98)
+            {
+                spline["u0"] = *pData;
+                pData++;
+                spline["u1"] = *pData;
+                pData++;
+                spline["u2"] = *pData;
+                pData++;
+                spline["u3"] = *pData;
+                pData++;
+                spline["u4"] = *pData;
+                pData++;
+                spline["u5"] = *pData;
+                pData++;
+                spline["u6"] = *pData;
+                pData++;
+                spline["u7"] = *pData;
+                pData++;
+                spline["u8"] = *pData;
+                pData++;
+                spline["u9"] = *pData;
+                pData++;
+                spline["u10"] = *pData;
+                pData++;
+                spline["u11"] = *pData;
+                pData++;
+                spline["u12"] = *pData;
+                pData++;
+                spline["u13"] = *pData;
+                pData++;
+                spline["u14"] = *pData;
+                pData++;
+                spline["u15"] = *pData;
+                pData++;
+                spline["u16"] = *pData;
+                pData++;
+                spline["u17"] = *pData;
+                pData++;
+                spline["u18"] = *pData;
+                pData++;
+                spline["u19"] = *pData;
+                pData++;
+                spline["u20"] = *pData;
+                pData++;
+                spline["u21"] = *pData;
+                pData++;
+                spline["u22"] = *pData;
+                pData++;
+                spline["u23"] = *pData;
+                pData++;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            pData = reinterpret_cast<const std::uint32_t*>(data.data() + resourceHeader.classObjectSize);
+
+            return
+            {
+                { "resourceHeader", resourceHeader.to_json() },
+                { "$Spline_Z", spline },
+            };
+        }*/
 
         return
         {
@@ -413,7 +2320,15 @@ struct DPCFile
     DPCFile(const std::filesystem::path& dpcFilePath)
         : path(dpcFilePath)
     {
+        std::filesystem::create_directory("unpack\\" + path.filename().stem().string());
+
         std::ifstream file(path, std::ios::binary | std::ios::ate);
+
+        if (!file.good())
+        {
+            assert(false);
+        }
+
         fileSize = file.tellg();
         file.seekg(0, std::ios::beg);
 
@@ -429,19 +2344,26 @@ struct DPCFile
             {
                 UnitResource unitResource;
                 file.read(reinterpret_cast<char*>(&unitResource.resourceHeader), sizeof(unitResource.resourceHeader));
-                unitResource.data.resize(unitResource.resourceHeader.dataSize);
+                unitResource.classObject.resize(unitResource.resourceHeader.classObjectSize);
+                file.read(reinterpret_cast<char*>(unitResource.classObject.data()), unitResource.classObject.size());
+                unitResource.data.resize(unitResource.resourceHeader.dataSize - unitResource.resourceHeader.classObjectSize);
                 file.read(reinterpret_cast<char*>(unitResource.data.data()), unitResource.data.size());
 
-                //if (unitResource.resourceHeader.compressedSize)
-                //{
-                //    std::vector<std::uint8_t> data(unitResource.data.begin() + unitResource.resourceHeader.classObjectSize, unitResource.data.end());
-                //    std::uint32_t unLZSize = unLZ(data).size();
+                if (unitResource.resourceHeader.compressedSize || (unitResource.resourceHeader.dataSize != unitResource.resourceHeader.classObjectSize))
+                {
+                    if (unitResource.resourceHeader.compressedSize)
+                    {
+                        unitResource.data = unLZ(unitResource.data);
+                    }
+                    std::ofstream resFile("unpack\\" + path.filename().stem().string() + "\\" + std::to_string(unitResource.resourceHeader.crc32) + "." + std::to_string(unitResource.resourceHeader.classCRC32), std::ios::binary);
 
-                //    if (unitResource.resourceHeader.decompressedSize != unLZSize)
-                //    {
-                //        std::cout << unitResource.resourceHeader.decompressedSize << " != " << unLZSize << std::endl;
-                //    }
-                //}
+                    if (!resFile.good())
+                    {
+                        assert(false);
+                    }
+
+                    resFile.write(reinterpret_cast<char*>(unitResource.data.data()), unitResource.data.size());
+                }
 
                 unit.unitResources.push_back(unitResource);
             }
@@ -498,15 +2420,21 @@ struct DPCFile
             resource.data.resize(resource.resourceHeader.dataSize);
             file.read(reinterpret_cast<char*>(resource.data.data()), resource.data.size());
 
-            //if (resource.resourceHeader.compressedSize)
-            //{
-            //    std::uint32_t unLZSize = unLZ(resource.data).size();
+            assert(resource.resourceHeader.classObjectSize == 0);
 
-            //    if (resource.resourceHeader.decompressedSize != unLZSize)
-            //    {
-            //        std::cout << resource.resourceHeader.decompressedSize << " != " << unLZSize << std::endl;
-            //    }
-            //}
+            if (resource.resourceHeader.compressedSize)
+            {
+                resource.data = unLZ(resource.data);
+            }
+
+            std::ofstream resFile("unpack\\" + path.filename().stem().string() + "\\" + std::to_string(resource.resourceHeader.crc32) + "." + std::to_string(resource.resourceHeader.classCRC32), std::ios::binary);
+
+            if (!resFile.good())
+            {
+                assert(false);
+            }
+
+            resFile.write(reinterpret_cast<char*>(resource.data.data()), resource.data.size());
 
             resource.padding.resize(calculatePaddingSize(file.tellg()));
             file.read(reinterpret_cast<char*>(resource.padding.data()), resource.padding.size());
@@ -561,9 +2489,11 @@ int main(int argc, const char* argv[])
     std::ofstream json("fmtk.json");
     nlohmann::json jsonDPCFiles;
 
+    std::filesystem::create_directory("unpack");
+
     for (const auto& file : std::filesystem::recursive_directory_iterator("."))
     {
-        if (file.path().extension() == ".DPC")
+        if (!file.is_directory() && file.path().extension() == ".DPC")
         {
             jsonDPCFiles.push_back(DPCFile(file.path()).to_json());
         }
@@ -580,4 +2510,14 @@ int main(int argc, const char* argv[])
     {
         std::cout << e.what() << std::endl;
     }
+
+    //for (std::uint32_t crc32 : classCRC32s)
+    //{
+    //    std::cout << crc32 << std::endl;
+    //}
+
+    //for (std::uint32_t height : heights)
+    //{
+    //    std::cout << height << std::endl;
+    //}
 }
