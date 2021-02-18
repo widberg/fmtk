@@ -190,7 +190,7 @@ FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 	//	std::filesystem::path path(pszFilename);
 
 	//	FMTK_HIGHLIGHT(lpBuffer);
-	//	FMTK_BREAKPOINT_IF(path.extension() == ".DPC");
+	//	FMTK_BREAKPOINT_IF(path.filename() == "USA1.DPC");
 	//}
 
 	return Real_ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);

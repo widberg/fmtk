@@ -220,8 +220,6 @@ struct Resource
 
     nlohmann::json to_json() const
     {
-        classCRC32s.insert(resourceHeader.classCRC32);
-
         return
         {
             { "resourceHeader", resourceHeader.to_json() },
@@ -410,7 +408,6 @@ struct UnitResource
                 p8++;
                 bitmap["u05"] = *p8;
                 p8++;
-                heights.insert(*p8);
                 bitmap["u06"] = *p8;
                 p8++;
                 bitmap["bitmapType"] = *p8;
@@ -2344,8 +2341,24 @@ struct DPCFile
             {
                 UnitResource unitResource;
                 file.read(reinterpret_cast<char*>(&unitResource.resourceHeader), sizeof(unitResource.resourceHeader));
+
+                if (unitResource.resourceHeader.dataSize > 0)
+                {
+                    classCRC32s.insert(unitResource.resourceHeader.classCRC32);
+                }
+
                 unitResource.classObject.resize(unitResource.resourceHeader.classObjectSize);
                 file.read(reinterpret_cast<char*>(unitResource.classObject.data()), unitResource.classObject.size());
+
+                std::ofstream headerFile("unpack\\" + path.filename().stem().string() + "\\" + std::to_string(unitResource.resourceHeader.crc32) + ".header." + std::to_string(unitResource.resourceHeader.classCRC32), std::ios::binary);
+
+                if (!headerFile.good())
+                {
+                    assert(false);
+                }
+
+                headerFile.write(reinterpret_cast<char*>(unitResource.classObject.data()), unitResource.classObject.size());
+
                 unitResource.data.resize(unitResource.resourceHeader.dataSize - unitResource.resourceHeader.classObjectSize);
                 file.read(reinterpret_cast<char*>(unitResource.data.data()), unitResource.data.size());
 
@@ -2418,6 +2431,12 @@ struct DPCFile
             Resource resource;
             file.read(reinterpret_cast<char*>(&resource.resourceHeader), sizeof(resource.resourceHeader));
             resource.data.resize(resource.resourceHeader.dataSize);
+
+            if (resource.resourceHeader.dataSize > 0)
+            {
+                heights.insert(resource.resourceHeader.classCRC32);
+            }
+
             file.read(reinterpret_cast<char*>(resource.data.data()), resource.data.size());
 
             assert(resource.resourceHeader.classObjectSize == 0);
@@ -2511,13 +2530,15 @@ int main(int argc, const char* argv[])
         std::cout << e.what() << std::endl;
     }
 
-    //for (std::uint32_t crc32 : classCRC32s)
-    //{
-    //    std::cout << crc32 << std::endl;
-    //}
+    for (std::uint32_t crc32 : classCRC32s)
+    {
+        std::cout << crc32 << std::endl;
+    }
 
-    //for (std::uint32_t height : heights)
-    //{
-    //    std::cout << height << std::endl;
-    //}
+    std::cout << std::endl;
+
+    for (std::uint32_t height : heights)
+    {
+        std::cout << height << std::endl;
+    }
 }

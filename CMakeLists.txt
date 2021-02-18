@@ -38,6 +38,7 @@ add_subdirectory(fmtk)
 add_subdirectory(dpc)
 add_subdirectory(crc32)
 add_subdirectory(lz)
+add_subdirectory(noesis_fuel_pc)
 
 add_custom_target(package COMMAND
     ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_CURRENT_BINARY_DIR}/fmtk-${fmtk_VERSION_MAJOR}_${fmtk_VERSION_MINOR}_${fmtk_VERSION_PATCH}_${fmtk_VERSION_TWEAK}.zip" --format=zip
