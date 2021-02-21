@@ -44,7 +44,6 @@ returnType callingConvention FMTK_XLive_##name(__VA_ARGS__)
 #define ATTACHXLIVE(x)  Real_XLive_##x = reinterpret_cast<decltype(Real_XLive_##x)>((DWORD_PTR)hiXLive +  (DWORD_PTR)Real_XLive_##x - (DWORD_PTR)XLIVE_DLL_BASE_ADDRESS); DetourAttach(&(PVOID&)Real_XLive_##x, FMTK_XLive_##x)
 #define DETACHXLIVE(x)  DetourDetach(&(PVOID&)Real_XLive_##x, FMTK_XLive_##x)
 
-
 #define BACKUP_REGISTER(reg) \
 DWORD backup_##reg;          \
 __asm                        \
@@ -353,6 +352,22 @@ FUNCTIONXLIVE(ValidateMemory, 0x004f36b3, INT, WINAPI, DWORD, DWORD, DWORD)
 	return 0;
 }
 
+FUNCTIONXLIVE(CreateFileW, 0x0040128c, HANDLE, WINAPI,
+	LPCWSTR               lpFileName,
+	DWORD                 dwDesiredAccess,
+	DWORD                 dwShareMode,
+	LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+	DWORD                 dwCreationDisposition,
+	DWORD                 dwFlagsAndAttributes,
+	HANDLE                hTemplateFile)
+{
+	//LOGW(trace, XLIVE, "XLive opening file: {}", lpFileName);
+
+	return Real_XLive_CreateFileW(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+
+	//return rv;
+}
+
 FUNCTION(CreateWindowExW, CreateWindowExW, HWND, WINAPI,
 	DWORD     dwExStyle,
 	LPCWSTR   lpClassName,
@@ -407,6 +422,7 @@ bool AttachDetoursXLive()
 	DetourUpdateThread(GetCurrentThread());
 
 	//ATTACHXLIVE(ValidateMemory);
+	//ATTACHXLIVE(CreateFileW);
 
 	ULONG result = DetourTransactionCommit();
 	
@@ -419,6 +435,7 @@ bool DetachDetoursXLive()
 	DetourUpdateThread(GetCurrentThread());
 
 	//DETACHXLIVE(ValidateMemory);
+	//DETACHXLIVE(CreateFileW);
 
 	return DetourTransactionCommit();
 }

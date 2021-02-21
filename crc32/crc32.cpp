@@ -3,6 +3,9 @@
 #include <string>
 #include <cstdint>
 #include <cctype>
+#include <vector>
+#include <unordered_map>
+#include <functional>
 
 #define CRC32_POLYNOMIAL (0x04C11DB7)
 #define CRC32_TABLE_SIZE (256)
@@ -53,25 +56,8 @@ std::uint32_t crc32(const std::string& str)
     return value;
 }
 
-int main(int argc, const char* argv[])
+void generateReverseTableFromNames(std::istream& in, std::ostream& out)
 {
-    if (argc < 3)
-    {
-        return 1;
-    }
-
-    std::ifstream in(argv[1]);
-    if (!in.good())
-    {
-        return 2;
-    }
-
-    std::ofstream out(argv[2]);
-    if (!out.good())
-    {
-        return 3;
-    }
-
     out << "std::unordered_map<std::uint32_t, std::string> crc32_reverse_lookup = {\n";
 
     std::string line;
@@ -81,6 +67,115 @@ int main(int argc, const char* argv[])
     }
 
     out << "};\n";
+}
+
+std::uint32_t crc32PrecheckedPrefix(std::uint32_t value, const std::string& str)
+{
+    for (char c : str)
+    {
+        value = (value >> 8) ^ crc32_table[(c ^ value) & 0xff];
+    }
+
+    return value;
+}
+
+void generateNPCFromCRC32s(std::istream& in, std::ostream& out)
+{
+    std::unordered_map<std::uint32_t, std::vector<std::string>> results;
+
+    std::uint32_t value;
+    while (!(in >> value).eof())
+    {
+        results[value] = {};
+    }
+
+    std::function<void(std::string, int)> searchAllKLengthRec;
+    searchAllKLengthRec = [&](std::string prefix, int k)
+    {
+        static const char chars[] = "0123456789abcdefghijklmnopqrstuvwxyz_.>";
+        static const int chars_len = sizeof(chars) - 1;
+
+        if (k == 0)
+        {
+            std::uint32_t value = crc32(prefix);
+            if (results.count(value))
+            {
+                results[value].push_back(prefix);
+            }
+            return;
+        }
+
+        for (int i = 0; i < chars_len; i++)
+        {
+            std::string newPrefix;
+            newPrefix = prefix + chars[i];
+            searchAllKLengthRec(newPrefix, k - 1);
+        }
+    };
+
+    auto searchAllKLength = [&](int k)
+    {
+        searchAllKLengthRec("", k);
+    };
+
+    searchAllKLength(1);
+
+    for (auto pair : results)
+    {
+        out << pair.first << "\n";
+        for (auto name : pair.second)
+        {
+            out << "\t" << name << "\n";
+        }
+    }
+    out << "\n";
+}
+
+int main(int argc, const char* argv[])
+{
+    if (argc < 4)
+    {
+        return 1;
+    }
+
+    std::string option(argv[1]);
+    int operation = 0;
+    if (option == "rtn")
+    {
+        operation = 1;
+    }
+    else if (option == "npcc")
+    {
+        operation = 2;
+    }
+    else
+    {
+        return 4;
+    }
+
+    std::ifstream in(argv[2]);
+    if (!in.good())
+    {
+        return 2;
+    }
+
+    std::ofstream out(argv[3]);
+    if (!out.good())
+    {
+        return 3;
+    }
+
+    switch (operation)
+    {
+    case 1:
+        generateReverseTableFromNames(in, out);
+        break;
+    case 2:
+        generateNPCFromCRC32s(in, out);
+        break;
+    default:
+        return 5;
+    }
 
     return 0;
 }

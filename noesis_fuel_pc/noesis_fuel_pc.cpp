@@ -67,6 +67,7 @@ std::uint32_t calculatePaddingSize(std::uint32_t unpaddedSize)
 {
 	return calculatePaddedSize(unpaddedSize) - unpaddedSize;
 }
+
 constexpr std::uint32_t WINDOW_LOG = 14;
 constexpr std::uint32_t WINDOW_SIZE = (1 << WINDOW_LOG);
 constexpr std::uint32_t WINDOW_MASK = (1 << WINDOW_LOG) - 1;
@@ -478,6 +479,69 @@ noesisModel_t* Model_FUEL_LoadTMESH(BYTE* fileBuffer, int bufferLen, int& numMdl
 	return mdl;
 }
 
+static bool Model_FUEL_TypeCheckTSKEL(BYTE* fileBuffer, int bufferLen, noeRAPI_t* rapi)
+{
+	if (bufferLen < sizeof(ResourceHeader))
+	{
+		return false;
+	}
+
+	ResourceHeader* resourceHeader = reinterpret_cast<ResourceHeader*>(fileBuffer);
+	return resourceHeader->classCRC32 == 3611002348;
+}
+
+noesisModel_t* Model_FUEL_LoadTSKEL(BYTE* fileBuffer, int bufferLen, int& numMdl, noeRAPI_t* rapi)
+{
+	cntStream_t* s = g_nfn->Stream_Alloc(fileBuffer, bufferLen);
+
+	ResourceHeader resourceHeader;
+	g_nfn->Stream_ReadBytes(s, &resourceHeader, sizeof(resourceHeader));
+	g_nfn->Stream_SetOffset(s, g_nfn->Stream_GetOffset(s) + resourceHeader.classObjectSize);
+	
+
+	void* pgctx = rapi->rpgCreateContext();
+
+	g_nfn->Stream_SetOffset(s, g_nfn->Stream_GetOffset(s) + 20);
+	std::uint32_t joinCount = g_nfn->Stream_ReadInt(s);
+	g_nfn->Stream_SetOffset(s, g_nfn->Stream_GetOffset(s) + 24);
+
+	modelBone_t* bones = rapi->Noesis_AllocBones(joinCount);
+
+	for (std::uint32_t i = 0; i < joinCount; ++i)
+	{
+		g_nfn->Stream_SetOffset(s, g_nfn->Stream_GetOffset(s) + 140);
+		fourxMatrix_t mat;
+		g_nfn->Stream_ReadBytes(s, &mat, sizeof(mat));
+		RichMat44 mat44(mat);
+		RichMat43 mat43 = mat44.ToMat43();
+
+		std::uint32_t unk = g_nfn->Stream_ReadInt(s);
+		std::uint32_t parent = g_nfn->Stream_ReadInt(s) - 1;
+
+		modelBone_t* bone = bones + i;
+		bone->index = i;
+		bone->mat = mat43.m;
+		std::strcpy(bone->name, std::to_string(i).c_str());
+		bone->eData.parent = (parent < joinCount && parent != i) ? bones + parent : NULL;
+
+		g_nfn->Stream_SetOffset(s, g_nfn->Stream_GetOffset(s) + 36);
+	}
+
+	g_nfn->Stream_Free(s);
+
+	rapi->rpgSetExData_Bones(bones, joinCount);
+
+	noesisModel_t* mdl = rapi->rpgConstructModel();
+	if (mdl)
+	{
+		numMdl = 1;
+	}
+
+	rapi->rpgDestroyContext(pgctx);
+
+	return mdl;
+}
+
 //called by Noesis to init the plugin
 bool NPAPI_InitLocal(void)
 {
@@ -516,6 +580,16 @@ bool NPAPI_InitLocal(void)
 
 	g_nfn->NPAPI_SetTypeHandler_TypeCheck(fh, Model_FUEL_TypeCheckTMESH);
 	g_nfn->NPAPI_SetTypeHandler_LoadModel(fh, Model_FUEL_LoadTMESH);
+
+	// TSKEL
+	fh = g_nfn->NPAPI_Register("FUEL Skeleton", ".TSKEL");
+	if (fh < 0)
+	{
+		return false;
+	}
+
+	g_nfn->NPAPI_SetTypeHandler_TypeCheck(fh, Model_FUEL_TypeCheckTSKEL);
+	g_nfn->NPAPI_SetTypeHandler_LoadModel(fh, Model_FUEL_LoadTSKEL);
 
 	return true;
 }
