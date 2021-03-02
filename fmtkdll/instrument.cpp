@@ -182,15 +182,15 @@ FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 	LPDWORD      lpNumberOfBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	//static TCHAR pszFilename[MAX_PATH + 1];
+	static TCHAR pszFilename[MAX_PATH + 1];
 
-	//if (GetFinalPathNameByHandleA(hFile, pszFilename, sizeof(pszFilename), FILE_NAME_NORMALIZED))
-	//{
-	//	std::filesystem::path path(pszFilename);
+	if (GetFinalPathNameByHandleA(hFile, pszFilename, sizeof(pszFilename), FILE_NAME_NORMALIZED))
+	{
+		std::filesystem::path path(pszFilename);
 
-	//	FMTK_HIGHLIGHT(lpBuffer);
-	//	FMTK_BREAKPOINT_IF(path.filename() == "USA1.DPC");
-	//}
+		FMTK_HIGHLIGHT(lpBuffer);
+		FMTK_BREAKPOINT_IF(path.extension() == ".DPC");
+	}
 
 	return Real_ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
 }
@@ -226,11 +226,11 @@ NAKEDFUNCTION(CRC32, 0x00669160)
 	BACKUP_REGISTER(eax);
 	BACKUP_REGISTER(edx);
 
-	char* str;
+	char* crc32str;
 	__asm {
-		mov str, edx
+		mov crc32str, edx
 	}
-	LOG(trace, FMTK, "crc32: {}", str);
+	LOG(trace, FMTK, "crc32: {}", crc32str);
 
 	RESTORE_REGISTER(eax);
 	RESTORE_REGISTER(edx);

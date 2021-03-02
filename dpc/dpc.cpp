@@ -105,7 +105,8 @@ struct RelationalTableUnknownStrcuture
     std::uint32_t unknown0;
     std::uint32_t unknown1;
     std::uint32_t unknown2;
-    std::uint32_t unknown3;
+    std::uint16_t unknown3;
+    std::uint16_t unknown4;
     std::uint32_t placeholder0;
     std::uint32_t placeholder1;
     std::uint32_t placeholder2;
@@ -118,6 +119,7 @@ struct RelationalTableUnknownStrcuture
             FIELD(unknown1),
             FIELD(unknown2),
             FIELD(unknown3),
+            FIELD(unknown4),
         };
     }
 };
@@ -2220,14 +2222,74 @@ struct Unit
     nlohmann::json to_json() const
     {
         std::vector<nlohmann::json> jsonUnitResources;
+        std::unordered_set<std::string> classes;
+
+        static std::unordered_map<std::uint32_t, const char*> classFileExtensions = {
+            { 549480509, "TOMNI" },
+            { 705810152, "TRTC" },
+            { 838505646, "TGENWORLD" },
+            { 848525546, "TLIGHTDATA" },
+            { 849267944, "TSOUND" },
+            { 849861735, "TOTEMBITMAP" },
+            { 866453734, "TROTSHAPE" },
+            { 954499543, "TPARTICLESDATA" },
+            { 968261323, "TWORLD" },
+            { 1114947943, "TWARP" },
+            { 1135194223, "TSPLINE" },
+            { 1175485833, "TANIM" },
+            { 1387343541, "TMESH" },
+            { 1391959958, "TUSERDEFINE" },
+            { 1396791303, "TSKIN" },
+            { 1471281566, "TBITMAP" },
+            { 1536002910, "TFONT" },
+            { 1625945536, "TROTSHAPEDATA" },
+            { 1706265229, "TSURFACE" },
+            { 1910554652, "TSPLINEGRAPH" },
+            { 1943824915, "TLOD" },
+            { 2204276779, "TMATERIAL" },
+            { 2245010728, "TNODE" },
+            { 2259852416, "TBINARY" },
+            { 2398393906, "TVOLUME" },
+            { 2906362741, "TWORLDREF" },
+            { 3312018398, "TPARTICLES" },
+            { 3412401859, "TLODDATA" },
+            { 3611002348, "TSKEL" },
+            { 3626109572, "TMESHDATA" },
+            { 3747817665, "TSURFACEDATAS" },
+            { 3834418854, "TMATERIALANIM" },
+            { 3845834591, "TGWROAD" },
+            { 4096629181, "TGAMEOBJ" },
+            { 4240844041, "TCAMERA" },
+        };
+
+        std::uint32_t dataSize = 0;
+        std::uint32_t compressedSize = 0;
+        std::uint32_t decompressedSize = 0;
+        std::uint32_t dataSizeSum = 0;
+        std::uint32_t compressedSizeSum = 0;
+        std::uint32_t decompressedSizeSum = 0;
 
         for (const UnitResource& unitResource : unitResources)
         {
             jsonUnitResources.push_back(unitResource.to_json());
+            classes.insert(classFileExtensions[unitResource.resourceHeader.classCRC32]);
+            dataSize = std::max(dataSize, unitResource.resourceHeader.dataSize);
+            compressedSize = std::max(compressedSize, unitResource.resourceHeader.compressedSize);
+            decompressedSize = std::max(decompressedSize, unitResource.resourceHeader.decompressedSize);
+            dataSizeSum += unitResource.resourceHeader.dataSize;
+            compressedSizeSum += unitResource.resourceHeader.compressedSize;
+            decompressedSizeSum += unitResource.resourceHeader.decompressedSize;
         }
 
         return
         {
+            { "classes", classes },
+            { "dataSize", dataSize },
+            { "compressedSize", compressedSize },
+            { "decompressedSize", decompressedSize },
+            { "dataSizeSum", dataSizeSum },
+            { "compressedSizeSum", compressedSizeSum },
+            { "decompressedSizeSum", decompressedSizeSum },
             { "unitResources", jsonUnitResources },
         };
     }
@@ -2344,7 +2406,6 @@ struct DPCFile
 
                 if (unitResource.resourceHeader.dataSize > 0)
                 {
-                    classCRC32s.insert(unitResource.resourceHeader.classCRC32);
                 }
 
                 unitResource.classObject.resize(unitResource.resourceHeader.classObjectSize);
@@ -2434,7 +2495,6 @@ struct DPCFile
 
             if (resource.resourceHeader.dataSize > 0)
             {
-                heights.insert(resource.resourceHeader.classCRC32);
             }
 
             file.read(reinterpret_cast<char*>(resource.data.data()), resource.data.size());
@@ -2484,7 +2544,7 @@ struct DPCFile
             { "$fileSize", fileSize },
             { "$fileSize-header", fileSize - sizeof(primaryHeader) },
             { "primaryHeader", primaryHeader.to_json() },
-            { "relationalTable", relationalTable.to_json() },
+            { "relationalTable", primaryHeader.relationalTableOffset ? relationalTable.to_json() : nlohmann::json() },
             { "units", jsonUnits },
             { "resources", jsonResources },
         };
