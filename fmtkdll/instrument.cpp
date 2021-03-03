@@ -182,15 +182,15 @@ FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 	LPDWORD      lpNumberOfBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	static TCHAR pszFilename[MAX_PATH + 1];
+	//static TCHAR pszFilename[MAX_PATH + 1];
 
-	if (GetFinalPathNameByHandleA(hFile, pszFilename, sizeof(pszFilename), FILE_NAME_NORMALIZED))
-	{
-		std::filesystem::path path(pszFilename);
+	//if (GetFinalPathNameByHandleA(hFile, pszFilename, sizeof(pszFilename), FILE_NAME_NORMALIZED))
+	//{
+	//	std::filesystem::path path(pszFilename);
 
-		FMTK_HIGHLIGHT(lpBuffer);
-		FMTK_BREAKPOINT_IF(path.extension() == ".DPC");
-	}
+	//	FMTK_HIGHLIGHT(lpBuffer);
+	//	FMTK_BREAKPOINT_IF(path.extension() == ".DPC");
+	//}
 
 	return Real_ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
 }
