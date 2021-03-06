@@ -16,7 +16,7 @@ if (POLICY CMP0091)
 	cmake_policy(SET CMP0091 NEW)
 endif()
 
-project(fmtk VERSION 0.1.0.0 LANGUAGES CXX)
+project(fmtk VERSION 0.1.0.0 LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE INTERNAL "")
@@ -37,6 +37,7 @@ add_subdirectory(fmtk)
 
 add_subdirectory(dpc)
 add_subdirectory(crc32)
+add_subdirectory(crc32gpu)
 add_subdirectory(lz)
 add_subdirectory(noesis_fuel_pc)
 

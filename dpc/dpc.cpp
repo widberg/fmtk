@@ -10,6 +10,7 @@
 
 std::unordered_set<std::uint32_t> classCRC32s;
 std::unordered_set<std::uint32_t> heights;
+std::unordered_set<std::uint32_t> objectCRC32s;
 
 #define FIELD(name) { #name, name }
 
@@ -2404,6 +2405,8 @@ struct DPCFile
                 UnitResource unitResource;
                 file.read(reinterpret_cast<char*>(&unitResource.resourceHeader), sizeof(unitResource.resourceHeader));
 
+                objectCRC32s.insert(unitResource.resourceHeader.crc32);
+
                 if (unitResource.resourceHeader.dataSize > 0)
                 {
                 }
@@ -2600,5 +2603,11 @@ int main(int argc, const char* argv[])
     for (std::uint32_t height : heights)
     {
         std::cout << height << std::endl;
+    }
+
+    std::ofstream crc32s("crc32s.txt");
+    for (std::uint32_t crc32 : objectCRC32s)
+    {
+        crc32s << crc32 << std::endl;
     }
 }

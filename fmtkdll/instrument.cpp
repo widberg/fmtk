@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <d3dx9shader.h>
 #include <detours.h>
+#include <intrin.h>
 
 #include <algorithm>
 #include <filesystem>
@@ -191,7 +192,7 @@ FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 	//	FMTK_HIGHLIGHT(lpBuffer);
 	//	FMTK_BREAKPOINT_IF(path.extension() == ".DPC");
 	//}
-
+	
 	return Real_ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
 }
 

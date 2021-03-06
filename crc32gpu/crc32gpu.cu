@@ -1,17 +1,25 @@
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <string>
+#include <cstdio>
 #include <cstdint>
-#include <cctype>
-#include <chrono>
-#include <vector>
-#include <unordered_map>
-#include <functional>
+
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+__host__
+inline void gpuAssert(cudaError_t code, const char* file, int line, bool abort = true)
+{
+    if (code != cudaSuccess)
+    {
+        fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+        if (abort) exit(code);
+    }
+}
+
+typedef std::uint32_t crc32_t;
+#define CRC32_MAX (UINT32_MAX)
+#define CRC32_MIN (UINT32_MIN)
 
 #define CRC32_POLYNOMIAL (0x04C11DB7)
 #define CRC32_TABLE_SIZE (256)
-const std::uint32_t crc32_table[CRC32_TABLE_SIZE] = {
+__device__
+const crc32_t crc32_table[CRC32_TABLE_SIZE] = {
     0x00000000, 0x04C11DB7, 0x09823B6E, 0x0D4326D9, 0x130476DC, 0x17C56B6B, 0x1A864DB2, 0x1E475005,  //   0 [0x00 .. 0x07]
     0x2608EDB8, 0x22C9F00F, 0x2F8AD6D6, 0x2B4BCB61, 0x350C9B64, 0x31CD86D3, 0x3C8EA00A, 0x384FBDBD,  //   8 [0x08 .. 0x0F]
     0x4C11DB70, 0x48D0C6C7, 0x4593E01E, 0x4152FDA9, 0x5F15ADAC, 0x5BD4B01B, 0x569796C2, 0x52568B75,  //  16 [0x10 .. 0x17]
@@ -46,176 +54,42 @@ const std::uint32_t crc32_table[CRC32_TABLE_SIZE] = {
     0xAFB010B1, 0xAB710D06, 0xA6322BDF, 0xA2F33668, 0xBCB4666D, 0xB8757BDA, 0xB5365D03, 0xB1F740B4,  // 248 [0xF8 .. 0xFF]
 };
 
-std::uint32_t crc32(const std::string& str)
+#define MAX_DEPTH (24)
+
+#define STARTING_HASH (0)
+#define MAX_LEN (1)
+#define CHARS_LEN (40)
+__constant__ char CHARS[CHARS_LEN + 1] = "0123456789abcdefghijklmnopqrstuvwxyz_.>-";
+#define FOUND_LEN (CRC32_MAX / 32 + 1)
+__device__ std::uint32_t found[FOUND_LEN] = { 0 };
+
+__global__
+void blockMain(crc32_t hash, const std::uint8_t depth)
 {
-    std::uint32_t value = 0;
+    hash = (hash >> 8) ^ crc32_table[(CHARS[threadIdx.x] ^ hash) & 0xff];
+    printf("%u\n", hash);
 
-    for (char c : str)
+    if (found[hash / 32] & (1 << (hash % 32)))
     {
-        value = (value >> 8) ^ crc32_table[(std::tolower(c) ^ value) & 0xff];
-    }
-
-    return value;
-}
-
-std::uint32_t crc32Prechecked(const char* str)
-{
-    std::uint32_t value = 0;
-
-    while (*str != '\0')
-    {
-        value = (value >> 8) ^ crc32_table[(*str ^ value) & 0xff];
-        ++str;
-    }
-
-    return value;
-}
-
-void generateReverseTableFromNames(std::istream& in, std::ostream& out)
-{
-    out << "std::unordered_map<std::uint32_t, std::string> crc32_reverse_lookup = {\n";
-
-    std::string line;
-    while (!std::getline(in, line).eof())
-    {
-        out << "\t{ " << crc32(line) << ", \"" << line << "\" },\n";
-    }
-
-    out << "};\n";
-}
-
-std::uint32_t crc32PrecheckedPrefix(std::uint32_t value, const std::string& str)
-{
-    for (char c : str)
-    {
-        value = (value >> 8) ^ crc32_table[(c ^ value) & 0xff];
-    }
-
-    return value;
-}
-
-std::uint32_t crc32PrecheckedAppend(std::uint32_t hash, char c)
-{
-    return (hash >> 8) ^ crc32_table[(c ^ hash) & 0xff];
-}
-
-void generateNPCFromCRC32s(std::istream& in, std::ostream& out)
-{
-    std::unordered_map<std::uint32_t, std::vector<std::string>> results;
-
-    std::uint32_t value;
-    while (!(in >> value).eof())
-    {
-        results[value] = {};
-    }
-
-    std::function<void(std::string, int)> searchAllKLengthRec;
-    searchAllKLengthRec = [&](std::string prefix, int k)
-    {
-        static const char chars[] = "0123456789abcdefghijklmnopqrstuvwxyz_.>";
-        static const int chars_len = sizeof(chars) - 1;
-
-        if (k == 0)
-        {
-            std::uint32_t value = crc32(prefix);
-            if (results.count(value))
-            {
-                results[value].push_back(prefix);
-            }
-            return;
-        }
-
-        for (int i = 0; i < chars_len; i++)
-        {
-            std::string newPrefix;
-            newPrefix = prefix + chars[i];
-            searchAllKLengthRec(newPrefix, k - 1);
-        }
-    };
-
-    auto searchAllKLength = [&](int k)
-    {
-        searchAllKLengthRec("", k);
-    };
-
-    searchAllKLength(1);
-
-    for (auto pair : results)
-    {
-        out << pair.first << "\n";
-        for (auto name : pair.second)
-        {
-            out << "\t" << name << "\n";
-        }
-    }
-    out << "\n";
-}
-
-double profile()
-{
-    static constexpr unsigned int times = 1000000;
-
-    auto start = std::chrono::high_resolution_clock::now();
-
-    for (unsigned int i = 0; i < times; ++i)
-    {
-        crc32Prechecked("DB:>LEVELS>COURSES3>QUARTIER_1>3DNODEGEOMETRY>BARRIERECLIGNOTANTEROT_009.TROTSHAPE");
-    }
-
-    auto end = std::chrono::high_resolution_clock::now();
-
-    return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / (double)times;
-}
-
-int main(int argc, const char* argv[])
-{
-    std::cout.precision(10);
-    std::cout << std::fixed << profile() << "\n";
-    return 0;
-
-    if (argc < 4)
-    {
-        return 1;
-    }
-
-    std::string option(argv[1]);
-    int operation = 0;
-    if (option == "rtn")
-    {
-        operation = 1;
-    }
-    else if (option == "npcc")
-    {
-        operation = 2;
+        return;
     }
     else
     {
-        return 4;
+        found[hash / 32] |= (1 << (hash % 32));
     }
 
-    std::ifstream in(argv[2]);
-    if (!in.good())
+    if (depth + 1 > MAX_DEPTH)
     {
-        return 2;
+        return;
     }
 
-    std::ofstream out(argv[3]);
-    if (!out.good())
-    {
-        return 3;
-    }
+    blockMain<<<1, CHARS_LEN>>>(hash, depth + 1);
+}
 
-    switch (operation)
-    {
-    case 1:
-        generateReverseTableFromNames(in, out);
-        break;
-    case 2:
-        generateNPCFromCRC32s(in, out);
-        break;
-    default:
-        return 5;
-    }
-
-    return 0;
+int main()
+{
+    blockMain<<<1, CHARS_LEN>>>(STARTING_HASH, 0);
+    gpuErrchk(cudaPeekAtLastError());
+    gpuErrchk(cudaDeviceSynchronize());
+	return 0;
 }
