@@ -167,8 +167,21 @@ double profile()
     return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / (double)times;
 }
 
+void previous(std::uint32_t hash)
+{
+    std::uint32_t start = hash * 256;
+    static const char chars[] = "0123456789abcdefghijklmnopqrstuvwxyz_.>-";
+    static const int chars_len = sizeof(chars) - 1;
+    for (int i = 0; i < chars_len; ++i)
+    {
+        std::cout << start + chars[i] << std::endl;
+    }
+}
+
 int main(int argc, const char* argv[])
 {
+    previous(3505614887);
+    return 0;
     std::cout.precision(10);
     std::cout << std::fixed << profile() << "\n";
     return 0;

@@ -2,10 +2,10 @@ add_executable(crc32gpu
 	crc32gpu.cu
 )
 
-target_compile_options(crc32gpu PRIVATE -rdc=true --default-stream per-thread)
-target_link_libraries(crc32gpu PRIVATE cudadevrt cudart)
-set_target_properties(crc32gpu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-set_target_properties(crc32gpu PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS ON)
+#target_compile_options(crc32gpu PRIVATE -rdc=true --default-stream per-thread)
+#target_link_libraries(crc32gpu PRIVATE cudadevrt cudart)
+#set_target_properties(crc32gpu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+#set_target_properties(crc32gpu PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS ON)
 set_target_properties(crc32gpu PROPERTIES CUDA_ARCHITECTURES OFF)
 
 set_target_properties(crc32gpu PROPERTIES
