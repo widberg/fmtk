@@ -2,6 +2,19 @@
 #include <cstdint>
 #include <cassert>
 
+typedef std::uint32_t crc32_t;
+#define CRC32_MAX (UINT32_MAX)
+#define CRC32_MIN (UINT32_MIN)
+
+#define HASHES_LEN (78965U)
+extern __device__ crc32_t HASHES[];
+
+#define EXTS_LEN (35U)
+extern __constant__ const char* EXTS[];
+
+__constant__ std::uint32_t DICTIONARY_LEN;
+__constant__ const char** DICTIONARY;
+
 __host__
 inline void cudaAssert(cudaError_t code, const char* file, int line)
 {
@@ -13,13 +26,9 @@ inline void cudaAssert(cudaError_t code, const char* file, int line)
 }
 #define CUDA_ASSERT(code) do { cudaAssert(code, __FILE__, __LINE__); } while(0)
 
-typedef std::uint32_t crc32_t;
-#define CRC32_MAX (UINT32_MAX)
-#define CRC32_MIN (UINT32_MIN)
-
-#define CRC32_POLYNOMIAL (0x04C11DB7)
-#define CRC32_TABLE_SIZE (256)
-__device__
+#define CRC32_POLYNOMIAL (0x04C11DB7U)
+#define CRC32_TABLE_SIZE (256U)
+__constant__
 const crc32_t crc32_table[CRC32_TABLE_SIZE] = {
     0x00000000, 0x04C11DB7, 0x09823B6E, 0x0D4326D9, 0x130476DC, 0x17C56B6B, 0x1A864DB2, 0x1E475005,  //   0 [0x00 .. 0x07]
     0x2608EDB8, 0x22C9F00F, 0x2F8AD6D6, 0x2B4BCB61, 0x350C9B64, 0x31CD86D3, 0x3C8EA00A, 0x384FBDBD,  //   8 [0x08 .. 0x0F]
@@ -55,293 +64,125 @@ const crc32_t crc32_table[CRC32_TABLE_SIZE] = {
     0xAFB010B1, 0xAB710D06, 0xA6322BDF, 0xA2F33668, 0xBCB4666D, 0xB8757BDA, 0xB5365D03, 0xB1F740B4,  // 248 [0xF8 .. 0xFF]
 };
 
-#define BLOCK_MAX (65535)
+__device__
+std::uint32_t crc32(const char* str, std::uint32_t value = 0)
+{
+    while (*str != '\0')
+    {
+        value = (value >> 8) ^ crc32_table[(*str ^ value) & 0xff];
+        ++str;
+    }
 
-#define CHARS_LEN (40)
+    return value;
+}
+
+#define BLOCK_MAX (65535U)
+#define THREAD_MAX (65535U)
+
+#define CHARS_LEN (40U)
 __constant__ char CHARS[CHARS_LEN + 1] = "-.0123456789>_abcdefghijklmnopqrstuvwxyz";
-//     = "-.0123456789>_abcdefghijklmnopqrstuvwxyz"
-//     = "_lmnohijkdefgabcxyztuvwpqrs-.>8945670123"
-//     = "_tuvwpqrsxyzdefgabclmnohijk45670123>89-."
-//     = "89>01234567-._xyzpqrstuvwhijklmnoabcdefg"
-//     = "-.1032547698>_acbedgfihkjmlonqpsrutwvyxz"
-//     = "_mlonihkjedgfacbyxzutwvqpsr-.>9854761032"
-//     = "_utwvqpsryxzedgfacbmlonihkj54761032>98-."
-//     = "98>10325476-._yxzqpsrutwvihkjmlonacbedgf"
-//     = "_nolmjkhifgdebcazxyvwturspq.->8967452301"
-//     = ".-2301674589>_bcafgdejkhinolmrspqvwtuzxy"
-//     = "89>23016745.-_zxyrspqvwtujkhinolmbcafgde"
-//     = "_vwturspqzxyfgdebcanolmjkhi67452301>89.-"
-//     = "_onmlkjihgfedcbazyxwvutsrqp.->9876543210"
-//     = ".-3210765498>_cbagfedkjihonmlsrqpwvutzyx"
-//     = "98>32107654.-_zyxsrqpwvutkjihonmlcbagfed"
-//     = "_wvutsrqpzyxgfedcbaonmlkjih76543210>98.-"
-//     = ">8945670123-._xyztuvwpqrslmnohijkdefgabc"
-//     = "_pqrstuvwxyzabcdefghijklmno0123456789>-."
-//     = "_hijklmnoabcdefgxyzpqrstuvw-.89>01234567"
-//     = "-.45670123>89_defgabclmnohijktuvwpqrsxyz"
-//     = ">9854761032-._yxzutwvqpsrmlonihkjedgfacb"
-//     = "_qpsrutwvyxzacbedgfihkjmlon1032547698>-."
-//     = "_ihkjmlonacbedgfyxzqpsrutwv-.98>10325476"
-//     = "-.54761032>98_edgfacbmlonihkjutwvqpsryxz"
-//     = "_rspqvwtuzxybcafgdejkhinolm2301674589>.-"
-//     = ">8967452301.-_zxyvwturspqnolmjkhifgdebca"
-//     = ".-67452301>89_fgdebcanolmjkhivwturspqzxy"
-//     = "_jkhinolmbcafgdezxyrspqvwtu.-89>23016745"
-//     = "_srqpwvutzyxcbagfedkjihonml3210765498>.-"
-//     = ">9876543210.-_zyxwvutsrqponmlkjihgfedcba"
-//     = ".-76543210>98_gfedcbaonmlkjihwvutsrqpzyx"
-//     = "_kjihonmlcbagfedzyxsrqpwvut.-98>32107654"
-//     = "_yxzutwvqpsrmlonihkjedgfacb>9854761032-."
-//     = "1032547698>-._qpsrutwvyxzacbedgfihkjmlon"
-//     = "-.98>10325476_ihkjmlonacbedgfyxzqpsrutwv"
-//     = "_edgfacbmlonihkjutwvqpsryxz-.54761032>98"
-//     = "_xyztuvwpqrslmnohijkdefgabc>8945670123-."
-//     = "0123456789>-._pqrstuvwxyzabcdefghijklmno"
-//     = "-.89>01234567_hijklmnoabcdefgxyzpqrstuvw"
-//     = "_defgabclmnohijktuvwpqrsxyz-.45670123>89"
-//     = "3210765498>.-_srqpwvutzyxcbagfedkjihonml"
-//     = "_zyxwvutsrqponmlkjihgfedcba>9876543210.-"
-//     = "_gfedcbaonmlkjihwvutsrqpzyx.-76543210>98"
-//     = ".-98>32107654_kjihonmlcbagfedzyxsrqpwvut"
-//     = "2301674589>.-_rspqvwtuzxybcafgdejkhinolm"
-//     = "_zxyvwturspqnolmjkhifgdebca>8967452301.-"
-//     = "_fgdebcanolmjkhivwturspqzxy.-67452301>89"
-//     = ".-89>23016745_jkhinolmbcafgdezxyrspqvwtu"
-//     = "_acbedgfihkjmlonqpsrutwvyxz-.1032547698>"
-//     = "-.>9854761032_mlonihkjedgfacbyxzutwvqpsr"
-//     = "54761032>98-._utwvqpsryxzedgfacbmlonihkj"
-//     = "_yxzqpsrutwvihkjmlonacbedgf98>10325476-."
-//     = "_abcdefghijklmnopqrstuvwxyz-.0123456789>"
-//     = "-.>8945670123_lmnohijkdefgabcxyztuvwpqrs"
-//     = "45670123>89-._tuvwpqrsxyzdefgabclmnohijk"
-//     = "_xyzpqrstuvwhijklmnoabcdefg89>01234567-."
-//     = ".->9876543210_onmlkjihgfedcbazyxwvutsrqp"
-//     = "_cbagfedkjihonmlsrqpwvutzyx.-3210765498>"
-//     = "_zyxsrqpwvutkjihonmlcbagfed98>32107654.-"
-//     = "76543210>98.-_wvutsrqpzyxgfedcbaonmlkjih"
-//     = ".->8967452301_nolmjkhifgdebcazxyvwturspq"
-//     = "_bcafgdejkhinolmrspqvwtuzxy.-2301674589>"
-//     = "_zxyrspqvwtujkhinolmbcafgde89>23016745.-"
-//     = "67452301>89.-_vwturspqzxyfgdebcanolmjkhi"
-//     = "_zyxwvutsrqponmlkjihgfedcba>9876543210.-"
-//     = "3210765498>.-_srqpwvutzyxcbagfedkjihonml"
-//     = ".-98>32107654_kjihonmlcbagfedzyxsrqpwvut"
-//     = "_gfedcbaonmlkjihwvutsrqpzyx.-76543210>98"
-//     = "_zxyvwturspqnolmjkhifgdebca>8967452301.-"
-//     = "2301674589>.-_rspqvwtuzxybcafgdejkhinolm"
-//     = ".-89>23016745_jkhinolmbcafgdezxyrspqvwtu"
-//     = "_fgdebcanolmjkhivwturspqzxy.-67452301>89"
-//     = "1032547698>-._qpsrutwvyxzacbedgfihkjmlon"
-//     = "_yxzutwvqpsrmlonihkjedgfacb>9854761032-."
-//     = "_edgfacbmlonihkjutwvqpsryxz-.54761032>98"
-//     = "-.98>10325476_ihkjmlonacbedgfyxzqpsrutwv"
-//     = "0123456789>-._pqrstuvwxyzabcdefghijklmno"
-//     = "_xyztuvwpqrslmnohijkdefgabc>8945670123-."
-//     = "_defgabclmnohijktuvwpqrsxyz-.45670123>89"
-//     = "-.89>01234567_hijklmnoabcdefgxyzpqrstuvw"
-//     = "_cbagfedkjihonmlsrqpwvutzyx.-3210765498>"
-//     = ".->9876543210_onmlkjihgfedcbazyxwvutsrqp"
-//     = "76543210>98.-_wvutsrqpzyxgfedcbaonmlkjih"
-//     = "_zyxsrqpwvutkjihonmlcbagfed98>32107654.-"
-//     = "_bcafgdejkhinolmrspqvwtuzxy.-2301674589>"
-//     = ".->8967452301_nolmjkhifgdebcazxyvwturspq"
-//     = "67452301>89.-_vwturspqzxyfgdebcanolmjkhi"
-//     = "_zxyrspqvwtujkhinolmbcafgde89>23016745.-"
-//     = "-.>9854761032_mlonihkjedgfacbyxzutwvqpsr"
-//     = "_acbedgfihkjmlonqpsrutwvyxz-.1032547698>"
-//     = "_yxzqpsrutwvihkjmlonacbedgf98>10325476-."
-//     = "54761032>98-._utwvqpsryxzedgfacbmlonihkj"
-//     = "-.>8945670123_lmnohijkdefgabcxyztuvwpqrs"
-//     = "_abcdefghijklmnopqrstuvwxyz-.0123456789>"
-//     = "_xyzpqrstuvwhijklmnoabcdefg89>01234567-."
-//     = "45670123>89-._tuvwpqrsxyzdefgabclmnohijk"
-//     = ".-2301674589>_bcafgdejkhinolmrspqvwtuzxy"
-//     = "_nolmjkhifgdebcazxyvwturspq.->8967452301"
-//     = "_vwturspqzxyfgdebcanolmjkhi67452301>89.-"
-//     = "89>23016745.-_zxyrspqvwtujkhinolmbcafgde"
-//     = ".-3210765498>_cbagfedkjihonmlsrqpwvutzyx"
-//     = "_onmlkjihgfedcbazyxwvutsrqp.->9876543210"
-//     = "_wvutsrqpzyxgfedcbaonmlkjih76543210>98.-"
-//     = "98>32107654.-_zyxsrqpwvutkjihonmlcbagfed"
-//     = "_lmnohijkdefgabcxyztuvwpqrs-.>8945670123"
-//     = "-.0123456789>_abcdefghijklmnopqrstuvwxyz"
-//     = "89>01234567-._xyzpqrstuvwhijklmnoabcdefg"
-//     = "_tuvwpqrsxyzdefgabclmnohijk45670123>89-."
-//     = "_mlonihkjedgfacbyxzutwvqpsr-.>9854761032"
-//     = "-.1032547698>_acbedgfihkjmlonqpsrutwvyxz"
-//     = "98>10325476-._yxzqpsrutwvihkjmlonacbedgf"
-//     = "_utwvqpsryxzedgfacbmlonihkj54761032>98-."
-//     = ">8967452301.-_zxyvwturspqnolmjkhifgdebca"
-//     = "_rspqvwtuzxybcafgdejkhinolm2301674589>.-"
-//     = "_jkhinolmbcafgdezxyrspqvwtu.-89>23016745"
-//     = ".-67452301>89_fgdebcanolmjkhivwturspqzxy"
-//     = ">9876543210.-_zyxwvutsrqponmlkjihgfedcba"
-//     = "_srqpwvutzyxcbagfedkjihonml3210765498>.-"
-//     = "_kjihonmlcbagfedzyxsrqpwvut.-98>32107654"
-//     = ".-76543210>98_gfedcbaonmlkjihwvutsrqpzyx"
-//     = "_pqrstuvwxyzabcdefghijklmno0123456789>-."
-//     = ">8945670123-._xyztuvwpqrslmnohijkdefgabc"
-//     = "-.45670123>89_defgabclmnohijktuvwpqrsxyz"
-//     = "_hijklmnoabcdefgxyzpqrstuvw-.89>01234567"
-//     = "_qpsrutwvyxzacbedgfihkjmlon1032547698>-."
-//     = ">9854761032-._yxzutwvqpsrmlonihkjedgfacb"
-//     = "-.54761032>98_edgfacbmlonihkjutwvqpsryxz"
-//     = "_ihkjmlonacbedgfyxzqpsrutwv-.98>10325476"
-//     = "rspqvwtuzxybcafgdejkhinolm_2301674589>.-"
-//     = ">8967452301.-zxyvwturspqnolmjkhifgdebca_"
-//     = ".-67452301>89fgdebcanolmjkhivwturspqzxy_"
-//     = "jkhinolmbcafgdezxyrspqvwtu_.-89>23016745"
-//     = "srqpwvutzyxcbagfedkjihonml_3210765498>.-"
-//     = ">9876543210.-zyxwvutsrqponmlkjihgfedcba_"
-//     = ".-76543210>98gfedcbaonmlkjihwvutsrqpzyx_"
-//     = "kjihonmlcbagfedzyxsrqpwvut_.-98>32107654"
-//     = ">8945670123-.xyztuvwpqrslmnohijkdefgabc_"
-//     = "pqrstuvwxyzabcdefghijklmno_0123456789>-."
-//     = "hijklmnoabcdefgxyzpqrstuvw_-.89>01234567"
-//     = "-.45670123>89defgabclmnohijktuvwpqrsxyz_"
-//     = ">9854761032-.yxzutwvqpsrmlonihkjedgfacb_"
-//     = "qpsrutwvyxzacbedgfihkjmlon_1032547698>-."
-//     = "ihkjmlonacbedgfyxzqpsrutwv_-.98>10325476"
-//     = "-.54761032>98edgfacbmlonihkjutwvqpsryxz_"
-//     = "nolmjkhifgdebcazxyvwturspq_.->8967452301"
-//     = ".-2301674589>bcafgdejkhinolmrspqvwtuzxy_"
-//     = "89>23016745.-zxyrspqvwtujkhinolmbcafgde_"
-//     = "vwturspqzxyfgdebcanolmjkhi_67452301>89.-"
-//     = "onmlkjihgfedcbazyxwvutsrqp_.->9876543210"
-//     = ".-3210765498>cbagfedkjihonmlsrqpwvutzyx_"
-//     = "98>32107654.-zyxsrqpwvutkjihonmlcbagfed_"
-//     = "wvutsrqpzyxgfedcbaonmlkjih_76543210>98.-"
-//     = "-.0123456789>abcdefghijklmnopqrstuvwxyz_"
-//     = "lmnohijkdefgabcxyztuvwpqrs_-.>8945670123"
-//     = "tuvwpqrsxyzdefgabclmnohijk_45670123>89-."
-//     = "89>01234567-.xyzpqrstuvwhijklmnoabcdefg_"
-//     = "-.1032547698>acbedgfihkjmlonqpsrutwvyxz_"
-//     = "mlonihkjedgfacbyxzutwvqpsr_-.>9854761032"
-//     = "utwvqpsryxzedgfacbmlonihkj_54761032>98-."
-//     = "98>10325476-.yxzqpsrutwvihkjmlonacbedgf_"
-//     = ".->9876543210onmlkjihgfedcbazyxwvutsrqp_"
-//     = "cbagfedkjihonmlsrqpwvutzyx_.-3210765498>"
-//     = "zyxsrqpwvutkjihonmlcbagfed_98>32107654.-"
-//     = "76543210>98.-wvutsrqpzyxgfedcbaonmlkjih_"
-//     = ".->8967452301nolmjkhifgdebcazxyvwturspq_"
-//     = "bcafgdejkhinolmrspqvwtuzxy_.-2301674589>"
-//     = "zxyrspqvwtujkhinolmbcafgde_89>23016745.-"
-//     = "67452301>89.-vwturspqzxyfgdebcanolmjkhi_"
-//     = "acbedgfihkjmlonqpsrutwvyxz_-.1032547698>"
-//     = "-.>9854761032mlonihkjedgfacbyxzutwvqpsr_"
-//     = "54761032>98-.utwvqpsryxzedgfacbmlonihkj_"
-//     = "yxzqpsrutwvihkjmlonacbedgf_98>10325476-."
-//     = "abcdefghijklmnopqrstuvwxyz_-.0123456789>"
-//     = "-.>8945670123lmnohijkdefgabcxyztuvwpqrs_"
-//     = "45670123>89-.tuvwpqrsxyzdefgabclmnohijk_"
-//     = "xyzpqrstuvwhijklmnoabcdefg_89>01234567-."
-//     = "3210765498>.-srqpwvutzyxcbagfedkjihonml_"
-//     = "zyxwvutsrqponmlkjihgfedcba_>9876543210.-"
-//     = "gfedcbaonmlkjihwvutsrqpzyx_.-76543210>98"
-//     = ".-98>32107654kjihonmlcbagfedzyxsrqpwvut_"
-//     = "2301674589>.-rspqvwtuzxybcafgdejkhinolm_"
-//     = "zxyvwturspqnolmjkhifgdebca_>8967452301.-"
-//     = "fgdebcanolmjkhivwturspqzxy_.-67452301>89"
-//     = ".-89>23016745jkhinolmbcafgdezxyrspqvwtu_"
-//     = "yxzutwvqpsrmlonihkjedgfacb_>9854761032-."
-//     = "1032547698>-.qpsrutwvyxzacbedgfihkjmlon_"
-//     = "-.98>10325476ihkjmlonacbedgfyxzqpsrutwv_"
-//     = "edgfacbmlonihkjutwvqpsryxz_-.54761032>98"
-//     = "xyztuvwpqrslmnohijkdefgabc_>8945670123-."
-//     = "0123456789>-.pqrstuvwxyzabcdefghijklmno_"
-//     = "-.89>01234567hijklmnoabcdefgxyzpqrstuvw_"
-//     = "defgabclmnohijktuvwpqrsxyz_-.45670123>89"
-//     = "-.>9854761032mlonihkjedgfacbyxzutwvqpsr_"
-//     = "acbedgfihkjmlonqpsrutwvyxz_-.1032547698>"
-//     = "yxzqpsrutwvihkjmlonacbedgf_98>10325476-."
-//     = "54761032>98-.utwvqpsryxzedgfacbmlonihkj_"
-//     = "-.>8945670123lmnohijkdefgabcxyztuvwpqrs_"
-//     = "abcdefghijklmnopqrstuvwxyz_-.0123456789>"
-//     = "xyzpqrstuvwhijklmnoabcdefg_89>01234567-."
-//     = "45670123>89-.tuvwpqrsxyzdefgabclmnohijk_"
-//     = "cbagfedkjihonmlsrqpwvutzyx_.-3210765498>"
-//     = ".->9876543210onmlkjihgfedcbazyxwvutsrqp_"
-//     = "76543210>98.-wvutsrqpzyxgfedcbaonmlkjih_"
-//     = "zyxsrqpwvutkjihonmlcbagfed_98>32107654.-"
-//     = "bcafgdejkhinolmrspqvwtuzxy_.-2301674589>"
-//     = ".->8967452301nolmjkhifgdebcazxyvwturspq_"
-//     = "67452301>89.-vwturspqzxyfgdebcanolmjkhi_"
-//     = "zxyrspqvwtujkhinolmbcafgde_89>23016745.-"
-//     = "1032547698>-.qpsrutwvyxzacbedgfihkjmlon_"
-//     = "yxzutwvqpsrmlonihkjedgfacb_>9854761032-."
-//     = "edgfacbmlonihkjutwvqpsryxz_-.54761032>98"
-//     = "-.98>10325476ihkjmlonacbedgfyxzqpsrutwv_"
-//     = "0123456789>-.pqrstuvwxyzabcdefghijklmno_"
-//     = "xyztuvwpqrslmnohijkdefgabc_>8945670123-."
-//     = "defgabclmnohijktuvwpqrsxyz_-.45670123>89"
-//     = "-.89>01234567hijklmnoabcdefgxyzpqrstuvw_"
-//     = "zyxwvutsrqponmlkjihgfedcba_>9876543210.-"
-//     = "3210765498>.-srqpwvutzyxcbagfedkjihonml_"
-//     = ".-98>32107654kjihonmlcbagfedzyxsrqpwvut_"
-//     = "gfedcbaonmlkjihwvutsrqpzyx_.-76543210>98"
-//     = "zxyvwturspqnolmjkhifgdebca_>8967452301.-"
-//     = "2301674589>.-rspqvwtuzxybcafgdejkhinolm_"
-//     = ".-89>23016745jkhinolmbcafgdezxyrspqvwtu_"
-//     = "fgdebcanolmjkhivwturspqzxy_.-67452301>89"
-//     = "pqrstuvwxyzabcdefghijklmno_0123456789>-."
-//     = ">8945670123-.xyztuvwpqrslmnohijkdefgabc_"
-//     = "-.45670123>89defgabclmnohijktuvwpqrsxyz_"
-//     = "hijklmnoabcdefgxyzpqrstuvw_-.89>01234567"
-//     = "qpsrutwvyxzacbedgfihkjmlon_1032547698>-."
-//     = ">9854761032-.yxzutwvqpsrmlonihkjedgfacb_"
-//     = "-.54761032>98edgfacbmlonihkjutwvqpsryxz_"
-//     = "ihkjmlonacbedgfyxzqpsrutwv_-.98>10325476"
-//     = ">8967452301.-zxyvwturspqnolmjkhifgdebca_"
-//     = "rspqvwtuzxybcafgdejkhinolm_2301674589>.-"
-//     = "jkhinolmbcafgdezxyrspqvwtu_.-89>23016745"
-//     = ".-67452301>89fgdebcanolmjkhivwturspqzxy_"
-//     = ">9876543210.-zyxwvutsrqponmlkjihgfedcba_"
-//     = "srqpwvutzyxcbagfedkjihonml_3210765498>.-"
-//     = "kjihonmlcbagfedzyxsrqpwvut_.-98>32107654"
-//     = ".-76543210>98gfedcbaonmlkjihwvutsrqpzyx_"
-//     = "lmnohijkdefgabcxyztuvwpqrs_-.>8945670123"
-//     = "-.0123456789>abcdefghijklmnopqrstuvwxyz_"
-//     = "89>01234567-.xyzpqrstuvwhijklmnoabcdefg_"
-//     = "tuvwpqrsxyzdefgabclmnohijk_45670123>89-."
-//     = "mlonihkjedgfacbyxzutwvqpsr_-.>9854761032"
-//     = "-.1032547698>acbedgfihkjmlonqpsrutwvyxz_"
-//     = "98>10325476-.yxzqpsrutwvihkjmlonacbedgf_"
-//     = "utwvqpsryxzedgfacbmlonihkj_54761032>98-."
-//     = ".-2301674589>bcafgdejkhinolmrspqvwtuzxy_"
-//     = "nolmjkhifgdebcazxyvwturspq_.->8967452301"
-//     = "vwturspqzxyfgdebcanolmjkhi_67452301>89.-"
-//     = "89>23016745.-zxyrspqvwtujkhinolmbcafgde_"
-//     = ".-3210765498>cbagfedkjihonmlsrqpwvutzyx_"
-//     = "onmlkjihgfedcbazyxwvutsrqp_.->9876543210"
-//     = "wvutsrqpzyxgfedcbaonmlkjih_76543210>98.-"
-//     = "98>32107654.-zyxsrqpwvutkjihonmlcbagfed_"
+
+#define MAX_DIRECTORIES (4U)
+const std::uint32_t INITIAL_CRC32 = crc32("db:>");
+
+__device__
+bool search(crc32_t hash)
+{
+    crc32_t first = 0;
+    crc32_t last = HASHES_LEN - 1;
+    crc32_t middle = (first + last) / 2;
+
+    while (first <= last) {
+        if (HASHES[middle] < hash)
+        {
+            first = middle + 1;
+        }
+        else if (HASHES[middle] == hash) {
+            return true;
+        }
+        else
+        {
+            last = middle - 1;
+        }
+
+        middle = (first + last) / 2;
+    }
+    
+    return false;
+}
 
 __global__
-void kernel(std::uint32_t hashOffset)
+void ext(crc32_t hash)
 {
-    crc32_t hash = blockIdx.x + hashOffset;
-    crc32_t newHash = (hash >> 8) ^ crc32_table[(threadIdx.x ^ hash) & 0xff];
-
-    //for (int i = 0; i < 1048576; ++i)
-    //{
-    //    std::uint32_t X = ((16 * (268435456 / 256)) * i);
-    //    if (newHash == X)
-    //    {
-    //        printf("%d %u %u %c\n", i, hash, newHash, CHARS[threadIdx.x]);
-    //    }
-    //}
-    std::uint32_t X = ((16 * (268435456 / 256)));
-    if (newHash % X == 0)
+    hash = crc32(EXTS[threadIdx.x], hash);
+    if (search(hash))
     {
-        printf("%u %u %u\n", newHash / X, hash, threadIdx.x);
+        printf("found %u\n", hash);
+    }
+}
+
+__global__
+void kernel(std::uint32_t offset, crc32_t hash, std::uint32_t depth)
+{
+    std::uint32_t id = blockIdx.x * blockDim.x + threadIdx.x + offset;
+
+    if (id >= DICTIONARY_LEN)
+    {
+        return;
+    }
+
+    hash = crc32(DICTIONARY[id], hash);
+
+    if (depth < MAX_DIRECTORIES)
+    {
+        hash = (hash >> 8) ^ crc32_table[('>' ^ hash) & 0xff];
+        for (std::uint32_t i = 0; i < ((DICTIONARY_LEN / BLOCK_MAX) / THREAD_MAX) + 1; ++i)
+        {
+            kernel<<<BLOCK_MAX, THREAD_MAX>>>(i * BLOCK_MAX * THREAD_MAX, hash, depth + 1);
+        }
+    }
+    else
+    {
+        hash = (hash >> 8) ^ crc32_table[('.' ^ hash) & 0xff];
+        ext<<<1, EXTS_LEN>>>(hash);
     }
 }
 
 int main()
 {
-    for (std::uint32_t i = 0; i < CRC32_MAX / BLOCK_MAX; ++i)
+    std::uint32_t* pDictionaryLen;
+    const char*** pDictionary;
+
+    cudaGetSymbolAddress((void**)&pDictionaryLen, &DICTIONARY_LEN);
+    CUDA_ASSERT(cudaPeekAtLastError());
+    cudaGetSymbolAddress((void**)&pDictionary, &DICTIONARY);
+    CUDA_ASSERT(cudaPeekAtLastError());
+
+    FILE* f = fopen("dictionary.txt", "rb");
+
+    if (!f)
     {
-        kernel<<<BLOCK_MAX, 256>>>(i * BLOCK_MAX);
+        exit(2);
+    }
+
+    fscanf(f, "%u", pDictionaryLen);
+    cudaMalloc((void**)pDictionary, *pDictionaryLen * sizeof(char*));
+    CUDA_ASSERT(cudaPeekAtLastError());
+
+    for (std::uint32_t i = 0; i < *pDictionaryLen; ++i)
+    {
+        fscanf(f, "%ms", &pDictionary[i]);
+    }
+
+    fclose(f);
+    f = nullptr;
+
+    for (std::uint32_t i = 0; i < ((*pDictionaryLen / BLOCK_MAX) / THREAD_MAX) + 1; ++i)
+    {
+        kernel<<<BLOCK_MAX, THREAD_MAX>>>(i * BLOCK_MAX * THREAD_MAX, INITIAL_CRC32, 0);
+        kernel<<<BLOCK_MAX, THREAD_MAX>>>(i * BLOCK_MAX * THREAD_MAX, INITIAL_CRC32, 1);
+        kernel<<<BLOCK_MAX, THREAD_MAX>>>(i * BLOCK_MAX * THREAD_MAX, INITIAL_CRC32, 2);
+        kernel<<<BLOCK_MAX, THREAD_MAX>>>(i * BLOCK_MAX * THREAD_MAX, INITIAL_CRC32, 3);
     }
     CUDA_ASSERT(cudaPeekAtLastError());
     CUDA_ASSERT(cudaDeviceSynchronize());

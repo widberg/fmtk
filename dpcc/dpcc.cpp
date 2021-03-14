@@ -4,137 +4,183 @@
 #include <filesystem>
 #include <vector>
 
-//std::vector<std::vector<std::uint8_t>> objects;
-
-struct MaterialAnim_Z_Data
+std::uint32_t calculatePaddedSize(std::uint32_t unpaddedSize)
 {
-    std::uint32_t unknown0;
-    std::uint32_t unknown1;
-    std::uint32_t unknown2;
-    std::uint32_t unknown3;
-    std::uint32_t unknown4;
-    std::uint32_t unknown5;
-    std::uint32_t unknown6;
-    std::uint32_t unknown7;
-    std::uint32_t unknown8;
-    std::uint32_t unknown9;
-    std::uint32_t unknown10;
-    std::uint32_t unknown11;
-    std::uint32_t unknown12;
-    std::uint32_t unknown13;
-    std::uint32_t unknown14;
-    std::uint32_t materialCRC32;
-    std::uint8_t unknown15;
-    std::uint8_t unknown16;
-    std::uint8_t unknown17;
-    std::uint8_t unknown18;
-    std::uint8_t unknown19;
+    return (unpaddedSize + 0x7ff) & 0xfffff800;
+}
+
+std::uint32_t calculatePaddingSize(std::uint32_t unpaddedSize)
+{
+    return calculatePaddedSize(unpaddedSize) - unpaddedSize;
+}
+
+struct BlockDescription
+{
+    std::uint32_t blockType;
+    std::uint32_t objectCount;
+    std::uint32_t paddedSize;
+    std::uint32_t dataSize;
+    std::uint32_t workingBufferOffset;
+    std::uint32_t crc32;
+};
+
+class Block
+{
+public:
+    void pushObject(const std::string& objectPath)
+    {
+        objects.push_back(objectPath);
+    }
+
+    BlockDescription getBlockDescription() const
+    {
+        BlockDescription blockDescription = {
+            0,
+            objects.size(),
+            getPaddedSize(),
+            getDataSize(),
+            0,
+            0
+        };
+
+        return blockDescription;
+    }
+
+    void write(std::ostream& out) const
+    {
+        for (const std::string& objectPath : objects)
+        {
+            std::ifstream in(objectPath, std::ios::ate | std::ios::binary);
+            std::uint32_t size = in.tellg();
+            in.seekg(0, std::ios::beg);
+            std::vector<char> buffer;
+            buffer.resize(size);
+            in.read(buffer.data(), buffer.size());
+            out.write(buffer.data(), buffer.size());
+        }
+        std::vector<char> fill;
+        fill.resize(calculatePaddingSize((getDataSize() == 0) + out.tellp()) + (getDataSize() == 0));
+        std::memset(fill.data(), 0, fill.size());
+        out.write(fill.data(), fill.size());
+    }
+
+    std::uint32_t getDataSize() const
+    {
+        std::uint32_t dataSize = 0;
+        for (const std::string& objectPath : objects)
+        {
+            std::ifstream out(objectPath, std::ios::ate | std::ios::binary);
+            dataSize += out.tellg();
+        }
+        return dataSize;
+    }
+
+    std::uint32_t getPaddedSize() const
+    {
+        return calculatePaddedSize(getDataSize());
+    }
+private:
+    std::vector<std::string> objects;
+};
+
+class DPC
+{
+public:
+    DPC()
+    {
+
+    }
+
+    Block& newBlock()
+    {
+        blocks.push_back({});
+        return blocks.back();
+    }
+
+    void write(const std::string& outPath) const
+    {
+        std::ofstream out(outPath, std::ios::binary);
+
+        if (!out.good())
+        {
+            exit(1);
+        }
+
+        char buffer[256] = {};
+        std::strcpy(buffer, versionString.c_str());
+        std::uint32_t buffer32 = 0;
+
+        out.write(buffer, sizeof(buffer));
+        buffer32 = 1;
+        out.write((char*)&buffer32, sizeof(buffer32));
+        buffer32 = blocks.size();
+        out.write((char*)&buffer32, sizeof(buffer32));
+        
+        buffer32 = 0;
+        for (const Block& block : blocks)
+        {
+            buffer32 = std::max(buffer32, block.getPaddedSize());
+        }
+        out.write((char*)&buffer32, sizeof(buffer32));
+        out.write((char*)&buffer32, sizeof(buffer32));
+
+        buffer32 = 0;
+        for (const Block& block : blocks)
+        {
+            buffer32 += block.getPaddedSize();
+        }
+        out.write((char*)&buffer32, sizeof(buffer32));
+
+        buffer32 = 0;
+        out.write((char*)&buffer32, sizeof(buffer32));
+        out.write((char*)&buffer32, sizeof(buffer32));
+
+        for (const Block& block : blocks)
+        {
+            out.write((char*)&block.getBlockDescription(), sizeof(BlockDescription));;
+        }
+
+        out.seekp(1824, std::ios::beg);
+
+        char buffer2[128] = {};
+
+        buffer32 = 0;
+        out.write((char*)&buffer32, sizeof(buffer32));
+        out.write((char*)&buffer32, sizeof(buffer32));
+        out.write((char*)&buffer32, sizeof(buffer32));
+        out.write((char*)&buffer32, sizeof(buffer32));
+        out.write((char*)&buffer32, sizeof(buffer32));
+        out.write((char*)&buffer32, sizeof(buffer32));
+        out.write((char*)&buffer32, sizeof(buffer32));
+        out.write((char*)&buffer32, sizeof(buffer32));
+        out.write(buffer2, sizeof(buffer2));
+        std::vector<char> fill;
+        fill.resize(calculatePaddingSize(out.tellp()));
+        std::memset(fill.data(), 0xFF, fill.size());
+        out.write(fill.data(), fill.size());
+
+        for (const Block& block : blocks)
+        {
+            block.write(out);
+            std::vector<char> fill;
+            fill.resize(calculatePaddingSize(out.tellp()));
+            std::memset(fill.data(), 0, fill.size());
+            out.write(fill.data(), fill.size());
+        }
+    }
+private:
+    std::string versionString = "v1.381.67.09 - Asobo Studio - Internal Cross Technology";
+    std::vector<BlockDescription> blockDescription;
+    std::vector<Block> blocks;
 };
 
 int main(int argc, const char* argv[])
 {
+    DPC dpc;
+    Block& block = dpc.newBlock();
+    block.pushObject("D:\\SteamLibrary\\steamapps\\common\\FUEL\\DATAS\\BIKE_files\\4206951608.TLODDATA");
 
+    dpc.write("DATAS\\TEST.DPC");
 
     return 0;
-
-	//std::ifstream in("C:\\Users\\jared\\Desktop\\New folder\\RandBIKE.DPC", std::ios::binary);
-	//if (!in.good())
-	//{
-	//	return 1;
-	//}
-
-	//std::uint32_t size;
-
-	//while (!in.read(reinterpret_cast<char*>(&size), sizeof(size)).eof())
-	//{
-	//	std::vector<std::uint8_t> data;
-	//	data.resize(size + 24);
-	//	*reinterpret_cast<std::uint32_t*>(data.data()) = size;
-	//	in.read(reinterpret_cast<char*>(data.data() + 4), data.size() - 4);
-	//	objects.push_back(data);
-	//}
-
-	//std::ofstream out("C:\\Users\\jared\\Desktop\\New folder\\OutRandBIKE.DPC", std::ios::binary);
-
-	//for (auto it = objects.rbegin(); it != objects.rend(); ++it)
-	//{
-	//	out.write(reinterpret_cast<char*>((*it).data()), (*it).size());
-	//}
-
-    //MaterialAnim_Z_Data min;
-    //MaterialAnim_Z_Data max;
-
-    //for (auto file : std::filesystem::directory_iterator("C:\\Users\\jared\\Desktop\\New folder\\New folder"))
-    //{
-    //    std::ifstream in(file.path(), std::ios::binary);
-    //    MaterialAnim_Z_Data materialAnim_Z_Data;
-    //    in.read(reinterpret_cast<char*>(&materialAnim_Z_Data), sizeof(materialAnim_Z_Data));
-
-    //    min.unknown0 = std::min(min.unknown0, materialAnim_Z_Data.unknown0);
-    //    min.unknown1 = std::min(min.unknown1, materialAnim_Z_Data.unknown1);
-    //    min.unknown2 = std::min(min.unknown2, materialAnim_Z_Data.unknown2);
-    //    min.unknown3 = std::min(min.unknown3, materialAnim_Z_Data.unknown3);
-    //    min.unknown4 = std::min(min.unknown4, materialAnim_Z_Data.unknown4);
-    //    min.unknown5 = std::min(min.unknown5, materialAnim_Z_Data.unknown5);
-    //    min.unknown6 = std::min(min.unknown6, materialAnim_Z_Data.unknown6);
-    //    min.unknown7 = std::min(min.unknown7, materialAnim_Z_Data.unknown7);
-    //    min.unknown8 = std::min(min.unknown8, materialAnim_Z_Data.unknown8);
-    //    min.unknown9 = std::min(min.unknown9, materialAnim_Z_Data.unknown9);
-    //    min.unknown10 = std::min(min.unknown10, materialAnim_Z_Data.unknown10);
-    //    min.unknown11 = std::min(min.unknown11, materialAnim_Z_Data.unknown11);
-    //    min.unknown12 = std::min(min.unknown12, materialAnim_Z_Data.unknown12);
-    //    min.unknown13 = std::min(min.unknown13, materialAnim_Z_Data.unknown13);
-    //    min.unknown14 = std::min(min.unknown14, materialAnim_Z_Data.unknown14);
-    //    min.materialCRC32 = std::min(min.materialCRC32, materialAnim_Z_Data.materialCRC32);
-    //    min.unknown15 = std::min(min.unknown15, materialAnim_Z_Data.unknown15);
-    //    min.unknown16 = std::min(min.unknown16, materialAnim_Z_Data.unknown16);
-    //    min.unknown17 = std::min(min.unknown17, materialAnim_Z_Data.unknown17);
-    //    min.unknown18 = std::min(min.unknown18, materialAnim_Z_Data.unknown18);
-    //    min.unknown19 = std::min(min.unknown19, materialAnim_Z_Data.unknown19);
-
-    //    max.unknown0 = std::max(max.unknown0, materialAnim_Z_Data.unknown0);
-    //    max.unknown1 = std::max(max.unknown1, materialAnim_Z_Data.unknown1);
-    //    max.unknown2 = std::max(max.unknown2, materialAnim_Z_Data.unknown2);
-    //    max.unknown3 = std::max(max.unknown3, materialAnim_Z_Data.unknown3);
-    //    max.unknown4 = std::max(max.unknown4, materialAnim_Z_Data.unknown4);
-    //    max.unknown5 = std::max(max.unknown5, materialAnim_Z_Data.unknown5);
-    //    max.unknown6 = std::max(max.unknown6, materialAnim_Z_Data.unknown6);
-    //    max.unknown7 = std::max(max.unknown7, materialAnim_Z_Data.unknown7);
-    //    max.unknown8 = std::max(max.unknown8, materialAnim_Z_Data.unknown8);
-    //    max.unknown9 = std::max(max.unknown9, materialAnim_Z_Data.unknown9);
-    //    max.unknown10 = std::max(max.unknown10, materialAnim_Z_Data.unknown10);
-    //    max.unknown11 = std::max(max.unknown11, materialAnim_Z_Data.unknown11);
-    //    max.unknown12 = std::max(max.unknown12, materialAnim_Z_Data.unknown12);
-    //    max.unknown13 = std::max(max.unknown13, materialAnim_Z_Data.unknown13);
-    //    max.unknown14 = std::max(max.unknown14, materialAnim_Z_Data.unknown14);
-    //    max.materialCRC32 = std::max(max.materialCRC32, materialAnim_Z_Data.materialCRC32);
-    //    max.unknown15 = std::max(max.unknown15, materialAnim_Z_Data.unknown15);
-    //    max.unknown16 = std::max(max.unknown16, materialAnim_Z_Data.unknown16);
-    //    max.unknown17 = std::max(max.unknown17, materialAnim_Z_Data.unknown17);
-    //    max.unknown18 = std::max(max.unknown18, materialAnim_Z_Data.unknown18);
-    //    max.unknown19 = std::max(max.unknown19, materialAnim_Z_Data.unknown19);
-    //}
-
-    //std::cout <<
-    //    "unknown0: [" << min.unknown0 << ", " << max.unknown0 << "]\n" <<
-    //    "unknown1: [" << min.unknown1 << ", " << max.unknown1 << "]\n" <<
-    //    "unknown2: [" << min.unknown2 << ", " << max.unknown2 << "]\n" <<
-    //    "unknown3: [" << min.unknown3 << ", " << max.unknown3 << "]\n" <<
-    //    "unknown4: [" << min.unknown4 << ", " << max.unknown4 << "]\n" <<
-    //    "unknown5: [" << min.unknown5 << ", " << max.unknown5 << "]\n" <<
-    //    "unknown6: [" << min.unknown6 << ", " << max.unknown6 << "]\n" <<
-    //    "unknown7: [" << min.unknown7 << ", " << max.unknown7 << "]\n" <<
-    //    "unknown8: [" << min.unknown8 << ", " << max.unknown8 << "]\n" <<
-    //    "unknown9: [" << min.unknown9 << ", " << max.unknown9 << "]\n" <<
-    //    "unknown10: [" << min.unknown10 << ", " << max.unknown10 << "]\n" <<
-    //    "unknown11: [" << min.unknown11 << ", " << max.unknown11 << "]\n" <<
-    //    "unknown12: [" << min.unknown12 << ", " << max.unknown12 << "]\n" <<
-    //    "unknown13: [" << min.unknown13 << ", " << max.unknown13 << "]\n" <<
-    //    "unknown14: [" << min.unknown14 << ", " << max.unknown14 << "]\n" <<
-    //    "materialCRC32: [" << min.materialCRC32 << ", " << max.materialCRC32 << "]\n" <<
-    //    "unknown15: [" << min.unknown15 << ", " << max.unknown15 << "]\n" <<
-    //    "unknown16: [" << min.unknown16 << ", " << max.unknown16 << "]\n" <<
-    //    "unknown17: [" << min.unknown17 << ", " << max.unknown17 << "]\n" <<
-    //    "unknown18: [" << min.unknown18 << ", " << max.unknown18 << "]\n" <<
-    //    "unknown19: [" << min.unknown19 << ", " << max.unknown19 << "]\n";
 }

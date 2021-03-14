@@ -180,11 +180,6 @@ void previous(std::uint32_t hash)
 
 int main(int argc, const char* argv[])
 {
-    previous(3505614887);
-    return 0;
-    std::cout.precision(10);
-    std::cout << std::fixed << profile() << "\n";
-    return 0;
 
     if (argc < 4)
     {
