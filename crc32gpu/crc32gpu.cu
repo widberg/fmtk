@@ -7,13 +7,13 @@ typedef std::uint32_t crc32_t;
 #define CRC32_MIN (UINT32_MIN)
 
 #define HASHES_LEN (78965U)
-extern __device__ crc32_t HASHES[];
+extern __device__ crc32_t HASHES[HASHES_LEN];
 
 #define EXTS_LEN (35U)
-extern __constant__ const char* EXTS[];
+extern __constant__ const char* EXTS[EXTS_LEN];
 
-__constant__ std::uint32_t DICTIONARY_LEN;
-__constant__ const char** DICTIONARY;
+#define DICTIONARY_LEN (669767U)
+extern __device__ const char* DICTIONARY[];
 
 __host__
 inline void cudaAssert(cudaError_t code, const char* file, int line)
@@ -25,6 +25,17 @@ inline void cudaAssert(cudaError_t code, const char* file, int line)
     }
 }
 #define CUDA_ASSERT(code) do { cudaAssert(code, __FILE__, __LINE__); } while(0)
+
+__device__
+inline void cudaDevAssert(cudaError_t code, const char* file, int line)
+{
+    if (code != cudaSuccess)
+    {
+        printf("CUDA_DEV_ASSERT: \"%s\" @ %s : %d\n", cudaGetErrorString(code), file, line);
+        return;
+    }
+}
+#define CUDA_DEV_ASSERT(code) do { cudaDevAssert(code, __FILE__, __LINE__); } while(0)
 
 #define CRC32_POLYNOMIAL (0x04C11DB7U)
 #define CRC32_TABLE_SIZE (256U)
@@ -76,55 +87,67 @@ std::uint32_t crc32(const char* str, std::uint32_t value = 0)
     return value;
 }
 
-#define BLOCK_MAX (65535U)
-#define THREAD_MAX (65535U)
+#define BLOCK_MAX (256U)
+#define THREAD_MAX (1024U)
 
 #define CHARS_LEN (40U)
 __constant__ char CHARS[CHARS_LEN + 1] = "-.0123456789>_abcdefghijklmnopqrstuvwxyz";
 
 #define MAX_DIRECTORIES (4U)
-const std::uint32_t INITIAL_CRC32 = crc32("db:>");
+
+struct trace_t
+{
+    std::uint32_t size;
+    std::uint32_t data[MAX_DIRECTORIES] = {};
+};
 
 __device__
 bool search(crc32_t hash)
 {
-    crc32_t first = 0;
-    crc32_t last = HASHES_LEN - 1;
-    crc32_t middle = (first + last) / 2;
+    crc32_t low = 0;
+    crc32_t high = HASHES_LEN - 1;
+    crc32_t middle = low + ((high - low) / 2);  // prevents overflow related errors https://ai.googleblog.com/2006/06/extra-extra-read-all-about-it-nearly.html
 
-    while (first <= last) {
+    do
+    {
         if (HASHES[middle] < hash)
         {
-            first = middle + 1;
+            low = middle + 1;
         }
-        else if (HASHES[middle] == hash) {
-            return true;
+        else if (HASHES[middle] > hash)
+        {
+            high = middle - 1;
         }
         else
         {
-            last = middle - 1;
+            return true;
         }
 
-        middle = (first + last) / 2;
+        middle = low + ((high - low) / 2);
+    } while (low < high);
+
+    if (HASHES[middle] == hash)
+    {
+        return true;
     }
-    
+
     return false;
 }
 
 __global__
-void ext(crc32_t hash)
+void ext(crc32_t hash, trace_t trace)
 {
     hash = crc32(EXTS[threadIdx.x], hash);
     if (search(hash))
     {
-        printf("found %u\n", hash);
+        printf("%u = db:>%s>%s>%s>%s.%s\n", hash, DICTIONARY[trace.data[0]], DICTIONARY[trace.data[1]], DICTIONARY[trace.data[2]], DICTIONARY[trace.data[3]], EXTS[threadIdx.x]);
     }
 }
 
 __global__
-void kernel(std::uint32_t offset, crc32_t hash, std::uint32_t depth)
+void kernel(std::uint32_t offset, crc32_t hash, std::uint32_t depth, trace_t trace)
 {
-    std::uint32_t id = blockIdx.x * blockDim.x + threadIdx.x + offset;
+    std::uint32_t id = blockIdx.x * THREAD_MAX + threadIdx.x + offset;
 
     if (id >= DICTIONARY_LEN)
     {
@@ -133,59 +156,46 @@ void kernel(std::uint32_t offset, crc32_t hash, std::uint32_t depth)
 
     hash = crc32(DICTIONARY[id], hash);
 
+    trace.data[depth] = id;
+
     if (depth < MAX_DIRECTORIES)
     {
         hash = (hash >> 8) ^ crc32_table[('>' ^ hash) & 0xff];
         for (std::uint32_t i = 0; i < ((DICTIONARY_LEN / BLOCK_MAX) / THREAD_MAX) + 1; ++i)
         {
-            kernel<<<BLOCK_MAX, THREAD_MAX>>>(i * BLOCK_MAX * THREAD_MAX, hash, depth + 1);
+            kernel << <BLOCK_MAX, THREAD_MAX >> > (i * BLOCK_MAX * THREAD_MAX, hash, depth + 1, trace);
+            CUDA_DEV_ASSERT(cudaPeekAtLastError());
+            CUDA_DEV_ASSERT(cudaDeviceSynchronize());
         }
     }
     else
     {
         hash = (hash >> 8) ^ crc32_table[('.' ^ hash) & 0xff];
-        ext<<<1, EXTS_LEN>>>(hash);
+        ext << <1, EXTS_LEN >> > (hash, trace);
+        CUDA_DEV_ASSERT(cudaPeekAtLastError());
+        CUDA_DEV_ASSERT(cudaDeviceSynchronize());
     }
 }
 
 int main()
 {
-    std::uint32_t* pDictionaryLen;
-    const char*** pDictionary;
+    CUDA_ASSERT(cudaDeviceSetLimit(cudaLimitDevRuntimeSyncDepth, MAX_DIRECTORIES + 2));
 
-    cudaGetSymbolAddress((void**)&pDictionaryLen, &DICTIONARY_LEN);
-    CUDA_ASSERT(cudaPeekAtLastError());
-    cudaGetSymbolAddress((void**)&pDictionary, &DICTIONARY);
-    CUDA_ASSERT(cudaPeekAtLastError());
+    //size_t rsize = 1024ULL * 1024ULL * 1024ULL * 4ULL;  // allocate 4GB
+    //CUDA_ASSERT(cudaDeviceSetLimit(cudaLimitMallocHeapSize, rsize));
+    //CUDA_ASSERT(cudaDeviceSetLimit(cudaLimitStackSize, rsize));
 
-    FILE* f = fopen("dictionary.txt", "rb");
-
-    if (!f)
+    const std::uint32_t INITIAL_CRC32 = 2405238643;
+    for (std::uint32_t i = 0; i < ((DICTIONARY_LEN / BLOCK_MAX) / THREAD_MAX) + 1; ++i)
     {
-        exit(2);
+        for (std::uint32_t j = 0; j < MAX_DIRECTORIES; ++j)
+        {
+            trace_t trace = { MAX_DIRECTORIES - j };
+            kernel << <BLOCK_MAX, THREAD_MAX >> > (i * BLOCK_MAX * THREAD_MAX, INITIAL_CRC32, j, trace);
+            CUDA_ASSERT(cudaPeekAtLastError());
+            CUDA_ASSERT(cudaDeviceSynchronize());
+        }
     }
-
-    fscanf(f, "%u", pDictionaryLen);
-    cudaMalloc((void**)pDictionary, *pDictionaryLen * sizeof(char*));
-    CUDA_ASSERT(cudaPeekAtLastError());
-
-    for (std::uint32_t i = 0; i < *pDictionaryLen; ++i)
-    {
-        fscanf(f, "%ms", &pDictionary[i]);
-    }
-
-    fclose(f);
-    f = nullptr;
-
-    for (std::uint32_t i = 0; i < ((*pDictionaryLen / BLOCK_MAX) / THREAD_MAX) + 1; ++i)
-    {
-        kernel<<<BLOCK_MAX, THREAD_MAX>>>(i * BLOCK_MAX * THREAD_MAX, INITIAL_CRC32, 0);
-        kernel<<<BLOCK_MAX, THREAD_MAX>>>(i * BLOCK_MAX * THREAD_MAX, INITIAL_CRC32, 1);
-        kernel<<<BLOCK_MAX, THREAD_MAX>>>(i * BLOCK_MAX * THREAD_MAX, INITIAL_CRC32, 2);
-        kernel<<<BLOCK_MAX, THREAD_MAX>>>(i * BLOCK_MAX * THREAD_MAX, INITIAL_CRC32, 3);
-    }
-    CUDA_ASSERT(cudaPeekAtLastError());
-    CUDA_ASSERT(cudaDeviceSynchronize());
     cudaDeviceReset();
-	return 0;
+    return 0;
 }

@@ -216,6 +216,11 @@ void Bridge_RegisterCommand(const void* pThis, void* callback, LPCSTR name)
 	};
 }
 
+// std::uint32_t __usercall crc32(std::uint32_t initial @ eax, const char* str @ edx)
+// std::uint32_t @ eax __usercall crc32(std::uint32_t initial @ eax, const char* str @ edx)
+// void __usercall crc32(std::uint32_t& initial @ eax, const char* str @ edx)
+// @@ means backup
+
 NAKEDFUNCTION(CRC32, 0x00669160)
 {
 	__asm {
