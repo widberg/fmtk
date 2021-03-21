@@ -180,6 +180,18 @@ void previous(std::uint32_t hash)
 
 int main(int argc, const char* argv[])
 {
+    for (int i = 1; i <= 2; ++i)
+    {
+        for (int j = 0; j < 100; ++j)
+        {
+            std::string str = "DB:>TEXTURES>BILLBOARDS>1x" + std::to_string(i) + ">BILLBOARDCR" + std::to_string(j) + "_";
+            std::cout << crc32(str + "S.TIF") << " " << str + "S.TIF" << "\n";
+            std::cout << crc32(str + "E.TIF") << " " << str + "E.TIF" << "\n";
+            std::cout << crc32(str + "M.TIF") << " " << str + "M.TIF" << "\n";
+        }
+    }
+
+    return 0;
 
     if (argc < 4)
     {

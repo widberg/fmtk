@@ -8,6 +8,7 @@
 #include <cstring>
 #include <unordered_set>
 #include <map>
+#include <set>
 
 std::unordered_set<std::uint32_t> classCRC32s;
 std::unordered_set<std::uint32_t> heights;
@@ -13128,7 +13129,7 @@ std::unordered_map<std::uint32_t, const char*> classFileExtensions = {
     { 1396791303, "Skin_Z" },
     { 1471281566, "Bitmap_Z" },
     { 1536002910, "Font_Z" },
-    { 1625945536, "RotShapeData_Z" },RotShape_Z
+    { 1625945536, "RotShapeData_Z" },
     { 1706265229, "Surface_Z" },
     { 1910554652, "SplineGraph_Z" },
     { 1943824915, "Lod_Z" },
@@ -13151,7 +13152,7 @@ std::unordered_map<std::uint32_t, const char*> classFileExtensions = {
 struct AAA
 {
     std::string className;
-    std::vector<std::string> dpcNames;
+    std::set<std::string> dpcNames;
     std::int32_t signedCRC32;
 	std::string text;
 };
@@ -15553,7 +15554,7 @@ struct DPCFile
 
                 AAA& aaa = crc32s[unitResource.resourceHeader.crc32];
                 aaa.className = classFileExtensions[unitResource.resourceHeader.classCRC32];
-                aaa.dpcNames.push_back(dpcFilePath.stem().string());
+                aaa.dpcNames.insert(dpcFilePath.stem().string());
                 aaa.signedCRC32 = unitResource.resourceHeader.crc32;
 				if (crc32_reverse_lookup.count(unitResource.resourceHeader.crc32))
 				{
@@ -15764,7 +15765,7 @@ int main(int argc, const char* argv[])
     for (auto& crc32 : crc32s)
     {
         crc32ss << crc32.first << ", " << crc32.second.signedCRC32 << ", " << crc32.second.className << ",";
-        for (std::string& str : crc32.second.dpcNames)
+        for (const std::string& str : crc32.second.dpcNames)
         {
             crc32ss << " " << str;
         }
