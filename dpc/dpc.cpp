@@ -13128,7 +13128,7 @@ std::unordered_map<std::uint32_t, const char*> classFileExtensions = {
     { 1396791303, "Skin_Z" },
     { 1471281566, "Bitmap_Z" },
     { 1536002910, "Font_Z" },
-    { 1625945536, "RotShapeData_Z" },
+    { 1625945536, "RotShapeData_Z" },RotShape_Z
     { 1706265229, "Surface_Z" },
     { 1910554652, "SplineGraph_Z" },
     { 1943824915, "Lod_Z" },
