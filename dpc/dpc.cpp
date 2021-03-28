@@ -2657,35 +2657,36 @@ int main(int argc, const char* argv[])
     //jsonDPCFiles.push_back(DPCFile("DATAS\\\VEH.DPC").to_json());
     //jsonDPCFiles.push_back(DPCFile("DATAS\\\BIKE.DPC").to_json());
 
-    try
-    {
-        json << jsonDPCFiles.dump(4) << ",\n";
-    }
-    catch (const nlohmann::json::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
+    //try
+    //{
+    //    json << jsonDPCFiles.dump(4) << ",\n";
+    //}
+    //catch (const nlohmann::json::exception& e)
+    //{
+    //    std::cout << e.what() << std::endl;
+    //}
 
-    for (std::uint32_t crc32 : classCRC32s)
-    {
-        std::cout << crc32 << std::endl;
-    }
+    //for (std::uint32_t crc32 : classCRC32s)
+    //{
+    //    std::cout << crc32 << std::endl;
+    //}
 
-    std::cout << std::endl;
+    //std::cout << std::endl;
 
-    for (std::uint32_t height : heights)
-    {
-        std::cout << height << std::endl;
-    }
+    //for (std::uint32_t height : heights)
+    //{
+    //    std::cout << height << std::endl;
+    //}
 
     std::ofstream crc32ss("crc32s.txt");
     for (auto& crc32 : crc32s)
     {
-        crc32ss << crc32.first << ", " << crc32.second.signedCRC32 << ", " << crc32.second.className << ",";
+        crc32ss << crc32.first << "," << crc32.second.signedCRC32 << "," << crc32.second.className << ",";
         for (const std::string& str : crc32.second.dpcNames)
         {
-            crc32ss << " " << str;
+            crc32ss << str << " ";
         }
-        crc32ss << ", " << crc32.second.text << "\n";
+        crc32ss.seekp(-1 + crc32ss.tellp(), std::ios::beg);
+        crc32ss << "," << crc32.second.text << "\n";
     }
 }

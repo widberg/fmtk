@@ -38,7 +38,6 @@ add_subdirectory(fmtk)
 add_subdirectory(dpc)
 add_subdirectory(dpcc)
 add_subdirectory(crc32)
-add_subdirectory(crc32gpu)
 add_subdirectory(lz)
 add_subdirectory(noesis_fuel_pc)
 

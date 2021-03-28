@@ -180,6 +180,32 @@ void previous(std::uint32_t hash)
 
 int main(int argc, const char* argv[])
 {
+    //std::ofstream ooo("crcstuffs.txt");
+
+    //for (int i = 0; i < 100; ++i)
+    //{
+    //    // DB:>LEVELS>SHARED>INTERFACE>INTERFACE_039.TBITMAP
+    //    // DB:>LEVELS>SHARED>FX>FX_010.TBITMAP
+    //    // _BF_MATERIAL_0
+    //    std::stringstream ss;
+    //    ss << "DB:>LEVELS>SHARED>INTERFACE>INTERFACE_" << std::setw(3) << std::setfill('0') << i << ".TBITMAP";
+    //    std::int32_t scrc = crc32(ss.str());
+    //    ooo << crc32(ss.str() + "_BF_MATERIAL_0") << " " << ss.str() + "_BF_MATERIAL_0" << "\n";
+    //    ooo << crc32(ss.str() + "_BF_MATERIAL_1") << " " << ss.str() + "_BF_MATERIAL_1" << "\n";
+    //    ooo << crc32(ss.str() + "_BF_MATERIAL_2") << " " << ss.str() + "_BF_MATERIAL_2" << "\n";
+    //    ooo << crc32(ss.str() + "_BF_MATERIAL_Z_" + std::to_string(scrc)) << " " << ss.str() + "_BF_MATERIAL_Z_" + std::to_string(scrc) << "\n";
+
+    //    std::stringstream sss;
+    //    sss << "DB:>LEVELS>SHARED>FX>FX_" << std::setw(3) << std::setfill('0') << i << ".TBITMAP";
+    //    std::int32_t sscrc = crc32(sss.str());
+    //    ooo << crc32(sss.str() + "_BF_MATERIAL_0") << " " << sss.str() + "_BF_MATERIAL_0" << "\n";
+    //    ooo << crc32(sss.str() + "_BF_MATERIAL_1") << " " << sss.str() + "_BF_MATERIAL_1" << "\n";
+    //    ooo << crc32(sss.str() + "_BF_MATERIAL_2") << " " << sss.str() + "_BF_MATERIAL_2" << "\n";
+    //    ooo << crc32(sss.str() + "_BF_MATERIAL_Z_" + std::to_string(sscrc)) << " " << sss.str() + "_BF_MATERIAL_Z_" + std::to_string(sscrc) << "\n";
+    //}
+
+    //return 0;
+
     if (argc < 4)
     {
         return 1;
