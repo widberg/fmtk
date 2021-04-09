@@ -28,7 +28,7 @@ std::unordered_map<std::uint32_t, const char*> classFileExtensions = {
     { 968261323, "World_Z" },
     { 1114947943, "Warp_Z" },
     { 1135194223, "Spline_Z" },
-    { 1175485833, "Anim_z" },
+    { 1175485833, "Anim_Z" },
     { 1387343541, "Mesh_Z" },
     { 1391959958, "UserDefine_Z" },
     { 1396791303, "Skin_Z" },
@@ -2433,6 +2433,7 @@ struct DPCFile
         : path(dpcFilePath)
     {
         std::filesystem::create_directory("unpack\\" + path.filename().stem().string());
+        std::ofstream llpc(path.filename().stem().string() + ".LLPC");
 
         std::ifstream file(path, std::ios::binary | std::ios::ate);
 
@@ -2456,6 +2457,13 @@ struct DPCFile
             {
                 UnitResource unitResource;
                 file.read(reinterpret_cast<char*>(&unitResource.resourceHeader), sizeof(unitResource.resourceHeader));
+
+                llpc << i << "/" << j << " " << unitResource.resourceHeader.crc32;
+                if (crc32_reverse_lookup.count(unitResource.resourceHeader.crc32))
+                {
+                    llpc << " " << crc32_reverse_lookup[unitResource.resourceHeader.crc32];
+                }
+                llpc << "\n";
 
                 AAA& aaa = crc32s[unitResource.resourceHeader.crc32];
                 aaa.className = classFileExtensions[unitResource.resourceHeader.classCRC32];
