@@ -180,7 +180,7 @@ int main(int argc, const char* argv[])
     Block& block = dpc.newBlock();
     block.pushObject("D:\\SteamLibrary\\steamapps\\common\\FUEL\\DATAS\\BIKE_files\\4206951608.TLODDATA");
 
-    dpc.write("DATAS\\TEST.DPC");
+    //dpc.write("DATAS\\TEST.DPC");
 
     return 0;
 }

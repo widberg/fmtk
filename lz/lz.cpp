@@ -2,77 +2,48 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <intrin.h>
 
-constexpr std::uint32_t WINDOW_LOG = 14;
-constexpr std::uint32_t WINDOW_SIZE = (1 << WINDOW_LOG);
-constexpr std::uint32_t WINDOW_MASK = (1 << WINDOW_LOG) - 1;
-
-struct LZHeader
+void lz_fuel_decompress(const std::uint8_t* compressed_buffer_ptr, std::uint32_t compressed_buffer_size, std::uint8_t* decompressed_buffer_ptr, std::uint32_t decompressed_buffer_size, bool is_in_place)
 {
-    std::uint32_t decompressedSize;
-    std::uint32_t compressedSize;
-};
+    // Magic Numbers
+    constexpr std::uint32_t WINDOW_LOG = 0xe;
+    constexpr std::uint32_t WINDOW_MASK = 0x3fff;
 
-std::vector<std::uint8_t> decompress(const std::vector<std::uint8_t>& data)
-{
-    std::uint8_t windowBuffer[WINDOW_SIZE] = { 0 };
-    std::uint32_t d, r, i, j, flag, flagmask, flagbit, pos, lenbits = 2;
-    std::uint8_t currentByte;
+    std::uint8_t* end_ptr = decompressed_buffer_ptr + decompressed_buffer_size;
 
-    const LZHeader lzHeader = *reinterpret_cast<const LZHeader*>(data.data());
-
-    std::vector<std::uint8_t> decompressed;
-    decompressed.reserve(lzHeader.decompressedSize);
-
-    const std::uint8_t* dataPointer = data.data() + sizeof(lzHeader);
-
-    flagbit = 0;
-
-    for (pos = 0; decompressed.size() < lzHeader.decompressedSize;)
+    while (true)
     {
+        std::uint32_t flags = _byteswap_ulong(*(std::uint32_t*)compressed_buffer_ptr); // read as big endian
+        std::uint8_t len = flags & 0x3; // 0b11
+        std::uint8_t temp_shift = WINDOW_LOG - len;
+        std::uint32_t temp_mask = WINDOW_MASK >> len;
+        compressed_buffer_ptr += 4;
 
-        if (flagbit <= 1)
+        for (std::uint8_t i = 0; i < 30; ++i, flags <<= 1)
         {
-            flagmask = *(dataPointer++) << 24;
-            flagmask |= *(dataPointer++) << 16;
-            flagmask |= *(dataPointer++) << 8;
-            flagmask |= *(dataPointer++);
-            flagbit = 32 - 1;
-            lenbits = WINDOW_LOG - (flagmask & 3);
-        }
-
-        flag = (flagmask >> flagbit) & 1;
-        flagbit--;
-
-        currentByte = *(dataPointer++);
-
-        if (flag == 0)
-        {
-            // literal
-
-            windowBuffer[(pos++) & WINDOW_MASK] = currentByte;
-            decompressed.push_back(currentByte);
-        }
-        else
-        {
-            // match
-
-            d = *(dataPointer++);
-            j = (currentByte << 8) + d;
-
-            std::uint32_t length = (j >> lenbits) + 3;
-            d = (j & ((1 << lenbits) - 1)) + 1;
-
-            for (j = 0; j < length; j++)
+            if ((flags & 0x80000000) != 0)
             {
-                currentByte = windowBuffer[(pos - d) & WINDOW_MASK];
-                windowBuffer[(pos++) & WINDOW_MASK] = currentByte;
-                decompressed.push_back(currentByte);
+                std::uint16_t temp = _byteswap_ushort(*(std::uint16_t*)compressed_buffer_ptr); // read as big endian
+                compressed_buffer_ptr += 2;
+
+                std::uint8_t* window_ptr = decompressed_buffer_ptr - ((temp & temp_mask) + 1);
+                for (std::uint32_t length = (temp >> temp_shift) + 3; length > 0; --length)
+                {
+                    *(decompressed_buffer_ptr++) = *(window_ptr++);
+                }
+            }
+            else
+            {
+                *(decompressed_buffer_ptr++) = *(compressed_buffer_ptr++);
+            }
+
+            if ((decompressed_buffer_ptr == end_ptr) || (is_in_place && (decompressed_buffer_ptr > compressed_buffer_ptr)))
+            {
+                return;
             }
         }
     }
-
-    return decompressed;
 }
 
 int main(int argc, const char* argv[])
@@ -98,11 +69,21 @@ int main(int argc, const char* argv[])
     }
 
     std::vector<std::uint8_t> inData;
+    std::vector<std::uint8_t> outData;
+
     inData.resize(inSize);
 
     in.read(reinterpret_cast<char*>(inData.data()), inData.size());
 
-    std::vector<std::uint8_t> outData = decompress(inData);
+    struct LZHeader
+    {
+        std::uint32_t decompressedSize;
+        std::uint32_t compressedSize;
+    } lzHeader = *(LZHeader*)inData.data();
+
+    outData.resize(lzHeader.decompressedSize);
+
+    lz_fuel_decompress(inData.data() + sizeof(LZHeader), lzHeader.compressedSize, outData.data(), lzHeader.decompressedSize, false);
 
     out.write(reinterpret_cast<char*>(outData.data()), outData.size());
 

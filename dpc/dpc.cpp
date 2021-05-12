@@ -2427,6 +2427,8 @@ struct PrimaryHeader
     }
 };
 
+std::ofstream allLLPC;
+
 struct DPCFile
 {
     DPCFile(const std::filesystem::path& dpcFilePath)
@@ -2464,6 +2466,8 @@ struct DPCFile
                     llpc << " " << crc32_reverse_lookup[unitResource.resourceHeader.crc32];
                 }
                 llpc << "\n";
+
+                allLLPC << path.filename().stem().string() << " " << i << " " << j << " " << unitResource.resourceHeader.crc32 << "\n";
 
                 AAA& aaa = crc32s[unitResource.resourceHeader.crc32];
                 aaa.className = classFileExtensions[unitResource.resourceHeader.classCRC32];
@@ -2639,6 +2643,12 @@ int main(int argc, const char* argv[])
 {
     std::ifstream nnpc("all.nnpc");
 
+    allLLPC.open("ALL.LLPC");
+    if (!allLLPC.good())
+    {
+        return -1;
+    }
+
     std::uint32_t crc32;
     std::string text;
 
@@ -2665,14 +2675,14 @@ int main(int argc, const char* argv[])
     //jsonDPCFiles.push_back(DPCFile("DATAS\\\VEH.DPC").to_json());
     //jsonDPCFiles.push_back(DPCFile("DATAS\\\BIKE.DPC").to_json());
 
-    //try
-    //{
-    //    json << jsonDPCFiles.dump(4) << ",\n";
-    //}
-    //catch (const nlohmann::json::exception& e)
-    //{
-    //    std::cout << e.what() << std::endl;
-    //}
+    try
+    {
+        json << jsonDPCFiles.dump(4) << ",\n";
+    }
+    catch (const nlohmann::json::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 
     //for (std::uint32_t crc32 : classCRC32s)
     //{
