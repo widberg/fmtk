@@ -14,6 +14,7 @@
 #include "fmtkdll.hpp"
 #include "logging.hpp"
 #include "scripting.hpp"
+#include "StackWalker.h"
 
 #define __usercall __stdcall
 
@@ -100,7 +101,7 @@ class SEHException : public std::exception
 {
 public:
 	SEHException(unsigned int code) noexcept : er{ code, 0, nullptr, nullptr, 0 } { setupMsg(); }
-	SEHException(const EXCEPTION_POINTERS* ep) noexcept : er(*ep->ExceptionRecord) { setupMsg(); }
+	SEHException(const EXCEPTION_POINTERS* ep) noexcept : context(*ep->ContextRecord), er(*ep->ExceptionRecord) { setupMsg(); }
 
 	DWORD code() const { return er.ExceptionCode; }
 	PVOID address() const { return er.ExceptionAddress; }
@@ -118,10 +119,111 @@ private:
 		{
 			ss << " this could indicate that xlive has detected a debugger attached to FUEL or you were playing around in the developer menus";
 		}
+		ss << "\n";
+
+		BOOL    result;
+		HANDLE  process;
+		HANDLE  thread;
+		HMODULE hModule;
+		HMODULE hLastModule = NULL;
+
+		STACKFRAME64        stack;
+		ULONG               frame;
+		DWORD64             displacement;
+		char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
+		PSYMBOL_INFO pSymbol = (PSYMBOL_INFO)buffer;
+		pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+		pSymbol->MaxNameLen = MAX_SYM_NAME;
+
+		DWORD disp;
+
+		char module[MAX_PATH + 1];
+
+		memset(&stack, 0, sizeof(STACKFRAME64));
+
+		process = GetCurrentProcess();
+		thread = GetCurrentThread();
+		displacement = 0;
+#if !defined(_M_AMD64)
+		stack.AddrPC.Offset = context.Eip;
+		stack.AddrPC.Mode = AddrModeFlat;
+		stack.AddrStack.Offset = context.Esp;
+		stack.AddrStack.Mode = AddrModeFlat;
+		stack.AddrFrame.Offset = context.Ebp;
+		stack.AddrFrame.Mode = AddrModeFlat;
+#endif
+
+		SymInitialize(process, NULL, TRUE); //load symbols
+
+		for (frame = 0; ; frame++)
+		{
+			//get next call from stack
+			result = StackWalk64
+			(
+#if defined(_M_AMD64)
+				IMAGE_FILE_MACHINE_AMD64
+#else
+				IMAGE_FILE_MACHINE_I386
+#endif
+				,
+				process,
+				thread,
+				&stack,
+				(PVOID)&context,
+				NULL,
+				SymFunctionTableAccess64,
+				SymGetModuleBase64,
+				NULL
+			);
+
+			if (!result)
+			{
+				break;
+			}
+
+			hModule = NULL;
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+				(LPCTSTR)(stack.AddrPC.Offset), &hModule);
+			if (hModule != NULL)
+			{
+				if (hModule != hLastModule)
+				{
+					GetModuleFileNameA(hModule, module, MAX_PATH + 1);
+					ss << "in " << module << "\n";
+					hLastModule = hModule;
+				}
+			}
+			else
+			{
+				ss << "in unknown module" << "\n";
+				hLastModule = NULL;
+			}
+
+			ss << "\tat ";
+			
+
+			if (SymFromAddr(process, (ULONG64)stack.AddrPC.Offset, &displacement, pSymbol))
+			{
+				ss << pSymbol->Name;
+
+				IMAGEHLP_LINE64 line;
+				line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+
+				if (SymGetLineFromAddr64(process, stack.AddrPC.Offset, &disp, &line))
+				{
+					ss << " in " << line.FileName << ":" << std::dec << line.LineNumber;
+				}
+
+				ss << ", ";
+			}
+			
+			ss << "address 0x" << std::hex << std::setw(8) << std::setfill('0') << (UINT32)stack.AddrPC.Offset << "\n";
+		}
 
 		msg = ss.str();
 	}
 
+	CONTEXT context;
 	EXCEPTION_RECORD er;
 	std::string msg;
 };
@@ -273,6 +375,20 @@ NAKEDFUNCTION(Load, 0x00689256)
 		jmp Real_Load
 	}
 }
+
+//FUNCTION(SetUnhandledExceptionFilter, SetUnhandledExceptionFilter, LPTOP_LEVEL_EXCEPTION_FILTER, __stdcall, LPTOP_LEVEL_EXCEPTION_FILTER)
+//{
+//	LOG(debug, FUEL, "{}", "Intercepted attempt to delete current UnhandledExceptionFilter");
+//
+//	return NULL;
+//}
+//
+//FUNCTION(UnhandledExceptionFilter, UnhandledExceptionFilter, LONG, __stdcall, _EXCEPTION_POINTERS* ep)
+//{
+//	LOG(debug, FUEL, "{}", "Intercepted call to UnhandledExceptionFilter");
+//
+//	return ErrLib_CatchAll(ep);
+//}
 
 FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
@@ -471,6 +587,8 @@ LONG AttachDetours()
 	//ATTACH(IsCarInGame);
 	ATTACH(Death);
 	ATTACH(ReadFile);
+	//ATTACH(SetUnhandledExceptionFilter);
+	//ATTACH(UnhandledExceptionFilter);
 	//ATTACH(CRC32);
 
     LOG(trace, FMTK, "Ready to commit");
@@ -501,6 +619,8 @@ LONG DetachDetours()
 	//DETACH(IsCarInGame);
 	DETACH(Death);
 	DETACH(ReadFile);
+	//DETACH(SetUnhandledExceptionFilter);
+	//DETACH(UnhandledExceptionFilter);
 	//DETACH(CRC32);
 
     LOG(trace, FMTK, "Ready to commit");
