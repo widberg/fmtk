@@ -1,6 +1,8 @@
 #include "instrument.hpp"
 
 #include <Windows.h>
+#include <winternl.h>
+#include <DbgHelp.h>
 #include <d3dx9shader.h>
 #include <detours.h>
 #include <intrin.h>
@@ -14,7 +16,6 @@
 #include "fmtkdll.hpp"
 #include "logging.hpp"
 #include "scripting.hpp"
-#include "StackWalker.h"
 
 #define __usercall __stdcall
 
@@ -409,6 +410,7 @@ FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevI
 	try
 	{
 		result = Real_WinMain(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
+		LOG(trace, FMTK, "FUEL returned {}", result);
 	}
 	catch (const std::exception& e)
 	{

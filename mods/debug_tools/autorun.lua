@@ -1,7 +1,0 @@
-fmtk.hook(FMTK_EVENT_COMMAND_INIT, function()
-	fmtk.run_command('EnableL2R2')
-	fmtk.run_command('EnableDebugViewport')
-	fmtk.run_command('epm on')
-	fmtk.run_command('adhud')
-	fmtk.run_command('EnableDebugTools')
-end)

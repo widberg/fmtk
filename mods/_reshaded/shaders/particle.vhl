@@ -1,5 +1,0 @@
-// Disabled Code
-
-	struct VS_Blank{float4	position : POSITION;};
-	void	vh_particle	(out VS_Blank o)	{o.position = 0;}
-	void	vh_heat		(out VS_Blank o)	{o.position = 0;}

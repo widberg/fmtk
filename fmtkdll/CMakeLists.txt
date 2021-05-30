@@ -2,9 +2,8 @@ add_library(fmtkdll SHARED
 	fmtkdll.cpp fmtkdll.hpp
 	instrument.cpp instrument.hpp
 	scripting.cpp scripting.hpp
-	StackWalker.cpp StackWalker.h
 )
-target_link_libraries(fmtkdll common detours spdlog luajit sol2 d3d9)
+target_link_libraries(fmtkdll common detours spdlog luajit sol2 d3d9 dbghelp)
 target_link_options(fmtkdll PRIVATE /export:DetourFinishHelperProcess,@1,NONAME)
 target_compile_options(fmtkdll PRIVATE /EHa)
 

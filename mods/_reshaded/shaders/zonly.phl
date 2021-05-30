@@ -1,3 +1,0 @@
-//	Disabled Code
-
-	float4 ph_zonly() : COLOR	{return 0;}

@@ -1,3 +1,0 @@
-// Disabled Code
-
-	float4 ph_sfx2d () : COLOR0	{return 0;}
