@@ -41,7 +41,7 @@ jobs:
     - name: Unpack D3D
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
-           curl -sSL https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o "$HOME/cache/DXSDK_Jun10.exe"
+           curl -sSL https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe --create-dirs -o "$HOME/cache/DXSDK_Jun10.exe"
            7z x "$HOME/cache/DXSDK_Jun10.exe" DXSDK/Include "-o$HOME/cache/"
            7z x "$HOME/cache/DXSDK_Jun10.exe" DXSDK/Lib/x86 "-o$HOME/cache/"
            rm -Force "$HOME/cache/DXSDK_Jun10.exe"
