@@ -40,6 +40,30 @@ bool run_command(std::string command)
 	return Real_RunCommand(*pGlobalCommandState, command.c_str(), CommandSource::GAME);
 }
 
+sol::table get_player_position()
+{
+	const void(*GetPlayerPosition)(void) = reinterpret_cast<const void(*)(void)>(0x00421F60);
+
+	float pos[3];
+	std::uint8_t result;
+
+	__asm
+	{
+		mov edi, pos
+		call GetPlayerPosition
+		mov result, al
+	}
+
+	LOG(trace, FMTK, "X: {:.2f}, Z: {.2f}, Y: {.2f}", pos[0], pos[1], pos[2]);
+
+	if (result)
+	{
+		return lua.create_table_with("x", pos[0], "z", pos[1], "y", pos[2]);
+	}
+
+	return lua.create_table_with("x", 0, "z", 0, "y", 0);
+}
+
 std::string get_current_file_path(sol::this_state ts)
 {
 	return "";

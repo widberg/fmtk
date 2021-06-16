@@ -1,0 +1,29 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Cache
+      id:   cache
+      uses: actions/cache@v1
+      with:
+        path: ~/cache
+        key:  cache
+
+    - name: Unpack D3D
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: curl -sSL https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o ~/cache/DXSDK_Jun10.exe
+           7z x ~/cache/DXSDK_Jun10.exe DXSDK/Include -o ~/cache/
+           7z x ~/cache/DXSDK_Jun10.exe DXSDK/Lib/x86 -o ~/cache/
+           rm -f ~/cache/DXSDK_Jun10.exe
+
+    - name: Build
+      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DDX9SDK_DIR="~/cache/DXSDK" .. && cmake --build . --target fmtk

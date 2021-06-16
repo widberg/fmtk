@@ -27,7 +27,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" CACHE INT
 set_property(GLOBAL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE INTERNAL "")
 
 add_subdirectory(dependencies)
-find_package(FUEL REQUIRED)
+find_package(FUEL)
 find_package(D3D9 REQUIRED)
 
 add_subdirectory(common)
@@ -36,13 +36,14 @@ add_subdirectory(fmtkdll)
 add_subdirectory(fmtk)
 
 add_custom_target(package COMMAND
-    ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_CURRENT_BINARY_DIR}/fmtk-${fmtk_VERSION_MAJOR}_${fmtk_VERSION_MINOR}_${fmtk_VERSION_PATCH}_${fmtk_VERSION_TWEAK}.zip" --format=zip
+    ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_BINARY_DIR}/fmtk.zip" --format=zip
        "$<TARGET_FILE:fmtk>"
 	   "$<TARGET_FILE:fmtkdll>"
 	   "$<TARGET_FILE:secudll>"
+	   "${CMAKE_SOURCE_DIR}/README.md"
 	WORKING_DIRECTORY "$<TARGET_FILE_DIR:fmtk>"
-	DEPENDS fmtk
-	BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/fmtk-${fmtk_VERSION_MAJOR}_${fmtk_VERSION_MINOR}_${fmtk_VERSION_PATCH}_${fmtk_VERSION_TWEAK}.zip"
+	DEPENDS fmtk fmtkdll secudll
+	BYPRODUCTS "${CMAKE_BINARY_DIR}/fmtk.zip"
 )
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT fmtk)

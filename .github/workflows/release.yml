@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  once:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+  build:
+    name: Publish
+    needs: once
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Cache
+      id:   cache
+      uses: actions/cache@v1
+      with:
+        path: ~/cache
+        key:  cache
+
+    - name: Unpack D3D
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: curl -sSL https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o ~/cache/DXSDK_Jun10.exe
+           7z x ~/cache/DXSDK_Jun10.exe DXSDK/Include -o ~/cache/
+           7z x ~/cache/DXSDK_Jun10.exe DXSDK/Lib/x86 -o ~/cache/
+           rm -f ~/cache/DXSDK_Jun10.exe
+
+    - name: Build
+      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DDX9SDK_DIR="~/cache/DXSDK" .. && cmake --build . --target package
+
+    - name: Upload Archive to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ needs.once.outputs.upload_url }}
+        asset_name: fmtk-${{ github.sha }}.zip
+        asset_path: build/fmtk.zip
+        asset_content_type: application/zip
