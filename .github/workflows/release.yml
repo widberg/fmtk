@@ -47,7 +47,10 @@ jobs:
            rm -Force "$HOME/cache/DXSDK_Jun10.exe"
 
     - name: Build
-      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DDX9SDK_DIR="~/cache/DXSDK" .. && cmake --build . --target package
+      run: |
+           mkdir build && cd build
+           cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=Release -DDX9SDK_DIR="~/cache/DXSDK" ..
+           cmake --build . --target package
 
     - name: Upload Archive to Release
       uses: actions/upload-release-asset@v1
