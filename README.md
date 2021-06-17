@@ -14,6 +14,22 @@ FUEL Modding Toolkit
 3. Verify that `fmtk.exe`, `fmtkdll.dll`, `secudll.dll`, and `FUEL.exe` are all in the same directory
 4. Run `fmtk.exe`
 
+## Features
+
+* Fully compatible with "FUEL: REFUELED" by default
+* Lua scripting engine
+* C++ Native Plugin interface for advanced mods
+* Callback hooks to game events
+* Interface functions to peek and poke game data
+* Full integration with the in-game command palette
+* Better error messages for shaders and crashes
+* File aliasing
+* Easy to install for inexperienced users
+
+## Documentation
+
+Documentation for mod developers and FMTK developers is available on the [FMTK Wiki](https://github.com/widberg/fmtk/wiki).
+
 ## Getting Started
 
 ### Prerequisites

@@ -148,7 +148,7 @@ bool FirstTimeSetup()
     }
     else
     {
-        LOG(error, FMTK, "Could not locate the FUEL executable. Please edit fmtk.ini.");
+        LOG(error, FMTK, "Could not locate the FUEL executable. Please edit fmtk.toml.");
         success = false;
     }
 
@@ -159,7 +159,7 @@ bool FirstTimeSetup()
     }
     else
     {
-        LOG(error, FMTK, "Could not locate the GameSetup executable. Please edit fmtk.ini.");
+        LOG(error, FMTK, "Could not locate the GameSetup executable. Please edit fmtk.toml.");
         success = false;
     }
 
@@ -170,7 +170,7 @@ bool FirstTimeSetup()
     }
     else
     {
-        LOG(error, FMTK, "Could not locate the SecuLauncher executable. Please edit fmtk.ini.");
+        LOG(error, FMTK, "Could not locate the SecuLauncher executable. Please edit fmtk.toml.");
         success = false;
     }
 
