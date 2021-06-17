@@ -227,56 +227,6 @@ private:
 	std::string msg;
 };
 
-FUNCTION(CreateFileW, CreateFileW, HANDLE, WINAPI,
-	LPCWSTR               lpFileName,
-	DWORD                 dwDesiredAccess,
-	DWORD                 dwShareMode,
-	LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-	DWORD                 dwCreationDisposition,
-	DWORD                 dwFlagsAndAttributes,
-	HANDLE                hTemplateFile)
-{
-	std::wstring fileName;
-
-	try
-	{
-		fileName = std::filesystem::absolute(lpFileName);
-	}
-	catch (const std::filesystem::filesystem_error&)
-	{
-		fileName = lpFileName;
-	}
-
-	std::transform(fileName.begin(), fileName.end(), fileName.begin(), std::towlower);
-
-	if (aliases.count(fileName))
-	{
-		std::wstring alias = aliases.at(fileName);
-		LOGW(trace, FMTK, "FUEL opening file: {} which resolved to {}", fileName, alias);
-		fileName = alias;
-	}
-	else
-	{
-		LOGW(trace, FMTK, "FUEL opening file: {}", fileName);
-	}
-
-	HANDLE rv = Real_CreateFileW(fileName.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
-
-	if (rv == INVALID_HANDLE_VALUE)
-	{
-		DWORD dwError = GetLastError();
-		LPSTR lpBuffer = nullptr;
-		FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL, dwError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpBuffer, 0, NULL);
-
-		LOG(error, FMTK, "Error {} : {}", dwError, lpBuffer);
-
-		LocalFree(lpBuffer);
-	}
-
-	return rv;
-}
-
 FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 	HANDLE       hFile,
 	LPVOID       lpBuffer,
@@ -298,239 +248,17 @@ FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 	return Real_ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
 }
 
-FUNCTION(RegisterCommand, 0x0069a400, void, __usercall, const void* pThis, void* callback)
-{
-	REG_TO_VAR(edi, LPCSTR, name);
-
-	LOG(trace, FMTK, "Registering command: {}", name);
-
-	Bridge_RegisterCommand(pThis, callback, name);
-}
-
-void Bridge_RegisterCommand(const void* pThis, void* callback, LPCSTR name)
-{
-	__asm
-	{
-		mov edi, name
-		push callback
-		push pThis
-		call Real_RegisterCommand
-	};
-}
-
-// std::uint32_t __usercall crc32(std::uint32_t initial @ eax, const char* str @ edx)
-// std::uint32_t @ eax __usercall crc32(std::uint32_t initial @ eax, const char* str @ edx)
-// void __usercall crc32(std::uint32_t& initial @ eax, const char* str @ edx)
-// @@ means backup
-
-NAKEDFUNCTION(CRC32, 0x00669160)
-{
-	__asm {
-		push ebp
-		mov ebp, esp
-		sub esp, __LOCAL_SIZE
-	}
-
-	BACKUP_REGISTER(eax);
-	BACKUP_REGISTER(edx);
-
-	unsigned int initial;
-	char* crc32str;
-	__asm {
-		mov initial, eax
-		mov crc32str, edx
-	}
-	LOG(trace, FMTK, "crc32: {} \"{}\"", initial, crc32str);
-
-	RESTORE_REGISTER(eax);
-	RESTORE_REGISTER(edx);
-	__asm {
-		mov esp, ebp
-		pop ebp
-	}
-
-	NAKEDRETURN(CRC32);
-}
-
-FUNCTION(ScriptManagerInit, 0x0081cdb0, void, __fastcall, DWORD x, DWORD y, DWORD z)
-{
-	LOG(trace, FMTK, "{} {} {}", x, y, z);
-	Real_ScriptManagerInit(x, y, z);
-
-	LOG(trace, FMTK, "ScriptManagerInit");
-	LOG(trace, FMTK, "Setting our callback");
-
-	// Bridge_RegisterCommand(*pGlobalCommandState, FMTKEmitEventCallback, "FMTKEmitEvent");
-
-}
-
-NAKEDFUNCTION(Load, 0x00689256)
-{
-	__asm
-	{
-		jmp Real_Load
-	}
-}
-
-//FUNCTION(SetUnhandledExceptionFilter, SetUnhandledExceptionFilter, LPTOP_LEVEL_EXCEPTION_FILTER, __stdcall, LPTOP_LEVEL_EXCEPTION_FILTER)
-//{
-//	LOG(debug, FUEL, "{}", "Intercepted attempt to delete current UnhandledExceptionFilter");
-//
-//	return NULL;
-//}
-//
-//FUNCTION(UnhandledExceptionFilter, UnhandledExceptionFilter, LONG, __stdcall, _EXCEPTION_POINTERS* ep)
-//{
-//	LOG(debug, FUEL, "{}", "Intercepted call to UnhandledExceptionFilter");
-//
-//	return ErrLib_CatchAll(ep);
-//}
-
-FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{
-	LOG(trace, FMTK, "Entry Point");
-
-	AttachDetoursXLive();
-
-	int result = 0;
-
-	_set_se_translator([](unsigned int code, EXCEPTION_POINTERS* pEP)
-	{
-		LOG(critical, FMTK, "Translating SEH Exception");
-		throw SEHException(pEP);
-	});
-
-	try
-	{
-		result = Real_WinMain(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
-		LOG(trace, FMTK, "FUEL returned {}", result);
-	}
-	catch (const std::exception& e)
-	{
-		LOG(critical, FMTK, "{}", e.what());
-	}
-	catch (...)
-	{
-		LOG(critical, FMTK, "Unhandled exception");
-	}
-
-	return result;
-}
-
-FUNCTION(CoreMainLoop, 0x00688bf0, void, __cdecl, void)
-{
-	Real_CoreMainLoop();
-}
-
-FUNCTION(OutputDebugStringA, OutputDebugStringA, void, WINAPI, LPCSTR lpOutputString)
-{
-	LOG(debug, FUEL, "{}", lpOutputString);
-}
-
-FUNCTION(OutputDebugStringW, OutputDebugStringW, void, WINAPI, LPCWSTR lpOutputString)
-{
-	LOGW(debug, FUEL, "{}", lpOutputString);
-}
-
-FUNCTION(RunCommand, 0x0069a590, bool, __stdcall, const void* pState, const char* cmd, CommandSource commandSource)
-{
-	LOG(trace, FUEL, "Running command: {} | {}", cmd, commandSource);
-
-	return Real_RunCommand(pState, cmd, commandSource);
-}
-
-FUNCTION(D3DXCompileShaderFromFileA, 0x008b11e6, HRESULT, WINAPI,
-	LPCSTR                          pSrcFile,
-	CONST D3DXMACRO*                pDefines,
-	LPD3DXINCLUDE                   pInclude,
-	LPCSTR                          pFunctionName,
-	LPCSTR                          pProfile,
-	DWORD                           Flags,
-	LPD3DXBUFFER*                   ppShader,
-	LPD3DXBUFFER*                   ppErrorMsgs,
-	LPD3DXCONSTANTTABLE*            ppConstantTable)
-{
-	LOG(trace, FMTK, "Compiling shader: {}", pSrcFile);
-
-	*ppErrorMsgs = nullptr;
-	LPD3DXBUFFER errorBuffer;
-
-	HRESULT result = Real_D3DXCompileShaderFromFileA(pSrcFile, pDefines, pInclude, pFunctionName, pProfile, Flags, ppShader, &errorBuffer, ppConstantTable);
-
-	if (errorBuffer != nullptr)
-	{
-		LOG(error, FMTK, "{}", (char*)errorBuffer->GetBufferPointer());
-	}
-
-	return result;
-}
-
-FUNCTIONXLIVE(ValidateMemory, 0x004f36b3, INT, WINAPI, DWORD, DWORD, DWORD)
-{
-	return 0;
-}
-
-FUNCTIONXLIVE(CreateFileW, 0x0040128c, HANDLE, WINAPI,
-	LPCWSTR               lpFileName,
-	DWORD                 dwDesiredAccess,
-	DWORD                 dwShareMode,
-	LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-	DWORD                 dwCreationDisposition,
-	DWORD                 dwFlagsAndAttributes,
-	HANDLE                hTemplateFile)
-{
-	//LOGW(trace, XLIVE, "XLive opening file: {}", lpFileName);
-
-	return Real_XLive_CreateFileW(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
-
-	//return rv;
-}
-
-FUNCTION(CreateWindowExW, CreateWindowExW, HWND, WINAPI,
-	DWORD     dwExStyle,
-	LPCWSTR   lpClassName,
-	LPCWSTR   lpWindowName,
-	DWORD     dwStyle,
-	int       X,
-	int       Y,
-	int       nWidth,
-	int       nHeight,
-	HWND      hWndParent,
-	HMENU     hMenu,
-	HINSTANCE hInstance,
-	LPVOID    lpParam)
-{
-	LOG(trace, FMTK, "Creating window");
-
-	int w = GetSystemMetrics(SM_CXSCREEN);
-	int h = GetSystemMetrics(SM_CYSCREEN);
-
-	return Real_CreateWindowExW(dwExStyle, lpClassName, lpWindowName, WS_POPUP, 0, 0, w, h, hWndParent, hMenu, hInstance, lpParam);
-}
-
-NAKEDFUNCTION(IsCarInGame, 0x0060f2a9)
-{
-	__asm
-	{
-		jmp Real_IsCarInGame
-	}
-}
-
-FUNCTION(Death, 0x0052f370, void, __usercall, void* x)
-{
-	BACKUP_REGISTER(ecx);
-	BACKUP_REGISTER(esi);
-
-	LOG(trace, FMTK, "DEATH");
-
-	RESTORE_REGISTER(ecx);
-	RESTORE_REGISTER(esi);
-	__asm
-	{
-		push x
-		call Real_Death
-	}
-}
+#include "gadgets/createfilew.hpp"
+#include "gadgets/registercommand.hpp"
+#include "gadgets/scriptmanagerinit.hpp"
+#include "gadgets/winmain.hpp"
+#include "gadgets/coremainloop.hpp"
+#include "gadgets/outputdebugstringa.hpp"
+#include "gadgets/outputdebugstringw.hpp"
+#include "gadgets/runcommand.hpp"
+#include "gadgets/d3dxcompileshaderfromfilea.hpp"
+#include "gadgets/validatememory.hpp"
+#include "gadgets/createwindowexw.hpp"
 
 bool AttachDetoursXLive()
 {
@@ -540,7 +268,6 @@ bool AttachDetoursXLive()
 	DetourUpdateThread(GetCurrentThread());
 
 	//ATTACHXLIVE(ValidateMemory);
-	//ATTACHXLIVE(CreateFileW);
 
 	ULONG result = DetourTransactionCommit();
 	
@@ -553,7 +280,6 @@ bool DetachDetoursXLive()
 	DetourUpdateThread(GetCurrentThread());
 
 	//DETACHXLIVE(ValidateMemory);
-	//DETACHXLIVE(CreateFileW);
 
 	return DetourTransactionCommit();
 }
@@ -576,9 +302,6 @@ LONG AttachDetours()
 	//ATTACH(CreateWindowExW);
 	ATTACH(RegisterCommand);
 	ATTACH(ScriptManagerInit);
-	ATTACH(Load);
-	//ATTACH(IsCarInGame);
-	ATTACH(Death);
 	ATTACH(ReadFile);
 	//ATTACH(SetUnhandledExceptionFilter);
 	//ATTACH(UnhandledExceptionFilter);
@@ -608,9 +331,6 @@ LONG DetachDetours()
 	//DETACH(CreateWindowExW);
 	DETACH(RegisterCommand);
 	DETACH(ScriptManagerInit);
-	DETACH(Load);
-	//DETACH(IsCarInGame);
-	DETACH(Death);
 	DETACH(ReadFile);
 	//DETACH(SetUnhandledExceptionFilter);
 	//DETACH(UnhandledExceptionFilter);

@@ -7,13 +7,8 @@
 
 #include "fmtkdll.hpp"
 
-#define FMTK_INTERNAL
-#include <fmtksdk/fmtksdk.hpp>
-#undef FMTK_INTERNAL
-
 #include "instrument.hpp"
 #include "logging.hpp"
-
 
 constexpr const char* FMTK_TOML_PATH = "fmtk.toml";
 std::vector<FMTKMod*> mods;
@@ -41,6 +36,14 @@ bool loadModDll(const std::filesystem::path& modDllPath)
     if (!handle)
     {
         LOG(error, FMTK, "Does not implement GetFMTKVersion: {}", modDllPath.string());
+        return false;
+    }
+
+    const FMTKVersion* modFMTKVersion = GetFMTKVersion();
+    if (FMTK_VERSION_MAJOR != modFMTKVersion->major || FMTK_VERSION_MINOR != modFMTKVersion->minor ||
+        FMTK_VERSION_PATCH != modFMTKVersion->patch || FMTK_VERSION_TWEAK != modFMTKVersion->tweak)
+    {
+        LOG(error, FMTK, "The FMTK version and the mods FMTKSDK version must match exactly for the time being.");
         return false;
     }
 
@@ -100,6 +103,8 @@ bool loadModsDirectory(const std::filesystem::path& modsDirectoryPath)
         LOG(error, FMTK, "The specified mods directory does not exist");
         return false;
     }
+
+    return true;
 }
 
 std::unordered_map<std::wstring, std::wstring> aliases;
@@ -164,9 +169,6 @@ BOOL ProcessDetach(HMODULE hDll)
 
 BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD dwReason, PVOID lpReserved)
 {
-    UNREFERENCED_PARAMETER(hModule);
-    UNREFERENCED_PARAMETER(lpReserved);
-
     if (DetourIsHelperProcess())
     {
         return TRUE;

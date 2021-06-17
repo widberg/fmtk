@@ -20,8 +20,10 @@ class FMTKMod
 {
 public:
 	virtual void Initialize() {}
+	virtual void Tick() {}
 
 #ifndef FMTK_INTERNAL
+// Placeholder methods for forward compatibility
 #include "placeholder.hpp"
 #endif // FMTK_INTERNAL
 };

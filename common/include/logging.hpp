@@ -25,7 +25,7 @@
 		LOG_LEVEL();                                                                              \
 	} while (0)
 
-#define LOG(level, source, format, ...) do { spdlog::##level("[" #source "] " ##format, __VA_ARGS__); } while(0)
-#define LOGW(level, source, format, ...) do { spdlog::##level(L"[" L#source L"] " L##format, __VA_ARGS__); } while(0)
+#define LOG(level, source, format, ...) do { spdlog::level("[" #source "] " format, __VA_ARGS__); } while(0)
+#define LOGW(level, source, format, ...) do { spdlog::level(L"[" L#source L"] " L##format, __VA_ARGS__); } while(0)
 
 #endif // !LOGGING_HPP
