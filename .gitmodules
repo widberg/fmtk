@@ -13,3 +13,6 @@
 [submodule "dependencies/json"]
 	path = dependencies/json
 	url = https://github.com/nlohmann/json.git
+[submodule "dependencies/tomlplusplus"]
+	path = dependencies/tomlplusplus
+	url = https://github.com/marzer/tomlplusplus.git

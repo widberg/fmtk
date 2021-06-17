@@ -2,7 +2,7 @@ add_executable(fmtk
 	fmtk.cpp
 	fmtk.rc
 )
-target_link_libraries(fmtk common detours spdlog)
+target_link_libraries(fmtk common detours spdlog tomlplusplus::tomlplusplus)
 add_dependencies(fmtk fmtkdll secudll)
 
 if (FUEL_FOUND)

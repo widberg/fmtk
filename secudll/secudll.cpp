@@ -1,5 +1,11 @@
 #include <Windows.h>
 #include <detours.h>
+#include <WinBase.h>
+#include <string>
+#include <toml++/toml.h>
+#include <optional>
+
+constexpr const char* FMTK_TOML_PATH = "fmtk.toml";
 
 #define ATTACH(x)       DetourAttach(&(PVOID&)Real_##x, FMTK_##x)
 #define DETACH(x)       DetourDetach(&(PVOID&)Real_##x, FMTK_##x)
@@ -29,13 +35,30 @@ BOOL WINAPI FMTK_CreateProcessW(
     LPPROCESS_INFORMATION lpProcessInformation
 )
 {
+    toml::table tbl;
+    try
+    {
+        tbl = toml::parse_file(FMTK_TOML_PATH);
+    }
+    catch (const toml::parse_error& err)
+    {
+        return -2;
+    }
+
+    std::optional<std::wstring> fuelPath = tbl["fmtk"]["fuel"].value<std::wstring>();
+    if (!fuelPath.has_value())
+    {
+        return -3;
+    }
+
     PROCESS_INFORMATION pi;
     if (lpProcessInformation == NULL) {
         ZeroMemory(&pi, sizeof(pi));
         lpProcessInformation = &pi;
     }
 
-    BOOL rv = DetourCreateProcessWithDllExW(lpApplicationName,
+    BOOL rv = DetourCreateProcessWithDllExW(
+        fuelPath.value().c_str(),
         lpCommandLine,
         lpProcessAttributes,
         lpThreadAttributes,

@@ -5,16 +5,68 @@
 #include <tchar.h>
 #include <sstream>
 #include <string>
+#include <filesystem>
+#include <WinBase.h>
+#include <fstream>
+#include <toml++/toml.h>
+#include <optional>
 
 #include "debug.hpp"
 #include "logging.hpp"
 
-void LogLastError();
+constexpr const char* FMTK_TOML_PATH = "fmtk.toml";
 
-int CDECL main(int argc, char** argv)
+void LogLastError();
+bool FirstTimeSetup();
+
+int main(int argc, char** argv)
 {
     LOG_INIT();
 
+    if (!std::filesystem::exists(FMTK_TOML_PATH))
+    {
+        if (!FirstTimeSetup())
+        {
+            return -1;
+        }
+    }
+
+    toml::table tbl;
+    try
+    {
+        tbl = toml::parse_file(FMTK_TOML_PATH);
+    }
+    catch (const toml::parse_error& err)
+    {
+        LOG(error, FMTK, "TOML Parsing failed:\n{}", err.what());
+        return -2;
+    }
+
+    std::optional<std::wstring> secuLauncherPath = tbl["fmtk"]["secu_launcher"].value<std::wstring>();
+    if (!secuLauncherPath.has_value())
+    {
+        LOG(error, FMTK, "No SecuLauncher path in toml");
+        return -3;
+    }
+
+    std::optional<std::string> modsPath = tbl["fmtk"]["mods_directory"].value<std::string>();
+    if (!modsPath.has_value())
+    {
+        LOG(error, FMTK, "No mods directory path in toml");
+        return -4;
+    }
+
+    try
+    {
+        std::filesystem::create_directories(modsPath.value());
+    }
+    catch (const std::exception& e)
+    {
+        LOG(error, FMTK, "{}", e.what());
+        return -5;
+    }
+
+#if FMTK_DEBUG
     std::stringstream environment;
 
     LPCH lpEnvironmentString = GetEnvironmentStrings();
@@ -48,6 +100,7 @@ int CDECL main(int argc, char** argv)
     environment.write("\0", 1);
 
     FreeEnvironmentStrings(lpEnvironmentString);
+#endif // FMTK_DEBUG
 
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
@@ -58,9 +111,14 @@ int CDECL main(int argc, char** argv)
 
     DWORD dwFlags = CREATE_DEFAULT_ERROR_MODE | CREATE_SUSPENDED;
 
-    if (!DetourCreateProcessWithDllExW(L"SecuLauncher.exe", NULL,
-        NULL, NULL, TRUE, dwFlags, reinterpret_cast<LPVOID>(environment.str().data()), NULL,
-        &si, &pi, "secudll.dll", NULL))
+    if (!DetourCreateProcessWithDllExW(secuLauncherPath.value().c_str(), NULL,
+        NULL, NULL, TRUE, dwFlags,
+#if FMTK_DEBUG
+        reinterpret_cast<LPVOID>(environment.str().data()),
+#else
+        NULL,
+#endif // FMTK_DEBUG
+        NULL, &si, &pi, "secudll.dll", NULL))
     {
         LOG(error, FMTK, "DetourCreateProcessWithDllEx failed: %ld\n", GetLastError());
         LogLastError();
@@ -102,4 +160,65 @@ void LogLastError()
 
         LocalFree(lpBuffer);
     }
+}
+
+bool FirstTimeSetup()
+{
+    LOG(info, FMTK, "Performing first time setup");
+
+    bool success = true;
+
+    std::wstring fuelExecutablePath;
+    if (std::filesystem::exists("FUEL.exe"))
+    {
+        fuelExecutablePath = L"FUEL.exe";
+    }
+    else
+    {
+        LOG(error, FMTK, "Could not locate the FUEL executable. Please edit fmtk.ini.");
+        success = false;
+    }
+
+    std::wstring gameSetupExecutablePath;
+    if (std::filesystem::exists("GameSetup.exe"))
+    {
+        gameSetupExecutablePath = L"GameSetup.exe";
+    }
+    else
+    {
+        LOG(error, FMTK, "Could not locate the GameSetup executable. Please edit fmtk.ini.");
+        success = false;
+    }
+
+    std::wstring secuLauncherPath;
+    if (std::filesystem::exists("SecuLauncher.exe"))
+    {
+        secuLauncherPath = L"SecuLauncher.exe";
+    }
+    else
+    {
+        LOG(error, FMTK, "Could not locate the SecuLauncher executable. Please edit fmtk.ini.");
+        success = false;
+    }
+
+    auto tbl = toml::table{{
+       { "fmtk", toml::table{{
+               { "fuel", fuelExecutablePath },
+               { "game_setup", gameSetupExecutablePath },
+               { "secu_launcher", secuLauncherPath },
+               { "mods_directory", "mods" },
+               { "args", toml::array{} },
+           }}
+       },
+    }};
+
+    std::ofstream toml_file(FMTK_TOML_PATH);
+    if (!toml_file.good())
+    {
+        return false;
+    }
+
+    toml_file << tbl << "\n";
+
+    return success;
 }
