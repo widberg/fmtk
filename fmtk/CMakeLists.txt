@@ -8,6 +8,7 @@ add_dependencies(fmtk fmtkdll secudll)
 if (FUEL_FOUND)
 	set_target_properties(fmtk PROPERTIES
 		VS_DEBUGGER_WORKING_DIRECTORY "${FUEL_DIR}"
+		VS_DEBUGGER_ENVIRONMENT "PATH=$ENV{PATH};$<TARGET_FILE_DIR:fmtk>"
 	)
 endif()
 

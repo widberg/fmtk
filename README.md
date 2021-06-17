@@ -19,7 +19,8 @@ FUEL Modding Toolkit
 ### Prerequisites
 
 * CMake
-* A Steam copy of FUEL
+* DirectX 9 SDK
+* A Steam copy of FUEL (Optional)
 
 ### Checkout
 

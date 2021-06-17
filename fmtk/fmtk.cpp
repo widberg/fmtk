@@ -10,6 +10,7 @@
 #include <fstream>
 #include <toml++/toml.h>
 #include <optional>
+#include <codecvt>
 
 #include "debug.hpp"
 #include "logging.hpp"
@@ -49,6 +50,19 @@ int main(int argc, char** argv)
         return -3;
     }
 
+    std::wstring arguments;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+    for (int i = 1; i < argc; ++i)
+    {
+        arguments += conv.from_bytes(argv[1]) + L" ";
+    }
+
+    std::optional<std::wstring> toml_args = tbl["fmtk"]["args"].value<std::wstring>();
+    if (toml_args.has_value())
+    {
+        arguments += toml_args.value();
+    }
+
     std::optional<std::string> modsPath = tbl["fmtk"]["mods_directory"].value<std::string>();
     if (!modsPath.has_value())
     {
@@ -66,42 +80,6 @@ int main(int argc, char** argv)
         return -5;
     }
 
-#if FMTK_DEBUG
-    std::stringstream environment;
-
-    LPCH lpEnvironmentString = GetEnvironmentStrings();
-    LPCH lpEnvironmentStringVariable = lpEnvironmentString;
-
-    while (true)
-    {
-        std::string variable(lpEnvironmentStringVariable);
-        if (variable.empty())
-        {
-            break;
-        }
-        else if (variable.find("Path") == 0)
-        {
-            TCHAR lpModuleFileName[MAX_PATH + 1];
-            GetModuleFileName(nullptr, lpModuleFileName, _countof(lpModuleFileName));
-            *_tcsrchr(lpModuleFileName, '\\') = '\0';
-
-            environment << variable << TEXT(";") << lpModuleFileName;
-        }
-        else
-        {
-            environment << lpEnvironmentStringVariable;
-        }
-
-        environment.write("\0", 1);
-
-        lpEnvironmentStringVariable += variable.size() + 1;
-    }
-
-    environment.write("\0", 1);
-
-    FreeEnvironmentStrings(lpEnvironmentString);
-#endif // FMTK_DEBUG
-
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
 
@@ -111,13 +89,8 @@ int main(int argc, char** argv)
 
     DWORD dwFlags = CREATE_DEFAULT_ERROR_MODE | CREATE_SUSPENDED;
 
-    if (!DetourCreateProcessWithDllExW(secuLauncherPath.value().c_str(), NULL,
-        NULL, NULL, TRUE, dwFlags,
-#if FMTK_DEBUG
-        reinterpret_cast<LPVOID>(environment.str().data()),
-#else
-        NULL,
-#endif // FMTK_DEBUG
+    if (!DetourCreateProcessWithDllExW((secuLauncherPath.value() + L" " + arguments).c_str(), NULL,
+        NULL, NULL, TRUE, dwFlags, NULL,
         NULL, &si, &pi, "secudll.dll", NULL))
     {
         LOG(error, FMTK, "DetourCreateProcessWithDllEx failed: %ld\n", GetLastError());

@@ -1,10 +1,6 @@
 # Detours
 add_subdirectory(detours)
 
-# json
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory(json)
-
 # LuaJIT
 add_subdirectory(luajit)
 
