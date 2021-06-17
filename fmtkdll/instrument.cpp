@@ -9,13 +9,11 @@
 
 #include <algorithm>
 #include <filesystem>
-#include <sol/sol.hpp>
 #include <cwctype>
 #include <csignal>
 
 #include "fmtkdll.hpp"
 #include "logging.hpp"
-#include "scripting.hpp"
 
 #define __usercall __stdcall
 
@@ -362,15 +360,12 @@ FUNCTION(ScriptManagerInit, 0x0081cdb0, void, __fastcall, DWORD x, DWORD y, DWOR
 	LOG(trace, FMTK, "ScriptManagerInit");
 	LOG(trace, FMTK, "Setting our callback");
 
-	Bridge_RegisterCommand(*pGlobalCommandState, FMTKEmitEventCallback, "FMTKEmitEvent");
+	// Bridge_RegisterCommand(*pGlobalCommandState, FMTKEmitEventCallback, "FMTKEmitEvent");
 
-	ScriptingEmitEvent(EventType::COMMAND_INIT);
 }
 
 NAKEDFUNCTION(Load, 0x00689256)
 {
-	ScriptingEmitEvent(EventType::LOAD);
-
 	__asm
 	{
 		jmp Real_Load
@@ -396,8 +391,6 @@ FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevI
 	LOG(trace, FMTK, "Entry Point");
 
 	AttachDetoursXLive();
-
-	ScriptingEmitEvent(EventType::ENTRY);
 
 	int result = 0;
 
@@ -426,8 +419,6 @@ FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevI
 
 FUNCTION(CoreMainLoop, 0x00688bf0, void, __cdecl, void)
 {
-	ScriptingEmitEvent(EventType::TICK);
-
 	Real_CoreMainLoop();
 }
 

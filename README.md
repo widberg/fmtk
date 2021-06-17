@@ -36,7 +36,7 @@ Documentation for mod developers and FMTK developers is available on the [FMTK W
 
 * CMake
 * DirectX 9 SDK
-* A Steam copy of FUEL (Optional)
+* A PC copy of FUEL (Optional)
 
 ### Checkout
 

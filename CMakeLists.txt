@@ -31,6 +31,8 @@ find_package(FUEL)
 find_package(D3D9 REQUIRED)
 
 add_subdirectory(common)
+add_subdirectory(fmtksdk)
+add_subdirectory(fmtklua)
 add_subdirectory(secudll)
 add_subdirectory(fmtkdll)
 add_subdirectory(fmtk)
