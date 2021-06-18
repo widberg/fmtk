@@ -6,6 +6,7 @@ FUEL Modding Toolkit
 
 ![Build Status](https://github.com/widberg/fmtk/actions/workflows/build.yml/badge.svg?branch=master)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/widberg/fmtk)
+[![Join the chat at https://discord.gg/8uJVY9mWZT](https://img.shields.io/badge/chat-on_discord-7389D8.svg?logo=discord&logoColor=ffffff&labelColor=6A7EC2)](https://discord.gg/8uJVY9mWZT)
 
 ## Installing
 
@@ -25,6 +26,10 @@ FUEL Modding Toolkit
 * Better error messages for shaders and crashes
 * File aliasing
 * Easy to install for inexperienced users
+
+## Discord
+
+Join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FUEL discussion and FMTK support.
 
 ## Documentation
 
