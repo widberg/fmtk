@@ -4,8 +4,8 @@
 
 FUEL Modding Toolkit
 
-![Build Status](https://github.com/widberg/fmtk/actions/workflows/build.yml/badge.svg?branch=master)
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/widberg/fmtk)
+[![Build Status](https://github.com/widberg/fmtk/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/widberg/fmtk/actions/workflows/build.yml)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/widberg/fmtk)](https://github.com/widberg/fmtk/releases)
 [![Join the chat at https://discord.gg/8uJVY9mWZT](https://img.shields.io/badge/chat-on_discord-7389D8.svg?logo=discord&logoColor=ffffff&labelColor=6A7EC2)](https://discord.gg/8uJVY9mWZT)
 
 ## Installing
