@@ -17,7 +17,8 @@ FUEL Modding Toolkit
 * Interface functions to peek and poke game data
 * Full integration with the in-game command palette
 * Better error messages for shaders and crashes
-* File aliasing
+* File aliasing (like a programmatic REFUELED)
+* Configurable launcher and mods
 * Easy to install for inexperienced users
 
 ## Installing (For Users and Mod Developers)
