@@ -18,7 +18,9 @@ FUEL Modding Toolkit
 * Full integration with the in-game command palette
 * Better error messages for shaders and crashes
 * File aliasing (like a programmatic REFUELED)
+* Seamless mod compatibility so everyone plays nice
 * Configurable launcher and mods
+* Cool "Blue FUEL" launcher logo :)
 * Easy to install for inexperienced users
 
 ## Installing (For Users and Mod Developers)
