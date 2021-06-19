@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(luajit VERSION 2.0.5 LANGUAGES C ASM)
+project(lua51 VERSION 2.0.5 LANGUAGES C ASM)
 
-set(LUAJIT_DIR ${CMAKE_CURRENT_LIST_DIR}/LuaJIT/src CACHE PATH "Location of luajit sources")
+set(LUAJIT_DIR ${CMAKE_CURRENT_LIST_DIR}/LuaJIT/src CACHE PATH "Location of LuaJIT sources")
 
 set(LJLIB_C
 	${LUAJIT_DIR}/lib_base.c
@@ -134,6 +134,14 @@ set(LJCORE_C
 	${LUAJIT_DIR}/lj_vmmath.c
 )
 
-add_library(luajit STATIC ${LJCORE_C})
-target_include_directories(luajit PUBLIC ${LUAJIT_DIR})
-target_include_directories(luajit PRIVATE ${CMAKE_CURRENT_BINARY_DIR} dynasm ${LUAJIT_DIR}/host)
+add_library(lua51 SHARED ${LJCORE_C})
+target_include_directories(lua51 PUBLIC ${LUAJIT_DIR})
+target_include_directories(lua51 PRIVATE ${CMAKE_CURRENT_BINARY_DIR} dynasm ${LUAJIT_DIR}/host)
+
+set_target_properties(lua51 PROPERTIES
+	WINDOWS_EXPORT_ALL_SYMBOLS 1
+	OUTPUT_NAME "lua5.1"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
