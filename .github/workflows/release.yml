@@ -29,11 +29,11 @@ jobs:
            7z x "$HOME/cache/DXSDK_Jun10.exe" DXSDK/Lib/x86 "-o$HOME/cache/"
            rm -Force "$HOME/cache/DXSDK_Jun10.exe"
 
-    - name: Build
+    - name: Package
       run: |
            mkdir build && cd build
            cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_BUILD_TYPE=Release -DDX9SDK_DIR="~/cache/DXSDK" ..
-           cmake --build . --target package
+           cmake --build . --target package --config Release
     
     - name: Create Release
       id: create_release

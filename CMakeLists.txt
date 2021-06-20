@@ -47,14 +47,21 @@ add_custom_target(package
 		"$<TARGET_FILE:secudll>"
 		"${CMAKE_SOURCE_DIR}/README.md"
 		"${CMAKE_BINARY_DIR}/mods"
-	COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_PROPERTY:fmtksdk,BINARY_DIR>/include" "${CMAKE_BINARY_DIR}/include"
-	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_PROPERTY:fmtksdk,BINARY_DIR>/CMakeLists.txt" "${CMAKE_BINARY_DIR}/CMakeLists.txt"
+	WORKING_DIRECTORY "$<TARGET_FILE_DIR:fmtk>"
+	DEPENDS fmtk fmtkdll secudll fmtklua
+	BYPRODUCTS "${CMAKE_BINARY_DIR}/fmtk.zip"
+)
+
+add_custom_target(package_fmtksdk
 	COMMAND
 		${CMAKE_COMMAND} -E tar "cf" "${CMAKE_BINARY_DIR}/fmtksdk.zip" --format=zip
-		"${CMAKE_BINARY_DIR}/include"
-		"${CMAKE_BINARY_DIR}/CMakeLists.txt"
-	DEPENDS fmtk fmtkdll secudll fmtklua fmtksdk
-	BYPRODUCTS "${CMAKE_BINARY_DIR}/fmtk.zip" "${CMAKE_BINARY_DIR}/fmtksdk.zip"
+		"include"
+		"CMakeLists.txt"
+	WORKING_DIRECTORY "$<TARGET_PROPERTY:fmtksdk,BINARY_DIR>"
+	DEPENDS fmtksdk
+	BYPRODUCTS "${CMAKE_BINARY_DIR}/fmtksdk.zip"
 )
+
+add_dependencies(package package_fmtksdk)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT fmtk)
