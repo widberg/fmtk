@@ -25,7 +25,7 @@ FUEL Modding Toolkit
 
 ## Compatibility
 
-FMTK is fully compatible with the retail and Steam release copies. Pirated versions of the game are not explicitly compatible with FMTK although they may work.
+FMTK is fully compatible with legally obtained retail and Steam release copies of FUEL. Pirated versions of the game are not explicitly compatible with FMTK although they may work.
 
 ## Installing (For Users and Mod Developers)
 
