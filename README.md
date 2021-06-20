@@ -23,10 +23,14 @@ FUEL Modding Toolkit
 * Cool "Blue FUEL" launcher logo :)
 * Easy to install for inexperienced users
 
+## Compatibility
+
+FMTK is fully compatible with the retail and Steam release copies. Pirated versions of the game are not explicitly compatible with FMTK although they may work.
+
 ## Installing (For Users and Mod Developers)
 
 1. Download the latest release from the [releases page](https://github.com/widberg/fmtk/releases)
-2. Unzip the release into the root FUEL directory
+2. Unzip the release into the root FUEL directory (the directory containing `FUEL.exe`)
 3. Verify that `fmtk.exe`, `fmtkdll.dll`, `secudll.dll`, `mods`, and `FUEL.exe` are all in the same directory
 4. Run `fmtk.exe`
 
