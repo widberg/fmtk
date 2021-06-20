@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.0)
+
+project(fmtksdk VERSION @fmtk_VERSION_MAJOR@.@fmtk_VERSION_MINOR@.@fmtk_VERSION_PATCH@.@fmtk_VERSION_TWEAK@ LANGUAGES CXX)
+
+add_library(fmtksdk INTERFACE
+	include/fmtksdk/fmtksdk.hpp
+)
+
+target_link_libraries(fmtksdk INTERFACE)
