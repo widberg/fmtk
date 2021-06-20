@@ -9,7 +9,7 @@
 #define FMTK_VERSION_PATCH @fmtk_VERSION_PATCH@
 #define FMTK_VERSION_TWEAK @fmtk_VERSION_TWEAK@
 
-#endif // FMTK_INTERNAL
+#endif // FMTK_VERSION
 
 struct FMTKVersion
 {
@@ -23,6 +23,7 @@ struct FMTKApi
 {
 	void (*print)(const char* msg);
 	const char* (*GetModsDirectoryPath)();
+	float* (*GetPlayerPosition)();
 };
 
 class FMTKMod

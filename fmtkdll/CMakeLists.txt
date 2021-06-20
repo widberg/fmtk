@@ -13,8 +13,9 @@ add_library(fmtkdll SHARED
 	gadgets/createwindowexw.hpp
 	gadgets/outputdebugstringw.hpp
 	gadgets/scriptmanagerinit.hpp
+	gadgets/getplayerposition.hpp
 )
-target_link_libraries(fmtkdll common fmtksdk detours spdlog d3d9 dbghelp tomlplusplus::tomlplusplus)
+target_link_libraries(fmtkdll common fmtksdk detours spdlog d3d9 dbghelp tomlplusplus::tomlplusplus usercall_hpp)
 target_link_options(fmtkdll PRIVATE /export:DetourFinishHelperProcess,@1,NONAME)
 target_compile_options(fmtkdll PRIVATE /EHa)
 target_compile_definitions(fmtkdll PRIVATE FMTK_INTERNAL)

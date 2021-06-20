@@ -2,21 +2,15 @@
 #define INSTRUMENT_HPP
 
 #include <Windows.h>
+#include <string>
 
 LONG AttachDetours();
 LONG DetachDetours();
 
-enum CommandSource : int
-{
-	GAME,
-	DPC,
-	TSC,
-};
-
-extern bool(__stdcall * Real_RunCommand)(const void* pState, const char* cmd, CommandSource commandSource);
+bool RunCommand(const std::string& cmd);
 extern const void** pGlobalCommandState;
 
-void Bridge_RegisterCommand(const void* pThis, void* callback, LPCSTR name);
+float* GetPlayerPosition();
 
 #define BROADCAST(name, ...) do { for (auto mod : mods) mod->name(__VA_ARGS__); } while(0)
 

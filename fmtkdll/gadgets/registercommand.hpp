@@ -1,19 +1,11 @@
-FUNCTION(RegisterCommand, 0x0069a400, void, __usercall, const void* pThis, void* callback)
-{
-	REG_TO_VAR(edi, LPCSTR, name);
+BF(void __usercall Real_RegisterCommand)(LPCSTR name AT edi, LPCVOID pThis, LPVOID callback)
+	(0x0069a400);
 
+FF(void __usercall FMTK_RegisterCommand)(LPCSTR name AT edi, LPCVOID pThis, LPVOID callback)
+(
 	LOG(trace, FMTK, "Registering command: {}", name);
 
-	Bridge_RegisterCommand(pThis, callback, name);
-}
+	Real_RegisterCommand_trampoline(name, pThis, callback);
 
-void Bridge_RegisterCommand(const void* pThis, void* callback, LPCSTR name)
-{
-	__asm
-	{
-		mov edi, name
-		push callback
-		push pThis
-		call Real_RegisterCommand
-	};
-}
+	RETURN;
+)

@@ -12,27 +12,15 @@
 #include <cwctype>
 #include <csignal>
 #include <sstream>
+#include <usercall_hpp/usercall.hpp>
 
 #include "fmtkdll.hpp"
 #include "logging.hpp"
-
-#define __usercall __stdcall
 
 #define FUNCTION(name, address, returnType, callingConvention, ...) \
 returnType (callingConvention * Real_##name)(__VA_ARGS__)           \
 	= reinterpret_cast<decltype(Real_##name)>(address);             \
 returnType callingConvention FMTK_##name(__VA_ARGS__)
-
-#define NAKEDFUNCTION(name, address)                    \
-void (* Real_##name)(void)                              \
-	= reinterpret_cast<decltype(Real_##name)>(address); \
-__declspec(naked) void FMTK_##name(void)
-
-#define NAKEDRETURN(name) \
-__asm                     \
-{                         \
-	jmp Real_##name       \
-}
 
 #define ATTACH(x)       DetourAttach(&(PVOID&)Real_##x, FMTK_##x)
 #define DETACH(x)       DetourDetach(&(PVOID&)Real_##x, FMTK_##x)
@@ -45,52 +33,6 @@ returnType callingConvention FMTK_XLive_##name(__VA_ARGS__)
 #define XLIVE_DLL_BASE_ADDRESS (0x400000)
 #define ATTACHXLIVE(x)  Real_XLive_##x = reinterpret_cast<decltype(Real_XLive_##x)>((DWORD_PTR)hiXLive +  (DWORD_PTR)Real_XLive_##x - (DWORD_PTR)XLIVE_DLL_BASE_ADDRESS); DetourAttach(&(PVOID&)Real_XLive_##x, FMTK_XLive_##x)
 #define DETACHXLIVE(x)  DetourDetach(&(PVOID&)Real_XLive_##x, FMTK_XLive_##x)
-
-#define BACKUP_REGISTER(reg) \
-DWORD backup_##reg;          \
-__asm                        \
-{                            \
-	mov backup_##reg, reg    \
-}
-
-#define BACKUP_REGISTERS() \
-BACKUP_REGISTER(eax);      \
-BACKUP_REGISTER(ecx);      \
-BACKUP_REGISTER(edx);      \
-BACKUP_REGISTER(ebx);      \
-BACKUP_REGISTER(esp);      \
-BACKUP_REGISTER(ebp);      \
-BACKUP_REGISTER(esi);      \
-BACKUP_REGISTER(edi);
-
-#define RESTORE_REGISTER(reg) \
-__asm                         \
-{                             \
-	mov reg, backup_##reg     \
-}
-
-#define RESTORE_REGISTERS() \
-RESTORE_REGISTER(eax);      \
-RESTORE_REGISTER(ecx);      \
-RESTORE_REGISTER(edx);      \
-RESTORE_REGISTER(ebx);      \
-RESTORE_REGISTER(esp);      \
-RESTORE_REGISTER(ebp);      \
-RESTORE_REGISTER(esi);      \
-RESTORE_REGISTER(edi);
-
-#define REG_TO_VAR(reg, type, var) \
-type var;                          \
-__asm                              \
-{                                  \
-	mov var, reg                   \
-};
-
-#define VAR_TO_REG(var, reg) \
-__asm                        \
-{                            \
-	mov reg, var             \
-};
 
 bool AttachDetoursXLive();
 bool DetachDetoursXLive();
@@ -249,6 +191,8 @@ FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 	return Real_ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
 }
 
+using p_float_t = float*;
+
 #include "gadgets/createfilew.hpp"
 #include "gadgets/registercommand.hpp"
 #include "gadgets/scriptmanagerinit.hpp"
@@ -260,6 +204,7 @@ FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 #include "gadgets/d3dxcompileshaderfromfilea.hpp"
 #include "gadgets/validatememory.hpp"
 #include "gadgets/createwindowexw.hpp"
+#include "gadgets/getplayerposition.hpp"
 
 bool AttachDetoursXLive()
 {

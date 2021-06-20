@@ -9,7 +9,7 @@ sol::state lua;
 class FMTKLua : FMTKMod
 {
 public:
-	virtual void Initialize()
+	virtual void Initialize() override
 	{
 		fmtk->print("TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST");
 
@@ -65,6 +65,25 @@ public:
 		if (!result.valid()) {
 			sol::error err = result;
 			fmtk->print(err.what());
+		}
+	}
+
+	virtual void Tick() override
+	{
+		static unsigned int timer = 0;
+		if (timer >= 1000)
+		{
+			float* vec;
+			if (vec = fmtk->GetPlayerPosition())
+			{
+				std::string s = "X: " + std::to_string(vec[0]) + ", Z: " + std::to_string(vec[1]) + ", Y: " + std::to_string(vec[2]);
+				fmtk->print(s.c_str());
+			}
+			timer = 0;
+		}
+		else
+		{
+			timer++;
 		}
 	}
 };

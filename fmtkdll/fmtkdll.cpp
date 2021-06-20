@@ -31,7 +31,8 @@ const char* GetModsDirectoryPath()
 FMTKApi fmtkApi
 {
     print,
-    GetModsDirectoryPath
+    GetModsDirectoryPath,
+    GetPlayerPosition
 };
 
 bool loadModDll(const std::filesystem::path& modDllPath)
