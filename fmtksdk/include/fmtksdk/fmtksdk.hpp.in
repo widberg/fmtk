@@ -24,6 +24,7 @@ struct FMTKApi
 	void (*print)(const char* msg);
 	const char* (*GetModsDirectoryPath)();
 	float* (*GetPlayerPosition)();
+	bool (*RunCommand)(const std::string& cmd);
 };
 
 class FMTKMod
