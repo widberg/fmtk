@@ -1,3 +1,6 @@
+# D3D9
+add_subdirectory(d3d9)
+
 # Detours
 add_subdirectory(detours)
 

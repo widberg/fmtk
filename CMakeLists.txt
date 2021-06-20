@@ -26,7 +26,6 @@ set_property(GLOBAL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug
 
 add_subdirectory(dependencies)
 find_package(FUEL)
-find_package(D3D9 REQUIRED)
 
 add_subdirectory(common)
 add_subdirectory(fmtksdk)

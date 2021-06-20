@@ -3,8 +3,6 @@ add_library(fmtksdk INTERFACE
 	include/fmtksdk/placeholder.hpp.in
 )
 
-target_link_libraries(fmtksdk INTERFACE)
-
 target_include_directories(fmtksdk INTERFACE
 	${CMAKE_CURRENT_BINARY_DIR}/include
 )
