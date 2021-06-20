@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <cwctype>
+
 FUNCTION(CreateFileW, CreateFileW, HANDLE, WINAPI,
 	LPCWSTR               lpFileName,
 	DWORD                 dwDesiredAccess,

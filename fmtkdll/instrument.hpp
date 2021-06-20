@@ -1,11 +1,10 @@
 #ifndef INSTRUMENT_HPP
 #define INSTRUMENT_HPP
 
-#include <Windows.h>
 #include <string>
 
-LONG AttachDetours();
-LONG DetachDetours();
+long AttachDetours();
+long DetachDetours();
 
 float* GetPlayerPosition();
 bool RunCommand(const std::string& cmd);

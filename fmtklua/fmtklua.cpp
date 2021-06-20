@@ -11,8 +11,6 @@ class FMTKLua : FMTKMod
 public:
 	virtual void Initialize() override
 	{
-		fmtk->print("TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST");
-
 		lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::coroutine, sol::lib::string, sol::lib::os, sol::lib::math, sol::lib::table, sol::lib::debug, sol::lib::bit32, sol::lib::io, sol::lib::ffi, sol::lib::jit, sol::lib::utf8);
 
 		std::string modsDirectory(fmtk->GetModsDirectoryPath());

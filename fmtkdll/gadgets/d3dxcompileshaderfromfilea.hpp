@@ -1,3 +1,5 @@
+#include <d3dx9shader.h>
+
 FUNCTION(D3DXCompileShaderFromFileA, 0x008b11e6, HRESULT, WINAPI,
 	LPCSTR                          pSrcFile,
 	CONST D3DXMACRO* pDefines,

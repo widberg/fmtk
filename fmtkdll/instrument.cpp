@@ -1,21 +1,15 @@
 #include "instrument.hpp"
 
 #include <Windows.h>
-#include <winternl.h>
-#include <DbgHelp.h>
-#include <d3dx9shader.h>
 #include <detours.h>
-#include <intrin.h>
 
-#include <algorithm>
 #include <filesystem>
-#include <cwctype>
-#include <csignal>
-#include <sstream>
+
 #include <usercall_hpp/usercall.hpp>
 
 #include "fmtkdll.hpp"
 #include "logging.hpp"
+#include "sehexception.hpp"
 
 #define FUNCTION(name, address, returnType, callingConvention, ...) \
 returnType (callingConvention * Real_##name)(__VA_ARGS__)           \
@@ -38,137 +32,6 @@ bool AttachDetoursXLive();
 bool DetachDetoursXLive();
 
 const void** pGlobalCommandState = reinterpret_cast<const void**>(0x00a7c080);
-
-class SEHException : public std::exception
-{
-public:
-	SEHException(unsigned int code) noexcept : er{ code, 0, nullptr, nullptr, 0 } { setupMsg(); }
-	SEHException(const EXCEPTION_POINTERS* ep) noexcept : context(*ep->ContextRecord), er(*ep->ExceptionRecord) { setupMsg(); }
-
-	DWORD code() const { return er.ExceptionCode; }
-	PVOID address() const { return er.ExceptionAddress; }
-
-	const char* what() const noexcept { return msg.c_str(); };
-private:
-	void setupMsg()
-	{
-		std::stringstream ss;
-		ss << "SEH Exception 0x";
-		ss << std::hex << std::setw(8) << std::setfill('0') << code();
-		ss << " at 0x";
-		ss << std::hex << std::setw(8) << std::setfill('0') << address();
-		if (code() == 0xc0000005)
-		{
-			ss << " this could indicate that xlive has detected a debugger attached to FUEL or you were playing around in the developer menus";
-		}
-		ss << "\n";
-
-		BOOL    result;
-		HANDLE  process;
-		HANDLE  thread;
-		HMODULE hModule;
-		HMODULE hLastModule = NULL;
-
-		STACKFRAME64        stack;
-		ULONG               frame;
-		DWORD64             displacement;
-		char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
-		PSYMBOL_INFO pSymbol = (PSYMBOL_INFO)buffer;
-		pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-		pSymbol->MaxNameLen = MAX_SYM_NAME;
-
-		DWORD disp;
-
-		char module[MAX_PATH + 1];
-
-		memset(&stack, 0, sizeof(STACKFRAME64));
-
-		process = GetCurrentProcess();
-		thread = GetCurrentThread();
-		displacement = 0;
-#if !defined(_M_AMD64)
-		stack.AddrPC.Offset = context.Eip;
-		stack.AddrPC.Mode = AddrModeFlat;
-		stack.AddrStack.Offset = context.Esp;
-		stack.AddrStack.Mode = AddrModeFlat;
-		stack.AddrFrame.Offset = context.Ebp;
-		stack.AddrFrame.Mode = AddrModeFlat;
-#endif
-
-		SymInitialize(process, NULL, TRUE); //load symbols
-
-		for (frame = 0; ; frame++)
-		{
-			//get next call from stack
-			result = StackWalk64
-			(
-#if defined(_M_AMD64)
-				IMAGE_FILE_MACHINE_AMD64
-#else
-				IMAGE_FILE_MACHINE_I386
-#endif
-				,
-				process,
-				thread,
-				&stack,
-				(PVOID)&context,
-				NULL,
-				SymFunctionTableAccess64,
-				SymGetModuleBase64,
-				NULL
-			);
-
-			if (!result)
-			{
-				break;
-			}
-
-			hModule = NULL;
-			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-				(LPCTSTR)(stack.AddrPC.Offset), &hModule);
-			if (hModule != NULL)
-			{
-				if (hModule != hLastModule)
-				{
-					GetModuleFileNameA(hModule, module, MAX_PATH + 1);
-					ss << "in " << module << "\n";
-					hLastModule = hModule;
-				}
-			}
-			else
-			{
-				ss << "in unknown module" << "\n";
-				hLastModule = NULL;
-			}
-
-			ss << "\tat ";
-			
-
-			if (SymFromAddr(process, (ULONG64)stack.AddrPC.Offset, &displacement, pSymbol))
-			{
-				ss << pSymbol->Name;
-
-				IMAGEHLP_LINE64 line;
-				line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
-
-				if (SymGetLineFromAddr64(process, stack.AddrPC.Offset, &disp, &line))
-				{
-					ss << " in " << line.FileName << ":" << std::dec << line.LineNumber;
-				}
-
-				ss << ", ";
-			}
-			
-			ss << "address 0x" << std::hex << std::setw(8) << std::setfill('0') << (UINT32)stack.AddrPC.Offset << "\n";
-		}
-
-		msg = ss.str();
-	}
-
-	CONTEXT context;
-	EXCEPTION_RECORD er;
-	std::string msg;
-};
 
 FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 	HANDLE       hFile,
@@ -206,28 +69,54 @@ using p_float_t = float*;
 #include "gadgets/createwindowexw.hpp"
 #include "gadgets/getplayerposition.hpp"
 
+bool patchXLive = false;
+
 bool AttachDetoursXLive()
 {
+	ULONG result = 1;
+
 	HINSTANCE hiXLive = GetModuleHandleA("xlive.dll");
 
-	DetourTransactionBegin();
-	DetourUpdateThread(GetCurrentThread());
+    BYTE signature_ValidateMemory[] = {
+		0x8b, 0xff, 0x55, 0x8b, 0xec, 0x83, 0xec, 0x20, 0x53, 0x56,
+		0x57, 0x8d, 0x45, 0xe0, 0x33, 0xf6, 0x50, 0xff, 0x75, 0x0c,
+		0x8b, 0xf9, 0x8b, 0x4d, 0x08, 0x89, 0x75, 0xe0, 0x89, 0x75,
+		0xe4, 0x89, 0x75, 0xf8, 0x89, 0x75, 0xf0, 0xe8, 0x3f, 0xf4,
+		0xff, 0xff, 0x8b, 0xd8, 0x3b, 0xde, 0x0f, 0x8c, 0x5c, 0x01,
+		0x00, 0x00, 0xff, 0x75, 0x0c, 0x8b, 0x4d, 0x08, 0xe8, 0x04,
+		0xf3, 0xff, 0xff, 0x8b
+	};
 
-	//ATTACHXLIVE(ValidateMemory);
+	if (memcmp(signature_ValidateMemory, (const void*)((DWORD_PTR)hiXLive + (DWORD_PTR)0x004f36b3 - (DWORD_PTR)XLIVE_DLL_BASE_ADDRESS), sizeof(signature_ValidateMemory)) == 0)
+	{
+		patchXLive = true;
 
-	ULONG result = DetourTransactionCommit();
+		DetourTransactionBegin();
+		DetourUpdateThread(GetCurrentThread());
+
+		ATTACHXLIVE(ValidateMemory);
+
+		result = DetourTransactionCommit();
+	}
 	
 	return result;
 }
 
 bool DetachDetoursXLive()
 {
-	DetourTransactionBegin();
-	DetourUpdateThread(GetCurrentThread());
+	LONG result = 1;
 
-	//DETACHXLIVE(ValidateMemory);
+	if (patchXLive)
+	{
+		DetourTransactionBegin();
+		DetourUpdateThread(GetCurrentThread());
 
-	return DetourTransactionCommit();
+		DETACHXLIVE(ValidateMemory);
+
+		result = DetourTransactionCommit();
+	}
+
+	return result;
 }
 
 // Instrument
@@ -241,17 +130,14 @@ LONG AttachDetours()
 	ATTACH(CreateFileW);
 	ATTACH(WinMain);
 	ATTACH(CoreMainLoop);
-	//ATTACH(OutputDebugStringA);
-	//ATTACH(OutputDebugStringW);
+	ATTACH(OutputDebugStringA);
+	ATTACH(OutputDebugStringW);
 	ATTACH(RunCommand);
 	ATTACH(D3DXCompileShaderFromFileA);
 	//ATTACH(CreateWindowExW);
 	ATTACH(RegisterCommand);
 	ATTACH(ScriptManagerInit);
 	ATTACH(ReadFile);
-	//ATTACH(SetUnhandledExceptionFilter);
-	//ATTACH(UnhandledExceptionFilter);
-	//ATTACH(CRC32);
 
     LOG(trace, FMTK, "Ready to commit");
 
@@ -270,17 +156,14 @@ LONG DetachDetours()
 	DETACH(CreateFileW);
 	DETACH(WinMain);
 	DETACH(CoreMainLoop);
-	//DETACH(OutputDebugStringA);
-	//DETACH(OutputDebugStringW);
+	DETACH(OutputDebugStringA);
+	DETACH(OutputDebugStringW);
 	DETACH(RunCommand);
 	DETACH(D3DXCompileShaderFromFileA);
 	//DETACH(CreateWindowExW);
 	DETACH(RegisterCommand);
 	DETACH(ScriptManagerInit);
 	DETACH(ReadFile);
-	//DETACH(SetUnhandledExceptionFilter);
-	//DETACH(UnhandledExceptionFilter);
-	//DETACH(CRC32);
 
     LOG(trace, FMTK, "Ready to commit");
 

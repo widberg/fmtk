@@ -1,6 +1,7 @@
 add_library(fmtkdll SHARED
 	fmtkdll.cpp fmtkdll.hpp
 	instrument.cpp instrument.hpp
+	sehexception.cpp sehexception.hpp
 
 	gadgets/coremainloop.hpp
 	gadgets/d3dxcompileshaderfromfilea.hpp
