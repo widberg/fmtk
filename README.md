@@ -27,7 +27,7 @@ FUEL Modding Toolkit
 
 1. Download the latest release from the [releases page](https://github.com/widberg/fmtk/releases)
 2. Unzip the release into the root FUEL directory
-3. Verify that `fmtk.exe`, `fmtkdll.dll`, `secudll.dll`, and `FUEL.exe` are all in the same directory
+3. Verify that `fmtk.exe`, `fmtkdll.dll`, `secudll.dll`, `mods`, and `FUEL.exe` are all in the same directory
 4. Run `fmtk.exe`
 
 ## Discord
