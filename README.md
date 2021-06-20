@@ -47,7 +47,6 @@ Documentation for mod developers and FMTK developers is available on the [FMTK W
 ### Prerequisites
 
 * CMake
-* DirectX 9 SDK
 * A PC copy of FUEL (Optional)
 
 ### Checkout
