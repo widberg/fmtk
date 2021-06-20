@@ -1,7 +1,15 @@
 #ifndef FMTKSDK_HPP
 #define FMTKSDK_HPP
 
-#include <configure.hpp>
+#ifndef FMTK_VERSION
+
+#define FMTK_VERSION "@fmtk_VERSION@"
+#define FMTK_VERSION_MAJOR @fmtk_VERSION_MAJOR@
+#define FMTK_VERSION_MINOR @fmtk_VERSION_MINOR@
+#define FMTK_VERSION_PATCH @fmtk_VERSION_PATCH@
+#define FMTK_VERSION_TWEAK @fmtk_VERSION_TWEAK@
+
+#endif // FMTK_INTERNAL
 
 struct FMTKVersion
 {
@@ -14,6 +22,7 @@ struct FMTKVersion
 struct FMTKApi
 {
 	void (*print)(const char* msg);
+	const char* (*GetModsDirectoryPath)();
 };
 
 class FMTKMod
@@ -24,7 +33,7 @@ public:
 
 #ifndef FMTK_INTERNAL
 // Placeholder methods for forward compatibility
-#include "placeholder.hpp"
+@FMTK_PLACEHOLDER_HPP_IN@
 #endif // FMTK_INTERNAL
 };
 

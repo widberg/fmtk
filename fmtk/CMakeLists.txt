@@ -10,6 +10,13 @@ if (FUEL_FOUND)
 		VS_DEBUGGER_WORKING_DIRECTORY "${FUEL_DIR}"
 		VS_DEBUGGER_ENVIRONMENT "PATH=$ENV{PATH};$<TARGET_FILE_DIR:fmtk>"
 	)
+
+	add_custom_target(copy_mods
+		COMMAND ${CMAKE_COMMAND} -E copy_directory  "${CMAKE_SOURCE_DIR}/mods" "${FUEL_DIR}/mods"
+		COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtklua>" "${FUEL_DIR}/mods/native/fmtklua.dll"
+	)
+	add_dependencies(copy_mods fmtklua)
+	add_dependencies(fmtk copy_mods)
 endif()
 
 set_target_properties(fmtk PROPERTIES

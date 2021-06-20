@@ -70,7 +70,7 @@ BOOL WINAPI FMTK_CreateProcessW(
         lpProcessInformation,
         "fmtkdll.dll",
         Real_CreateProcessW);
-
+    
     ResumeThread(lpProcessInformation->hThread);
 
     return rv;

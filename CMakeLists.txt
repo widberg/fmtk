@@ -37,15 +37,18 @@ add_subdirectory(secudll)
 add_subdirectory(fmtkdll)
 add_subdirectory(fmtk)
 
-add_custom_target(package COMMAND
-    ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_BINARY_DIR}/fmtk.zip" --format=zip
-       "$<TARGET_FILE:fmtk>"
-	   "$<TARGET_FILE:fmtkdll>"
-	   "$<TARGET_FILE:secudll>"
-	   "$<TARGET_FILE:lua51>"
-	   "${CMAKE_SOURCE_DIR}/README.md"
+add_custom_target(package
+	COMMAND ${CMAKE_COMMAND} -E copy_directory  "${CMAKE_SOURCE_DIR}/mods" "${CMAKE_BINARY_DIR}/mods"
+	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtklua>" "${CMAKE_BINARY_DIR}/mods/native/fmtklua.dll"
+	COMMAND
+		${CMAKE_COMMAND} -E tar "cf" "${CMAKE_BINARY_DIR}/fmtk.zip" --format=zip
+		"$<TARGET_FILE:fmtk>"
+		"$<TARGET_FILE:fmtkdll>"
+		"$<TARGET_FILE:secudll>"
+		"${CMAKE_SOURCE_DIR}/README.md"
+		"${CMAKE_BINARY_DIR}/mods"
 	WORKING_DIRECTORY "$<TARGET_FILE_DIR:fmtk>"
-	DEPENDS fmtk fmtkdll secudll
+	DEPENDS fmtk fmtkdll secudll fmtklua
 	BYPRODUCTS "${CMAKE_BINARY_DIR}/fmtk.zip"
 )
 

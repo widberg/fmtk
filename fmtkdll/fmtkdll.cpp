@@ -1,5 +1,8 @@
 #include <Windows.h>
 #include <detours.h>
+#include <cstring>
+#include <locale>
+#include <codecvt>
 
 #include <filesystem>
 #include <toml++/toml.h>
@@ -18,9 +21,17 @@ void print(const char* msg)
     LOG(trace, FMTK, "{}", msg);
 }
 
+std::string fmtkModsDirectoryPath;
+
+const char* GetModDirectoryPath()
+{
+    return fmtkModsDirectoryPath.c_str();
+}
+
 FMTKApi fmtkApi
 {
-    print
+    print,
+    GetModDirectoryPath
 };
 
 bool loadModDll(const std::filesystem::path& modDllPath)
@@ -111,6 +122,20 @@ std::unordered_map<std::wstring, std::wstring> aliases;
 
 BOOL ProcessAttach(HMODULE hDll)
 {
+#define FMTK_ABI_SIGNATURE_ASSERT(name ,address, ...) \
+    BYTE signature_##address[] = { __VA_ARGS__ }; \
+    FMTK_ASSERT(memcmp(signature_##address, (const void*)address, sizeof(signature_##address)) == 0, "Failed FMTK_ABI_SIGNATURE_ASSERT for " #name)
+
+    FMTK_ABI_SIGNATURE_ASSERT(CoreMainLoop, 0x00688bf0,
+        0x55, 0x8b, 0xec, 0x83, 0xe4, 0xf8, 0x51, 0x53, 0x56, 0x57,
+        0xb9, 0x06, 0x00, 0x00, 0x00, 0xbe, 0xb4, 0x7b, 0x9c, 0x00,
+        0xbf, 0xf8, 0xea, 0xa2, 0x00, 0xf3, 0xa5, 0x66, 0xa5, 0x33,
+        0xdb, 0x38, 0x1d, 0x27, 0xc9, 0xa7, 0x00, 0xa4, 0x74, 0x7b,
+        0xd9, 0x05, 0x2c, 0xc9, 0xa7, 0x00, 0xd8, 0x25, 0x60, 0xb6,
+        0xa2, 0x00, 0xd9, 0x15, 0x2c, 0xc9, 0xa7, 0x00, 0xd9, 0xee,
+        0xd8, 0xd1, 0xdf, 0xe0
+    );
+
     DetourRestoreAfterWith();
 
     if (!AttachConsole(ATTACH_PARENT_PROCESS))
@@ -147,7 +172,9 @@ BOOL ProcessAttach(HMODULE hDll)
         return FALSE;
     }
 
-    loadModsDirectory(modsDirectoryPath.value());
+    fmtkModsDirectoryPath = (std::filesystem::absolute(modsDirectoryPath.value()) / "").string();
+
+    loadModsDirectory(modsDirectoryPath.value() + L"\\native");
 
     return TRUE;
 }
