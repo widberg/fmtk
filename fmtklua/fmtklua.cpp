@@ -14,10 +14,10 @@ public:
 
 		lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::coroutine, sol::lib::string, sol::lib::os, sol::lib::math, sol::lib::table, sol::lib::debug, sol::lib::bit32, sol::lib::io, sol::lib::ffi, sol::lib::jit, sol::lib::utf8);
 
-		const std::string package_path = lua["package"]["path"];
+		const std::string& package_path = lua["package"]["path"];
 		lua["package"]["path"] = "D:\\programming\\widberg\\fmtk\\build\\bin\\mods\\lua\\share\\?.lua;" + package_path;
 
-		const std::string package_cpath = lua["package"]["cpath"];
+		const std::string& package_cpath = lua["package"]["cpath"];
 		lua["package"]["cpath"] = "D:\\programming\\widberg\\fmtk\\build\\bin\\mods\\lua\\share\\?.dll;" + package_cpath;
 
 		auto fmtk_table = lua["fmtk"].get_or_create<sol::table>();

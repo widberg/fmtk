@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <cwctype>
 #include <csignal>
+#include <sstream>
 
 #include "fmtkdll.hpp"
 #include "logging.hpp"

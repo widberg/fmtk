@@ -42,6 +42,7 @@ add_custom_target(package COMMAND
        "$<TARGET_FILE:fmtk>"
 	   "$<TARGET_FILE:fmtkdll>"
 	   "$<TARGET_FILE:secudll>"
+	   "$<TARGET_FILE:lua51>"
 	   "${CMAKE_SOURCE_DIR}/README.md"
 	WORKING_DIRECTORY "$<TARGET_FILE_DIR:fmtk>"
 	DEPENDS fmtk fmtkdll secudll

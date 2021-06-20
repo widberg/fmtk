@@ -13,3 +13,9 @@ target_compile_definitions(spdlog PUBLIC "SPDLOG_WCHAR_TO_UTF8_SUPPORT" "SPDLOG_
 
 # tomlplusplus
 add_subdirectory(tomlplusplus)
+
+# usercall.hpp
+SET(USERCALL_HPP_CHECK_RETURN           ON CACHE BOOL "")
+SET(USERCALL_HPP_USE_HEXRAYS_DEFS       ON CACHE BOOL "")
+SET(USERCALL_HPP_USE_REALLY_SHORT_NAMES ON CACHE BOOL "")
+add_subdirectory(usercall.hpp)
