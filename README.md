@@ -50,9 +50,7 @@ Documentation for mod developers and FMTK developers is available on the [FMTK W
 * DirectX 9 SDK
 * A PC copy of FUEL (Optional)
 
-### Manual Setup
-
-#### Checkout
+### Checkout
 
 ```sh
 git clone https://github.com/widberg/fmtk.git
@@ -60,17 +58,11 @@ cd fmtk
 git submodule update --init --recursive
 ```
 
-#### Build
+### Build
 
 ```sh
 mkdir build
 cd build
 cmake -A Win32 ..
 cmake --build .
-```
-
-### Bootstrap (Recommended)
-
-```sh
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/widberg/fmtk/master/bootstrap.ps1'))
 ```
