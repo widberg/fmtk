@@ -1,6 +1,6 @@
 # FMTK
 
-![FMTK Logo](https://github.com/widberg/fmtk/blob/master/logo.png?raw=true)
+[![FMTK Logo](https://github.com/widberg/fmtk/blob/master/logo.png?raw=true)](https://github.com/widberg/fmtk#fmtk)
 
 FUEL Modding Toolkit
 
