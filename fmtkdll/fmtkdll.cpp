@@ -33,7 +33,8 @@ FMTKApi fmtkApi
     print,
     GetModsDirectoryPath,
     GetPlayerPosition,
-    RunCommand
+    RunCommand,
+    RegisterCommand
 };
 
 bool loadModDll(const std::filesystem::path& modDllPath)

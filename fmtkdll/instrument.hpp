@@ -7,10 +7,9 @@
 LONG AttachDetours();
 LONG DetachDetours();
 
-extern const void** pGlobalCommandState;
-
 float* GetPlayerPosition();
 bool RunCommand(const std::string& cmd);
+void RegisterCommand(const std::string& name, bool(*callback)());
 
 #define BROADCAST(name, ...) do { for (auto mod : mods) mod->name(__VA_ARGS__); } while(0)
 

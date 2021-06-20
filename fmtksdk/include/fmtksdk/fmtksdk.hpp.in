@@ -9,7 +9,7 @@
 #define FMTK_VERSION_PATCH @fmtk_VERSION_PATCH@
 #define FMTK_VERSION_TWEAK @fmtk_VERSION_TWEAK@
 
-#endif // FMTK_VERSION
+#endif // !FMTK_VERSION
 
 struct FMTKVersion
 {
@@ -25,6 +25,7 @@ struct FMTKApi
 	const char* (*GetModsDirectoryPath)();
 	float* (*GetPlayerPosition)();
 	bool (*RunCommand)(const std::string& cmd);
+	void (*RegisterCommand)(const std::string& name, bool(*callback)());
 };
 
 class FMTKMod
@@ -36,7 +37,7 @@ public:
 #ifndef FMTK_INTERNAL
 // Placeholder methods for forward compatibility
 @FMTK_PLACEHOLDER_HPP_IN@
-#endif // FMTK_INTERNAL
+#endif // !FMTK_INTERNAL
 };
 
 #ifndef FMTK_INTERNAL

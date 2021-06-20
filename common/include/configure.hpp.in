@@ -9,6 +9,6 @@
 #define FMTK_VERSION_PATCH @fmtk_VERSION_PATCH@
 #define FMTK_VERSION_TWEAK @fmtk_VERSION_TWEAK@
 
-#endif // FMTK_VERSION
+#endif // !FMTK_VERSION
 
 #endif // !CONFIGURE_HPP
