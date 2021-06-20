@@ -16,5 +16,5 @@ add_library(d3d9 INTERFACE
 )
 
 target_include_directories(d3d9 INTERFACE
-	${CMAKE_CURRENT_BINARY_DIR}/Include
+	Include
 )
