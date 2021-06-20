@@ -1,1 +1,2 @@
-mods/**/* linguist-vendored
+mods/lua/share/**/* linguist-vendored
+package/uninstall_fmtk.bat linguist-vendored
