@@ -23,7 +23,7 @@ void print(const char* msg)
 
 std::string fmtkModsDirectoryPath;
 
-const char* GetModDirectoryPath()
+const char* GetModsDirectoryPath()
 {
     return fmtkModsDirectoryPath.c_str();
 }
@@ -31,7 +31,7 @@ const char* GetModDirectoryPath()
 FMTKApi fmtkApi
 {
     print,
-    GetModDirectoryPath
+    GetModsDirectoryPath
 };
 
 bool loadModDll(const std::filesystem::path& modDllPath)
@@ -66,8 +66,6 @@ bool loadModDll(const std::filesystem::path& modDllPath)
     }
 
     mods.push_back(GetMod(&fmtkApi));
-
-    mods.back()->Initialize();
 
     return true;
 }

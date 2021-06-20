@@ -14,6 +14,8 @@ FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevI
 
 	try
 	{
+		BROADCAST(Initialize);
+
 		result = Real_WinMain(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
 		LOG(trace, FMTK, "FUEL returned {}", result);
 	}

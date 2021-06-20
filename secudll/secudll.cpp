@@ -62,7 +62,7 @@ BOOL WINAPI FMTK_CreateProcessW(
         lpCommandLine,
         lpProcessAttributes,
         lpThreadAttributes,
-        bInheritHandles,
+        TRUE,
         dwCreationFlags | CREATE_SUSPENDED,
         lpEnvironment,
         lpCurrentDirectory,
@@ -71,6 +71,72 @@ BOOL WINAPI FMTK_CreateProcessW(
         "fmtkdll.dll",
         Real_CreateProcessW);
     
+    ResumeThread(lpProcessInformation->hThread);
+
+    return rv;
+}
+
+BOOL(WINAPI* Real_CreateProcessA)(LPCSTR a0,
+    LPSTR a1,
+    LPSECURITY_ATTRIBUTES a2,
+    LPSECURITY_ATTRIBUTES a3,
+    BOOL a4,
+    DWORD a5,
+    LPVOID a6,
+    LPCSTR a7,
+    LPSTARTUPINFOA a8,
+    LPPROCESS_INFORMATION a9)
+    = CreateProcessA;
+
+BOOL WINAPI FMTK_CreateProcessA(
+    LPCSTR               lpApplicationName,
+    LPSTR                lpCommandLine,
+    LPSECURITY_ATTRIBUTES lpProcessAttributes,
+    LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    BOOL                  bInheritHandles,
+    DWORD                 dwCreationFlags,
+    LPVOID                lpEnvironment,
+    LPCSTR               lpCurrentDirectory,
+    LPSTARTUPINFOA        lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation
+)
+{
+    toml::table tbl;
+    try
+    {
+        tbl = toml::parse_file(FMTK_TOML_PATH);
+    }
+    catch (const toml::parse_error& err)
+    {
+        return -2;
+    }
+
+    std::optional<std::string> fuelPath = tbl["fmtk"]["fuel"].value<std::string>();
+    if (!fuelPath.has_value())
+    {
+        return -3;
+    }
+
+    PROCESS_INFORMATION pi;
+    if (lpProcessInformation == NULL) {
+        ZeroMemory(&pi, sizeof(pi));
+        lpProcessInformation = &pi;
+    }
+
+    BOOL rv = DetourCreateProcessWithDllExA(
+        fuelPath.value().c_str(),
+        lpCommandLine,
+        lpProcessAttributes,
+        lpThreadAttributes,
+        TRUE,
+        dwCreationFlags | CREATE_SUSPENDED,
+        lpEnvironment,
+        lpCurrentDirectory,
+        lpStartupInfo,
+        lpProcessInformation,
+        "fmtkdll.dll",
+        Real_CreateProcessA);
+
     ResumeThread(lpProcessInformation->hThread);
 
     return rv;
@@ -100,6 +166,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD dwReason, PVOID lpReserved)
         DetourUpdateThread(GetCurrentThread());
 
         ATTACH(CreateProcessW);
+        ATTACH(CreateProcessA);
 
         DetourTransactionCommit();
 
@@ -109,6 +176,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD dwReason, PVOID lpReserved)
         DetourUpdateThread(GetCurrentThread());
 
         DETACH(CreateProcessW);
+        DETACH(CreateProcessA);
 
         DetourTransactionCommit();
 
