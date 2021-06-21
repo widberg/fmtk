@@ -30,13 +30,13 @@ sys.path.append(abspath('../ext/'))
 # -- Project information -----------------------------------------------------
 
 project = 'FMTK'
-copyright = '2019, Missing Bit Studios'
-author = 'Missing Bit Studios'
+copyright = '2021, widberg'
+author = 'widberg'
 
 # The short X.Y version
-version = '0.1.0'
+version = '0.0.0'
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = '0.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -103,7 +103,7 @@ html_theme = 'sphinx_rtd_theme'
 #
 html_theme_options = {
     'collapse_navigation': False,
-    'style_nav_header_background': '#AEC6CF'
+    'style_nav_header_background': '#1e5696'
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -155,7 +155,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'FMTK.tex', 'FMTK Documentation',
-     'Missing Bit Studios', 'manual'),
+     'widberg', 'manual'),
 ]
 
 
