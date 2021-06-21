@@ -3,19 +3,72 @@
 
 #ifndef FMTK_VERSION
 
+/**
+ * \addtogroup fmtk_version_macros
+ * Version macros for FMTK SDK used to build the mod
+ * \{
+ */
+
+/**
+ * \def FMTK_VERSION
+ * \brief A c-style string literal containing the dot separated version number
+ */
 #define FMTK_VERSION "@fmtk_VERSION@"
+
+/**
+ * \def FMTK_VERSION
+ * \brief An integer literal containing the major component of the version number
+ */
 #define FMTK_VERSION_MAJOR @fmtk_VERSION_MAJOR@
+
+/**
+ * \def FMTK_VERSION
+ * \brief An integer literal containing the minor component of the version number
+ */
 #define FMTK_VERSION_MINOR @fmtk_VERSION_MINOR@
+
+/**
+ * \def FMTK_VERSION
+ * \brief An integer literal containing the patch component of the version number
+ */
 #define FMTK_VERSION_PATCH @fmtk_VERSION_PATCH@
+
+/**
+ * \def FMTK_VERSION
+ * \brief An integer literal containing the tweak component of the version number
+ */
 #define FMTK_VERSION_TWEAK @fmtk_VERSION_TWEAK@
+
+/**
+ * \}
+ */
 
 #endif // !FMTK_VERSION
 
+/**
+ * \struct FMTKVersion
+ * \brief This structure contains the values of the version macros of FMTK SDK used to build the mod.
+ */
 struct FMTKVersion
 {
+	/**
+	 * \brief The major version
+	 */
 	unsigned int major = FMTK_VERSION_MAJOR;
+
+	/**
+	 * \brief The minor version
+	 */
 	unsigned int minor = FMTK_VERSION_MINOR;
+
+	/**
+	 * \brief The patch version
+	 */
 	unsigned int patch = FMTK_VERSION_PATCH;
+
+	/**
+	 * \brief The tweak version
+	 */
 	unsigned int tweak = FMTK_VERSION_TWEAK;
 };
 
