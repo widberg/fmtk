@@ -230,7 +230,7 @@ def run_cmake(folder):
 
 def builder_inited(app):
     """Run the cmake command"""
-    run_cmake('../../build')
+    run_cmake('../build')
     """Run the doxygen command"""
     run_doxygen('../')
 
