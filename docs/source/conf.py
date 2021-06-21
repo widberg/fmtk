@@ -34,6 +34,8 @@ project = 'FMTK'
 copyright = '2021, widberg'
 author = 'widberg'
 
+version = '0.0.0'
+release = version
 
 # -- General configuration ---------------------------------------------------
 
@@ -210,34 +212,9 @@ def run_doxygen(folder):
         sys.stderr.write('doxygen execution failed: %s' % e)
 
 
-def run_cmake(folder):
-    """Run the cmake command in the designated folder"""
-
-    folder = abspath(folder)
-    Path(folder).mkdir(parents=True, exist_ok=True)
-
-    try:
-        print('running cmake in %s' % folder)
-        retcode = subprocess.call(['cmake', '-DCMAKE_BUILD_TYPE=Release', '-DFMTK_READ_THE_DOCS=ON', '..'], cwd=folder)
-        if retcode < 0:
-            sys.stderr.write('cmake terminated by signal %s' % (-retcode))
-    except OSError as e:
-        sys.stderr.write('cmake execution failed: %s' % e)
-
-
 def builder_inited(app):
-    """Run the cmake command"""
-    run_cmake('../../build')
     """Run the doxygen command"""
     run_doxygen('../')
-
-	
-    # The short X.Y version
-    with open('version.txt') as f:
-        version = f.readline()
-    
-    # The full version, including alpha/beta/rc tags
-    release = version
 
 
 def setup(app):
