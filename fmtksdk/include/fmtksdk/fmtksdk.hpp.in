@@ -10,31 +10,26 @@
  */
 
 /**
- * \def FMTK_VERSION
  * \brief A c-style string literal containing the dot separated version number
  */
 #define FMTK_VERSION "@fmtk_VERSION@"
 
 /**
- * \def FMTK_VERSION
  * \brief An integer literal containing the major component of the version number
  */
 #define FMTK_VERSION_MAJOR @fmtk_VERSION_MAJOR@
 
 /**
- * \def FMTK_VERSION
  * \brief An integer literal containing the minor component of the version number
  */
 #define FMTK_VERSION_MINOR @fmtk_VERSION_MINOR@
 
 /**
- * \def FMTK_VERSION
  * \brief An integer literal containing the patch component of the version number
  */
 #define FMTK_VERSION_PATCH @fmtk_VERSION_PATCH@
 
 /**
- * \def FMTK_VERSION
  * \brief An integer literal containing the tweak component of the version number
  */
 #define FMTK_VERSION_TWEAK @fmtk_VERSION_TWEAK@
@@ -73,50 +68,42 @@ struct FMTKVersion
 };
 
 /**
- * \enum LogLevel
  * \brief Log levels available for use with Log
  */
 enum class LogLevel
 {
 	/**
-	 * \var LogLevel::TRACE
 	 * \brief This is a message for an FMTK developer. Exclude it from release builds.
 	 */
 	TRACE,
 
 	/**
-	 * \var LogLevel::DEBUG
 	 * \brief This is a message for a mod developer.
 	 */
 	DEBUG,
 
 	/**
-	 * \var LogLevel::INFO
 	 * \brief This is a message for a user that everythong is fine and no action is necessary.
 	 */
 	INFO,
 
 	/**
-	 * \var LogLevel::WARN
 	 * \brief This is a message for a user that something may be wrong but no action is necessary.
 	 */
 	WARN,
 
 	/**
-	 * \var LogLevel::ERR
 	 * \brief This is a message for a user that something is wrong but no action is necessary. A recoverable error.
 	 */
 	ERR,
 
 	/**
-	 * \var LogLevel::CRITICAL
 	 * \brief This is a message for a user that something is wrong and action is necessary. An unrecoverable error.
 	 */
 	CRITICAL,
 };
 
 /**
- * \struct FMTKApi
  * \brief This structure contains pointers to FMTK functions that should be filled in when the mod is loaded.
  */
 struct FMTKApi
@@ -167,7 +154,6 @@ struct FMTKApi
 };
 
 /**
- * \class FMTKMod
  * \brief The FMTKMod base class all mods inherit
  */
 class FMTKMod
@@ -211,7 +197,6 @@ public:
 
 /**
  * \internal
- * \def FMTKAPI
  * \brief Instruct the compiler on the linkage specifications for a function
  */
 #define FMTKAPI extern "C" __declspec(dllexport) __declspec(noinline)
@@ -224,6 +209,7 @@ FMTKAPI const FMTKVersion* GetFMTKVersion();
 
 /**
  * \internal
+ * \brief Static FMTKVersion to be passed by pointer to the FMTK process for validation.
  */
 extern const FMTKVersion fmtkVersion;
 
@@ -233,7 +219,6 @@ extern const FMTKVersion fmtkVersion;
 extern const FMTKApi* fmtk;
 
 /**
- * \def REGISTER_MOD(class_name)
  * \brief Generates the necessary functions for the mod to be loaded by FMTK and initialize the fmtk global variable. This macro should only be used once per dll. This macro must appear after the mod class has been defined.
  * \param class_name The fully qualified name of the class implementing FMTKMod. There should only be one class implementing FMTKMod per dll.
  */
