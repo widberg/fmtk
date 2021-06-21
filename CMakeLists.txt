@@ -18,7 +18,7 @@ endif()
 
 project(fmtk VERSION 0.0.3.0 LANGUAGES CXX)
 
-option(FMTK_READ_THE_DOCS        "Build documentation." OFF)
+option(FMTK_READ_THE_DOCS        "Build only the documentation." OFF)
 
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE INTERNAL "")
