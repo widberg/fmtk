@@ -34,13 +34,6 @@ project = 'FMTK'
 copyright = '2021, widberg'
 author = 'widberg'
 
-# The short X.Y version
-with open('version.txt') as f:
-    version = f.readline()
-
-# The full version, including alpha/beta/rc tags
-release = version
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -240,6 +233,14 @@ def builder_inited(app):
     run_cmake('../../build')
     """Run the doxygen command"""
     run_doxygen('../')
+
+	
+    # The short X.Y version
+    with open('version.txt') as f:
+        version = f.readline()
+    
+    # The full version, including alpha/beta/rc tags
+    release = version
 
 
 def setup(app):
