@@ -28,13 +28,41 @@ const char* GetModsDirectoryPath()
     return fmtkModsDirectoryPath.c_str();
 }
 
+void Log(LogLevel level, const char* source, const char* msg)
+{
+    switch (level)
+    {
+    case LogLevel::TRACE:
+        spdlog::trace("[" + std::string(source) + "] {}", msg);
+        break;
+    case LogLevel::DEBUG:
+        spdlog::debug("[" + std::string(source) + "] {}", msg);
+        break;
+    case LogLevel::INFO:
+        spdlog::info("[" + std::string(source) + "] {}", msg);
+        break;
+    case LogLevel::WARN:
+        spdlog::warn("[" + std::string(source) + "] {}", msg);
+        break;
+    case LogLevel::ERR:
+        spdlog::error("[" + std::string(source) + "] {}", msg);
+        break;
+    case LogLevel::CRITICAL:
+        spdlog::critical("[" + std::string(source) + "] {}", msg);
+        break;
+    default:
+        break;
+    }
+}
+
 FMTKApi fmtkApi
 {
     print,
     GetModsDirectoryPath,
     GetPlayerPosition,
     RunCommand,
-    RegisterCommand
+    RegisterCommand,
+    Log,
 };
 
 bool loadModDll(const std::filesystem::path& modDllPath)
@@ -182,6 +210,8 @@ BOOL ProcessAttach(HMODULE hDll)
 
 BOOL ProcessDetach(HMODULE hDll)
 {
+    BROADCAST(Shutdown);
+
     LOG(trace, FMTK, "Detaching from FUEL");
 
     LONG error = DetachDetours();

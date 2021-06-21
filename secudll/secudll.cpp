@@ -4,6 +4,11 @@
 #include <string>
 #include <toml++/toml.h>
 #include <optional>
+#include <debug.hpp>
+#include <iostream>
+#include <shellapi.h>
+#include <sstream>
+#include <vector>
 
 constexpr const char* FMTK_TOML_PATH = "fmtk.toml";
 
@@ -51,19 +56,13 @@ BOOL WINAPI FMTK_CreateProcessW(
         return -3;
     }
 
-    PROCESS_INFORMATION pi;
-    if (lpProcessInformation == NULL) {
-        ZeroMemory(&pi, sizeof(pi));
-        lpProcessInformation = &pi;
-    }
-
     BOOL rv = DetourCreateProcessWithDllExW(
-        fuelPath.value().c_str(),
+        lpApplicationName,
         lpCommandLine,
         lpProcessAttributes,
         lpThreadAttributes,
-        TRUE,
-        dwCreationFlags | CREATE_SUSPENDED,
+        bInheritHandles,
+        dwCreationFlags,
         lpEnvironment,
         lpCurrentDirectory,
         lpStartupInfo,
@@ -71,8 +70,6 @@ BOOL WINAPI FMTK_CreateProcessW(
         "fmtkdll.dll",
         Real_CreateProcessW);
     
-    ResumeThread(lpProcessInformation->hThread);
-
     return rv;
 }
 
@@ -101,45 +98,8 @@ BOOL WINAPI FMTK_CreateProcessA(
     LPPROCESS_INFORMATION lpProcessInformation
 )
 {
-    toml::table tbl;
-    try
-    {
-        tbl = toml::parse_file(FMTK_TOML_PATH);
-    }
-    catch (const toml::parse_error& err)
-    {
-        return -2;
-    }
-
-    std::optional<std::string> fuelPath = tbl["fmtk"]["fuel"].value<std::string>();
-    if (!fuelPath.has_value())
-    {
-        return -3;
-    }
-
-    PROCESS_INFORMATION pi;
-    if (lpProcessInformation == NULL) {
-        ZeroMemory(&pi, sizeof(pi));
-        lpProcessInformation = &pi;
-    }
-
-    BOOL rv = DetourCreateProcessWithDllExA(
-        fuelPath.value().c_str(),
-        lpCommandLine,
-        lpProcessAttributes,
-        lpThreadAttributes,
-        TRUE,
-        dwCreationFlags | CREATE_SUSPENDED,
-        lpEnvironment,
-        lpCurrentDirectory,
-        lpStartupInfo,
-        lpProcessInformation,
-        "fmtkdll.dll",
-        Real_CreateProcessA);
-
-    ResumeThread(lpProcessInformation->hThread);
-
-    return rv;
+    FMTK_ASSERT(false, "CreateProcessA used by SecuLauncher. This is unexpected < Did you pirate the game? :( >. CreateProcessW expected. Please report this assertion to an FMTK developer.");
+    return FALSE;
 }
 
 BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD dwReason, PVOID lpReserved)

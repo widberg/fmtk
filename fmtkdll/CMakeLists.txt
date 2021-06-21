@@ -15,6 +15,7 @@ add_library(fmtkdll SHARED
 	gadgets/outputdebugstringw.hpp
 	gadgets/scriptmanagerinit.hpp
 	gadgets/getplayerposition.hpp
+	gadgets/readfile.hpp
 )
 target_link_libraries(fmtkdll common fmtksdk detours spdlog d3d9 dbghelp tomlplusplus::tomlplusplus usercall_hpp)
 target_link_options(fmtkdll PRIVATE /export:DetourFinishHelperProcess,@1,NONAME)

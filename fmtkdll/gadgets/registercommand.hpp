@@ -10,7 +10,7 @@ FF(void __usercall FMTK_RegisterCommand)(LPCSTR name AT edi, LPCVOID pThis, LPVO
 	RETURN;
 )
 
-void RegisterCommand(const std::string& name, bool(*callback)())
+void RegisterCommand(const char* name, bool(*callback)())
 {
-	Real_RegisterCommand_trampoline(name.c_str(), *pGlobalCommandState, (void*)callback);
+	Real_RegisterCommand_trampoline(name, *pGlobalCommandState, (void*)callback);
 }

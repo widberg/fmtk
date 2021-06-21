@@ -33,27 +33,6 @@ bool DetachDetoursXLive();
 
 const void** pGlobalCommandState = reinterpret_cast<const void**>(0x00a7c080);
 
-FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
-	HANDLE       hFile,
-	LPVOID       lpBuffer,
-	DWORD        nNumberOfBytesToRead,
-	LPDWORD      lpNumberOfBytesRead,
-	LPOVERLAPPED lpOverlapped)
-{
-	static TCHAR pszFilename[MAX_PATH + 1];
-
-	//if (GetFinalPathNameByHandleA(hFile, pszFilename, sizeof(pszFilename), FILE_NAME_NORMALIZED))
-	//{
-	//	std::filesystem::path path(pszFilename);
-
-	//	FMTK_HIGHLIGHT(lpBuffer);
-	//	//FMTK_BREAKPOINT_IF(path.extension() == ".DPC");
-	//	FMTK_BREAKPOINT_IF(path.filename() == "BUGGY.DPC");
-	//}
-	
-	return Real_ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
-}
-
 using p_float_t = float*;
 
 #include "gadgets/createfilew.hpp"
@@ -68,6 +47,7 @@ using p_float_t = float*;
 #include "gadgets/validatememory.hpp"
 #include "gadgets/createwindowexw.hpp"
 #include "gadgets/getplayerposition.hpp"
+#include "gadgets/readfile.hpp"
 
 bool patchXLive = false;
 
@@ -75,7 +55,7 @@ bool AttachDetoursXLive()
 {
 	ULONG result = 1;
 
-	HINSTANCE hiXLive = GetModuleHandleA("xlive.dll");
+	/*HINSTANCE hiXLive = GetModuleHandleA("xlive.dll");
 
     BYTE signature_ValidateMemory[] = {
 		0x8b, 0xff, 0x55, 0x8b, 0xec, 0x83, 0xec, 0x20, 0x53, 0x56,
@@ -97,7 +77,7 @@ bool AttachDetoursXLive()
 		ATTACHXLIVE(ValidateMemory);
 
 		result = DetourTransactionCommit();
-	}
+	}*/
 	
 	return result;
 }
@@ -106,7 +86,7 @@ bool DetachDetoursXLive()
 {
 	LONG result = 1;
 
-	if (patchXLive)
+	/*if (patchXLive)
 	{
 		DetourTransactionBegin();
 		DetourUpdateThread(GetCurrentThread());
@@ -114,7 +94,7 @@ bool DetachDetoursXLive()
 		DETACHXLIVE(ValidateMemory);
 
 		result = DetourTransactionCommit();
-	}
+	}*/
 
 	return result;
 }

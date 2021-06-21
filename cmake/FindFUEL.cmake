@@ -1,4 +1,6 @@
 set(FUEL_SEARCH_PATHS
+	"${FUEL_DIR}"
+	"$ENV{FUEL_DIR}"
 	"D:\\SteamLibrary\\steamapps\\common\\FUEL"
 	"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FUEL"
 )

@@ -19,13 +19,24 @@ struct FMTKVersion
 	unsigned int tweak = FMTK_VERSION_TWEAK;
 };
 
+enum class LogLevel
+{
+	TRACE,
+	DEBUG,
+	INFO,
+	WARN,
+	ERR,
+	CRITICAL,
+};
+
 struct FMTKApi
 {
 	void (*print)(const char* msg);
 	const char* (*GetModsDirectoryPath)();
 	float* (*GetPlayerPosition)();
-	bool (*RunCommand)(const std::string& cmd);
-	void (*RegisterCommand)(const std::string& name, bool(*callback)());
+	bool (*RunCommand)(const char* cmd);
+	void (*RegisterCommand)(const char* name, bool(*callback)());
+	void (*Log)(LogLevel level, const char* source, const char* msg);
 };
 
 class FMTKMod
@@ -33,6 +44,8 @@ class FMTKMod
 public:
 	virtual void Initialize() {}
 	virtual void Tick() {}
+	virtual void ScriptManagerInitialize() {}
+	virtual void Shutdown() {}
 
 #ifndef FMTK_INTERNAL
 // Placeholder methods for forward compatibility
@@ -56,4 +69,4 @@ FMTKAPI class_name* GetMod(const FMTKApi* fmtkApi) { fmtk = fmtkApi; return &mod
 
 #endif // !FMTK_INTERNAL
 
-#endif // FMTKSDK_HPP
+#endif // !FMTKSDK_HPP

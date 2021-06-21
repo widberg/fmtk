@@ -8,7 +8,7 @@ FF(bool __usercall FMTK_RunCommand AT al)(LPCVOID pState, LPCSTR cmd, DWORD dept
 	RETURN(Real_RunCommand_trampoline(pState, cmd, depth));
 )
 
-bool RunCommand(const std::string& cmd)
+bool RunCommand(const char* cmd)
 {
-	return Real_RunCommand_trampoline(*pGlobalCommandState, cmd.c_str(), 0);
+	return Real_RunCommand_trampoline(*pGlobalCommandState, cmd, 0);
 }

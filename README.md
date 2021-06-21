@@ -5,6 +5,7 @@
 FUEL Modding Toolkit
 
 [![Build Status](https://github.com/widberg/fmtk/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/widberg/fmtk/actions/workflows/build.yml)
+[![Documentation Status](https://readthedocs.org/projects/fmtk/badge/?version=latest)](https://fmtk.readthedocs.io/en/latest/?badge=latest)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/widberg/fmtk)](https://github.com/widberg/fmtk/releases)
 [![Join the chat at https://discord.gg/8uJVY9mWZT](https://img.shields.io/badge/chat-on_discord-7389D8.svg?logo=discord&logoColor=ffffff&labelColor=6A7EC2)](https://discord.gg/8uJVY9mWZT)
 
@@ -40,7 +41,7 @@ Join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FU
 
 ## Documentation
 
-Documentation for mod developers and FMTK developers is available on the [FMTK Wiki](https://github.com/widberg/fmtk/wiki).
+Documentation for mod developers and FMTK developers is available on the [FMTK Wiki](https://github.com/widberg/fmtk/wiki). Work is being done to migrate FMTKSDK and FMTKLua specific documentation to [Read the Docs](fmtk.rtfd.io).
 
 ## Getting Started (For FMTK Developers)
 

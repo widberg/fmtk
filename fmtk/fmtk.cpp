@@ -11,6 +11,7 @@
 #include <toml++/toml.h>
 #include <optional>
 #include <codecvt>
+#include <vector>
 
 #include "debug.hpp"
 #include "logging.hpp"
@@ -54,7 +55,7 @@ int main(int argc, char** argv)
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
     for (int i = 1; i < argc; ++i)
     {
-        arguments += conv.from_bytes(argv[1]) + L" ";
+        arguments += L'\"' + conv.from_bytes(argv[1]) + L"\" ";
     }
 
     std::optional<std::wstring> toml_args = tbl["fmtk"]["args"].value<std::wstring>();
@@ -89,7 +90,16 @@ int main(int argc, char** argv)
 
     DWORD dwFlags = CREATE_DEFAULT_ERROR_MODE | CREATE_SUSPENDED;
 
-    if (!DetourCreateProcessWithDllExW((secuLauncherPath.value() + L" " + arguments).c_str(), NULL,
+    std::wstringstream ss;
+
+    ss << L'\"' << secuLauncherPath.value() << L"\" " << arguments;
+
+    std::vector<wchar_t> buf;
+    buf.resize(ss.str().size() + 1);
+    ss.str().copy(buf.data(), ss.str().size());
+    buf.back() = L'\0';
+
+    if (!DetourCreateProcessWithDllExW(NULL, buf.data(),
         NULL, NULL, TRUE, dwFlags, NULL,
         NULL, &si, &pi, "secudll.dll", NULL))
     {
