@@ -10,10 +10,6 @@ formats:
   - epub
   - pdf
 
-build:
-  apt_packages:
-    - cmake
-
 submodules:
   include:
     - docs/ext/breathe
