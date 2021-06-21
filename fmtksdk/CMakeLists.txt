@@ -1,6 +1,8 @@
-add_library(fmtksdk INTERFACE
-	include/fmtksdk/fmtksdk.hpp.in
-	include/fmtksdk/placeholder.hpp.in
+add_library(fmtksdk INTERFACE)
+
+target_sources(fmtksdk INTERFACE
+	${CMAKE_CURRENT_SOURCE_DIR}/include/fmtksdk/fmtksdk.hpp.in
+	${CMAKE_CURRENT_SOURCE_DIR}/include/fmtksdk/placeholder.hpp.in
 )
 
 target_include_directories(fmtksdk INTERFACE
