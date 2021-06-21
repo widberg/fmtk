@@ -218,7 +218,7 @@ def run_cmake(folder):
 
     try:
         print('running cmake in %s' % folder)
-        retcode = subprocess.call('cmake -DCMAKE_BUILD_TYPE=Release -DFMTK_DOCS=ON ..', cwd=folder)
+        retcode = subprocess.call(['cmake', '-DCMAKE_BUILD_TYPE=Release', '-DFMTK_DOCS=ON', '..'], cwd=folder)
         if retcode < 0:
             sys.stderr.write('cmake terminated by signal %s' % (-retcode))
         retcode = subprocess.call('cmake --build . --target fmtkdocs', cwd=folder)
