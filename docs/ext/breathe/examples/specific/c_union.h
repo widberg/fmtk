@@ -1,5 +1,0 @@
-
-union ACUnion {
-	int i;
-};
-

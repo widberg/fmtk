@@ -16,3 +16,6 @@
 [submodule "dependencies/usercall.hpp"]
 	path = dependencies/usercall.hpp
 	url = https://github.com/widberg/usercall.hpp.git
+[submodule "docs/ext/breathe"]
+	path = docs/ext/breathe
+	url = https://github.com/michaeljones/breathe.git
