@@ -18,6 +18,8 @@ endif()
 
 project(fmtk VERSION 0.0.3.0 LANGUAGES CXX)
 
+option(FMTK_DOCS        "Build documentation." OFF)
+
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE INTERNAL "")
 add_definitions(-DUNICODE -D_UNICODE)
@@ -27,7 +29,9 @@ set_property(GLOBAL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug
 add_subdirectory(dependencies)
 find_package(FUEL)
 
-add_subdirectory(docs)
+if(FMTK_DOCS)
+	add_subdirectory(docs)
+endif()
 
 add_subdirectory(common)
 add_subdirectory(fmtksdk)
