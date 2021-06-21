@@ -56,7 +56,7 @@ enum class LogLevel
 	ERR,
 
 	/**
-	 * \var LogLevel::ERR
+	 * \var LogLevel::CRITICAL
 	 * \brief This is a message for a user that something is wrong and action is necessary. An unrecoverable error.
 	 */
 	CRITICAL,
@@ -133,6 +133,11 @@ public:
 
 #ifndef FMTK_INTERNAL
 
+/**
+ * \internal
+ * \def FMTKAPI
+ * \brief Instruct the compiler on the linkage specifications for a function
+ */
 #define FMTKAPI extern "C" __declspec(dllexport) __declspec(noinline)
 
 /**
@@ -142,7 +147,7 @@ public:
 FMTKAPI const FMTKVersion* GetFMTKVersion();
 
 /**
- * \internal.
+ * \internal
  */
 extern const FMTKVersion fmtkVersion;
 
