@@ -39,3 +39,8 @@
 
 # woke
 .wokeignore
+
+#docs
+docs/build
+docs/Doxyfile
+docs/source/version.py

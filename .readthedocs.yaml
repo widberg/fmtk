@@ -1,0 +1,20 @@
+# Required
+version: 2
+
+# Build documentation in the docs/ directory with Sphinx
+sphinx:
+   configuration: docs/source/conf.py
+
+# Build PDF & ePub
+formats:
+  - epub
+  - pdf
+
+build:
+  apt_packages:
+    - cmake
+
+submodules:
+  include:
+    - breathe
+  recursive: true

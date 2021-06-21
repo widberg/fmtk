@@ -29,10 +29,6 @@ set_property(GLOBAL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug
 add_subdirectory(dependencies)
 find_package(FUEL)
 
-if(FMTK_DOCS)
-	add_subdirectory(docs)
-endif()
-
 add_subdirectory(common)
 add_subdirectory(fmtksdk)
 add_subdirectory(fmtklua)
@@ -40,5 +36,9 @@ add_subdirectory(secudll)
 add_subdirectory(fmtkdll)
 add_subdirectory(fmtk)
 add_subdirectory(package)
+
+if(FMTK_DOCS)
+	add_subdirectory(docs)
+endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT fmtk)

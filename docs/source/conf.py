@@ -8,7 +8,9 @@
 
 # -- Imports -----------------------------------------------------------------
 
+from pathlib import Path
 import os, subprocess, sys
+import version
 
 # -- Path setup --------------------------------------------------------------
 
@@ -34,9 +36,9 @@ copyright = '2021, widberg'
 author = 'widberg'
 
 # The short X.Y version
-version = '0.0.0'
+version = FMTK_VERSION
 # The full version, including alpha/beta/rc tags
-release = '0.0.0'
+release = FMTK_RELEASE
 
 
 # -- General configuration ---------------------------------------------------
@@ -206,23 +208,42 @@ def run_doxygen(folder):
     folder = abspath(folder)
 
     try:
-        print("running doxygen in %s" % folder)
-        retcode = subprocess.call("doxygen", cwd=folder)
+        print('running doxygen in %s' % folder)
+        retcode = subprocess.call('doxygen', cwd=folder)
         if retcode < 0:
-            sys.stderr.write("doxygen terminated by signal %s" % (-retcode))
+            sys.stderr.write('doxygen terminated by signal %s' % (-retcode))
     except OSError as e:
-        sys.stderr.write("doxygen execution failed: %s" % e)
+        sys.stderr.write('doxygen execution failed: %s' % e)
 
 
-def generate_doxygen(app):
-    """Run the doxygen commands"""
+def run_cmake(folder):
+    """Run the cmake command in the designated folder"""
 
-    run_doxygen("..")
+    folder = abspath(folder)
+    Path(folder).mkdir(parents=True, exist_ok=True)
+
+    try:
+        print('running cmake in %s' % folder)
+        retcode = subprocess.call('cmake -DCMAKE_BUILD_TYPE=Release -DFMTK_DOCS=ON ..', cwd=folder)
+        if retcode < 0:
+            sys.stderr.write('cmake terminated by signal %s' % (-retcode))
+        retcode = subprocess.call('cmake --build . --target fmtkdocs', cwd=folder)
+        if retcode < 0:
+            sys.stderr.write('cmake terminated by signal %s' % (-retcode))
+    except OSError as e:
+        sys.stderr.write('cmake execution failed: %s' % e)
+
+
+def builder_inited(app):
+    """Run the cmake command"""
+    run_cmake('../../build')
+    """Run the doxygen command"""
+    run_doxygen(FMTK_DOXYGEN_DIR)
 
 
 def setup(app):
 
     # Add hook for building doxygen when needed
-    app.connect("builder-inited", generate_doxygen)
+    app.connect("builder-inited", builder_inited)
 
     app.add_css_file('style.css')
