@@ -121,7 +121,7 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
-html_logo = abspath('img/logo.png')
+html_logo = abspath('logo.png')
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
