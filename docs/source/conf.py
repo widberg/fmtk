@@ -221,7 +221,7 @@ def run_cmake(folder):
         retcode = subprocess.call(['cmake', '-DCMAKE_BUILD_TYPE=Release', '-DFMTK_READ_THE_DOCS=ON', '..'], cwd=folder)
         if retcode < 0:
             sys.stderr.write('cmake terminated by signal %s' % (-retcode))
-        retcode = subprocess.call('cmake --build . --target fmtkdocs', cwd=folder)
+        retcode = subprocess.call(['cmake', '--build', '.', '--target', 'fmtkdocs'], cwd=folder)
         if retcode < 0:
             sys.stderr.write('cmake terminated by signal %s' % (-retcode))
     except OSError as e:
