@@ -26,7 +26,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 def abspath(relpath):
     return os.path.abspath(os.path.join(script_dir, relpath))
 
-sys.path.append(abspath('../ext/'))
+sys.path.append(abspath('../ext/breathe/'))
 
 # -- Project information -----------------------------------------------------
 
