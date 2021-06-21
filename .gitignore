@@ -36,3 +36,6 @@
 
 # VsCode
 .vscode/
+
+# woke
+.wokeignore
