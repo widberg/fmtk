@@ -48,8 +48,12 @@ public:
 	virtual void Shutdown() {}
 
 #ifndef FMTK_INTERNAL
+#ifndef DOXYGEN
+#ifndef __INTELLISENSE__
 // Placeholder methods for forward compatibility
 @FMTK_PLACEHOLDER_HPP_IN@
+#endif // !__INTELLISENSE__
+#endif // !DOXYGEN
 #endif // !FMTK_INTERNAL
 };
 
