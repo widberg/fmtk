@@ -103,7 +103,7 @@ html_theme = 'sphinx_rtd_theme'
 #
 html_theme_options = {
     'collapse_navigation': False,
-    'style_nav_header_background': '#89609E'
+    'style_nav_header_background': '#AEC6CF'
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -121,7 +121,7 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
-html_logo = abspath('logo.png')
+html_logo = abspath('img/logo.png')
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
