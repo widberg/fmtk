@@ -16,5 +16,5 @@ build:
 
 submodules:
   include:
-    - breathe
+    - docs/ext/breathe
   recursive: true
