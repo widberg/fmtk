@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.10)
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "Prevented in-tree built. Please create a build directory outside of the fmtk source code and call cmake from there")
@@ -18,7 +18,7 @@ endif()
 
 project(fmtk VERSION 0.0.3.0 LANGUAGES CXX)
 
-option(FMTK_DOCS        "Build documentation." OFF)
+option(FMTK_READ_THE_DOCS        "Build documentation." OFF)
 
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE INTERNAL "")
@@ -26,18 +26,21 @@ add_definitions(-DUNICODE -D_UNICODE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" CACHE INTERNAL "")
 set_property(GLOBAL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE INTERNAL "")
 
-add_subdirectory(dependencies)
-find_package(FUEL)
-
-add_subdirectory(common)
 add_subdirectory(fmtksdk)
-add_subdirectory(fmtklua)
-add_subdirectory(secudll)
-add_subdirectory(fmtkdll)
-add_subdirectory(fmtk)
-add_subdirectory(package)
 
-if(FMTK_DOCS)
+if(NOT FMTK_READ_THE_DOCS)
+	add_subdirectory(dependencies)
+	find_package(FUEL)	
+
+	add_subdirectory(common)
+	add_subdirectory(fmtklua)
+	add_subdirectory(secudll)
+	add_subdirectory(fmtkdll)
+	add_subdirectory(fmtk)
+	add_subdirectory(package)
+endif()
+
+if(FMTK_READ_THE_DOCS)
 	add_subdirectory(docs)
 endif()
 
