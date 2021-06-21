@@ -19,23 +19,97 @@ struct FMTKVersion
 	unsigned int tweak = FMTK_VERSION_TWEAK;
 };
 
+/**
+ * \enum LogLevel
+ * \brief Log levels available for use with Log
+ */
 enum class LogLevel
 {
+	/**
+	 * \var LogLevel::TRACE
+	 * \brief This is a message for an FMTK developer. Exclude it from release builds.
+	 */
 	TRACE,
+
+	/**
+	 * \var LogLevel::DEBUG
+	 * \brief This is a message for a mod developer.
+	 */
 	DEBUG,
+
+	/**
+	 * \var LogLevel::INFO
+	 * \brief This is a message for a user that everythong is fine and no action is necessary.
+	 */
 	INFO,
+
+	/**
+	 * \var LogLevel::WARN
+	 * \brief This is a message for a user that something may be wrong but no action is necessary.
+	 */
 	WARN,
+
+	/**
+	 * \var LogLevel::ERR
+	 * \brief This is a message for a user that something is wrong but no action is necessary. A recoverable error.
+	 */
 	ERR,
+
+	/**
+	 * \var LogLevel::ERR
+	 * \brief This is a message for a user that something is wrong and action is necessary. An unrecoverable error.
+	 */
 	CRITICAL,
 };
 
+/**
+ * \struct FMTKApi
+ * \brief This structure contains pointers to FMTK functions that should be filled in when the mod is loaded.
+ */
 struct FMTKApi
 {
-	void (*print)(const char* msg);
+	/**
+	 * \brief Get the mods directory path
+	 *
+	 * Get the absolute path of the mods directory as a c-style string.
+	 * \return A c-style string containing the absolute path of the mods directory.
+	 */
 	const char* (*GetModsDirectoryPath)();
+
+	/**
+	 * \brief Get the players position
+	 *
+	 * Get the players position as a 3 element float array.
+	 * \return A pointer to a 3 element float array containing the XZY components of the player's position. Will be null if the players position cannot be obtained. This pointer is owned by FMTK and should not be freed.
+	 */
 	float* (*GetPlayerPosition)();
+
+	/**
+	 * \brief Run a command string
+	 *
+	 * Run a command string.
+	 * \param cmd A c-style string containing the command string. Owned by the caller.
+	 * \return A bool that is true if the command ran successfully and false if it failed.
+	 */
 	bool (*RunCommand)(const char* cmd);
+
+	/**
+	 * \brief Register a command
+	 *
+	 * Register a command.
+	 * \param name A c-style string containing the command name. The abbreviated version of the command name will be generated from the capital letters taken in left to right order.
+	 * \param callback A pointer to a callback function to be run when the command is invoked.
+	 */
 	void (*RegisterCommand)(const char* name, bool(*callback)());
+
+	/**
+	 * \brief Submit a log message
+	 *
+	 * Submit a log message to FMTK to be output to the console and written to the log file as applicable.
+	 * \param level The severity of the incident being logged.
+	 * \param source A c-style string containing the name of the event's source. This should be the name of the mod calling the function.
+	 * \param msg A c-style string containing the message to be logged.
+	 */
 	void (*Log)(LogLevel level, const char* source, const char* msg);
 };
 
@@ -60,16 +134,34 @@ public:
 #ifndef FMTK_INTERNAL
 
 #define FMTKAPI extern "C" __declspec(dllexport) __declspec(noinline)
+
+/**
+ * \brief Get a pointer to the version of the FMTKSDK used to build the mod.
+ * \return A pointer to an FMTKVersion struct owned by the mod. This should not be freed.
+ */
 FMTKAPI const FMTKVersion* GetFMTKVersion();
+
+/**
+ * \internal.
+ */
 extern const FMTKVersion fmtkVersion;
+
+/**
+ * \brief A pointer to an FMTKApi struct owned by FMTK and automatically initialized when the mod is registered. This should not be freed.
+ */
 extern const FMTKApi* fmtk;
 
+/**
+ * \def REGISTER_MOD(class_name)
+ * \brief Generates the necessary functions for the mod to be loaded by FMTK and initialize the fmtk global variable. This macro should only be used once per dll. This macro must appear after the mod class has been defined.
+ * \param class_name The fully qualified name of the class implementing FMTKMod. There should only be one class implementing FMTKMod per dll.
+ */
 #define REGISTER_MOD(class_name) \
-const FMTKVersion fmtkVersion; \
-const FMTKApi* fmtk; \
-FMTKAPI const FMTKVersion* GetFMTKVersion() { return &fmtkVersion; } \
-class_name mod; \
-FMTKAPI class_name* GetMod(const FMTKApi* fmtkApi) { fmtk = fmtkApi; return &mod; }
+	const FMTKVersion fmtkVersion; \
+	const FMTKApi* fmtk; \
+	FMTKAPI const FMTKVersion* GetFMTKVersion() { return &fmtkVersion; } \
+	class_name mod; \
+	FMTKAPI class_name* GetMod(const FMTKApi* fmtkApi) { fmtk = fmtkApi; return &mod; }
 
 #endif // !FMTK_INTERNAL
 
