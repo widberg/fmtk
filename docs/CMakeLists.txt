@@ -3,5 +3,5 @@ add_custom_target(fmtkdocs ALL
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 file(GENERATE OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile INPUT Doxyfile.in)
-configure_file(source/version.py.in ${CMAKE_CURRENT_SOURCE_DIR}/source/version.py @ONLY)
+configure_file(source/version.txt.in ${CMAKE_CURRENT_SOURCE_DIR}/source/version.txt @ONLY)
 add_dependencies(fmtkdocs fmtksdk)

@@ -10,7 +10,6 @@
 
 from pathlib import Path
 import os, subprocess, sys
-import version
 
 # -- Path setup --------------------------------------------------------------
 
@@ -36,9 +35,11 @@ copyright = '2021, widberg'
 author = 'widberg'
 
 # The short X.Y version
-version = FMTK_VERSION
+with open('version.txt') as f:
+    version = f.readline()
+
 # The full version, including alpha/beta/rc tags
-release = FMTK_RELEASE
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -238,7 +239,7 @@ def builder_inited(app):
     """Run the cmake command"""
     run_cmake('../../build')
     """Run the doxygen command"""
-    run_doxygen(FMTK_DOXYGEN_DIR)
+    run_doxygen('../')
 
 
 def setup(app):
