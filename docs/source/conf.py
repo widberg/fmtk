@@ -35,7 +35,7 @@ author = 'widberg'
 
 with open('../CMakeLists.txt') as f:
     for line in f.readlines():
-        m = re.find(r'^project\(fmtk.+VERSION\s+(\d+\.\d+\.\d+\.\d+).+\)$', line)
+        m = re.match(r'^project\(fmtk.+VERSION\s+(\d+\.\d+\.\d+\.\d+).+\)$', line)
         if m:
             version = m.group(1)
 
