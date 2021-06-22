@@ -3,6 +3,8 @@
 #include <cstring>
 #include <locale>
 #include <codecvt>
+#include <algorithm>
+#include <cwctype>
 
 #include <filesystem>
 #include <toml++/toml.h>
@@ -55,6 +57,17 @@ void Log(LogLevel level, const char* source, const char* msg)
     }
 }
 
+void Alias(const char* originalPath, const char* newPath)
+{
+    std::wstring originalPathString = std::filesystem::absolute(originalPath).wstring();
+    std::transform(originalPathString.begin(), originalPathString.end(), originalPathString.begin(), std::towlower);
+
+    std::wstring newPathString = std::filesystem::absolute(newPath).wstring();
+    std::transform(newPathString.begin(), newPathString.end(), newPathString.begin(), std::towlower);
+
+    aliases[originalPathString] = newPathString;
+}
+
 FMTKApi fmtkApi
 {
     GetModsDirectoryPath,
@@ -63,6 +76,7 @@ FMTKApi fmtkApi
     RegisterCommand,
     UnregisterCommand,
     Log,
+    Alias,
 };
 
 bool loadModDll(const std::filesystem::path& modDllPath)

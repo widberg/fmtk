@@ -120,6 +120,9 @@ public:
 		);
 
 		fmtk_table.set_function("hook", Hook);
+		fmtk_table.set_function("unhook", Unhook);
+
+		fmtk_table.set_function("alias", fmtk->Alias);
 
 		fmtk_table.set_function("get_fmtklua_version", [&]() -> sol::table { return lua.create_table_with("major", FMTK_VERSION_MAJOR, "minor", FMTK_VERSION_MINOR, "patch", FMTK_VERSION_PATCH, "tweak", FMTK_VERSION_TWEAK); });
 		fmtk_table.set_function("run_command", [&](const std::string& cmd) { fmtk->RunCommand(cmd.c_str()); });
