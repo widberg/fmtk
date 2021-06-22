@@ -68,6 +68,14 @@ void Alias(const char* originalPath, const char* newPath)
     aliases[originalPathString] = newPathString;
 }
 
+void Unalias(const char* originalPath)
+{
+    std::wstring originalPathString = std::filesystem::absolute(originalPath).wstring();
+    std::transform(originalPathString.begin(), originalPathString.end(), originalPathString.begin(), std::towlower);
+
+    aliases.erase(originalPathString);
+}
+
 FMTKApi fmtkApi
 {
     GetModsDirectoryPath,
@@ -77,6 +85,7 @@ FMTKApi fmtkApi
     UnregisterCommand,
     Log,
     Alias,
+    Unalias,
 };
 
 bool loadModDll(const std::filesystem::path& modDllPath)

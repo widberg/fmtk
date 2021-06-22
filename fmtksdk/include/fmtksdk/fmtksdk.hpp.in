@@ -172,6 +172,14 @@ public:
 	 * \param newPath The new path relative to FUEL's working directory. Case insensitive.
 	 */
 	void (*Alias)(const char* originalPath, const char* newPath);
+
+	/**
+	 * \brief Unalias a path
+	 *
+	 * Instruct fuel to open the originalPath whenever it tries to open originalPath undoing a previous Alias call.
+	 * \param originalPath The original path relative to FUEL's working directory. Case insensitive.
+	 */
+	void (*Unalias)(const char* originalPath);
 };
 
 /**

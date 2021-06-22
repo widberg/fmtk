@@ -137,6 +137,7 @@ public:
 
 		auto fmtk_fs_table = lua["fmtk"]["fs"].get_or_create<sol::table>();
 		fmtk_fs_table.set_function("alias", fmtk->Alias);
+		fmtk_fs_table.set_function("unalias", fmtk->Unalias);
 		fmtk_fs_table.set_function("get_mods_directory_path", [&]() { modsDirectory; });
 		fmtk_fs_table.set_function("get_current_file_path",
 			[&](sol::this_state ts) -> std::string

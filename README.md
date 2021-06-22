@@ -11,7 +11,7 @@ FUEL Modding Toolkit
 
 ## Features
 
-* Fully compatible with "FUEL: REFUELED" by default
+* Fully compatible with "FUEL: REFUELED", "FUEL: RESHADED", and other legacy mods by default
 * Lua scripting engine
 * C++ Native Plugin interface for advanced mods
 * Callback hooks to game events
