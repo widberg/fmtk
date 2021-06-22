@@ -52,9 +52,9 @@ Documentation for mod developers and FMTK developers is available on the [FMTK W
 
 These are projects that are related to researching FUEL but not directly part of the modding process.
 
-* [https://github.com/widberg/dpc](widberg/dpc) - Tar analogous utility to work with the DPC file format
-* [https://github.com/widberg/fuel-brute](widberg/fuel-brute) - CRC32 Brute Force Solver For FUEL
-* [https://github.com/widberg/fuel-map](widberg/fuel-map) - It's just information about the map
+* [dpc](https://github.com/widberg/dpc) - Tar analogous utility to work with the DPC file format
+* [fuel-brute](https://github.com/widberg/fuel-brute) - CRC32 Brute Force Solver For FUEL
+* [fuel-map](https://github.com/widberg/fuel-map) - It's just information about the map
 
 ## Getting Started (For FMTK Developers)
 
