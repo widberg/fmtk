@@ -173,24 +173,28 @@ class FMTKMod
 public:
 	/**
 	* \brief Initialize Hook
+	*
 	* This function is called before the games WinMain entry point. At this point the ScriptManager is unavailable so calls to command functions will fail. This will always be the first hook to run.
 	*/
 	virtual void Initialize() {}
 	
 	/**
 	* \brief Tick Hook
+	*
 	* This function is called once per execution of the games CoreMainLoop function.
 	*/
 	virtual void Tick() {}
 	
 	/**
 	* \brief ScriptManagerInitialize Hook
+	*
 	* This function is called once the ScriptManager is initialized. This is the first legal place to call command functions.
 	*/
 	virtual void ScriptManagerInitialize() {}
 	
 	/**
 	* \brief Shutdown Hook
+	*
 	* This function is called before the FMTK dll is unloaded. This will always be the last hook to run.
 	*/
 	virtual void Shutdown() {}

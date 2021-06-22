@@ -38,6 +38,7 @@ with open('../../CMakeLists.txt') as f:
         m = re.match(r'^project\(fmtk.+VERSION\s+(\d+\.\d+\.\d+).+\)$', line)
         if m:
             version = m.group(1)
+            break
 
 release = version
 
@@ -104,7 +105,6 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 html_theme_options = {
-    'collapse_navigation': False,
     'style_nav_header_background': '#1e5696'
 }
 

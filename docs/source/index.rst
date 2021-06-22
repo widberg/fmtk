@@ -2,7 +2,7 @@ Welcome to FMTK's documentation!
 ===================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: FMTK SDK
    :name: sec-fmtksdk
 
