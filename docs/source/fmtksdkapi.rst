@@ -1,4 +1,4 @@
 FMTK SDK API
 ============
 
-.. doxygenfile:: fmtksdk.hpp
+.. doxygenfile:: fmtksdk.hpp.in
