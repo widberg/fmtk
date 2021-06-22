@@ -188,7 +188,7 @@ public:
 	/**
 	* \brief ScriptManagerInitialize Hook
 	*
-	* This function is called once the ScriptManager is initialized. This is the first legal place to call command functions.
+	* This function is called once the ScriptManager is initialized. This is the first legal place to call the register command function. None of the FUEL commands have been registered yet so RunCommand with them will fail.
 	*/
 	virtual void ScriptManagerInitialize() {}
 	
