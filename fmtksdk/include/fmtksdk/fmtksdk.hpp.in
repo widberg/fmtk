@@ -109,8 +109,9 @@ enum class LogLevel
 /**
  * \brief This structure contains pointers to FMTK functions that should be filled in when the mod is loaded.
  */
-struct FMTKApi
+class FMTKApi
 {
+public:
 	/**
 	 * \brief Get the mods directory path
 	 *
