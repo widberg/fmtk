@@ -8,8 +8,7 @@
 
 # -- Imports -----------------------------------------------------------------
 
-from pathlib import Path
-import os, subprocess, sys
+import os, subprocess, sys, re
 
 # -- Path setup --------------------------------------------------------------
 
@@ -34,7 +33,12 @@ project = 'FMTK'
 copyright = '2021, widberg'
 author = 'widberg'
 
-version = '0.0.0'
+with open('../CMakeLists.txt') as f:
+    for line in f.readlines():
+        m = re.find(r'^project\(fmtk.+VERSION\s+(\d+\.\d+\.\d+\.\d+).+\)$', line)
+        if m:
+            version = m.group(1)
+
 release = version
 
 # -- General configuration ---------------------------------------------------
