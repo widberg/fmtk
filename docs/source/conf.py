@@ -33,7 +33,11 @@ project = 'FMTK'
 copyright = '2021, widberg'
 author = 'widberg'
 
-version = '0.0.0'
+with open('../../CMakeLists.txt') as f:
+    for line in f.readlines():
+        m = re.match(r'^project\(fmtk.+VERSION\s+(\d+\.\d+\.\d+).+\)$', line)
+        if m:
+            version = m.group(1)
 
 release = version
 
