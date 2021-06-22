@@ -57,11 +57,11 @@ void Log(LogLevel level, const char* source, const char* msg)
 
 FMTKApi fmtkApi
 {
-    print,
     GetModsDirectoryPath,
     GetPlayerPosition,
     RunCommand,
     RegisterCommand,
+    UnregisterCommand,
     Log,
 };
 

@@ -30,10 +30,15 @@ FMTK is fully compatible with legally obtained retail and Steam release copies o
 
 ## Installing (For Users and Mod Developers)
 
-1. Download the latest release from the [releases page](https://github.com/widberg/fmtk/releases)
-2. Unzip the release into the root FUEL directory (the directory containing `FUEL.exe`)
-3. Verify that `fmtk.exe`, `fmtkdll.dll`, `secudll.dll`, `mods`, and `FUEL.exe` are all in the same directory
-4. Run `fmtk.exe`
+1. Verify that your FUEL installation is stock and all of the executable files have their original names.
+  - If you have renamed `FUEL.exe`, `GameSetup.exe`, or `SecuLauncher.exe`, now would be the time to revert them to their original names. If you have a Steam copy, this can be done with the "Verify integrity of game files..." button in the "Local Files" tab of FUEL's Steam "Properties..." menu.
+  - This requirement will be removed in future releases once fingerprinting is implemented.
+2. Download the latest release from the [releases page](https://github.com/widberg/fmtk/releases)
+3. Unzip the release into the root FUEL directory (the directory containing `FUEL.exe`)
+4. Verify that `fmtk.exe`, `fmtkdll.dll`, `secudll.dll`, `mods`, and your `FUEL.exe` are all in the same directory
+5. Run `fmtk.exe`
+
+**FMTK mods are only loaded when the fmtk.exe "Blue FUEL" launcher is used to run the game. To run the game without mods enabled, simply launch it how you normally would without FMTK; uninstalling FMTK is unnecessary. You can uninstall FMTK and all FMTK mods at any time by running the included `uninstall_fmtk.bat` script from the root FUEL directory.**
 
 ## Discord
 

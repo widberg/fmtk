@@ -22,7 +22,7 @@ public:
 		lua["package"]["cpath"] = modsDirectory + "\\lua\\share\\?.dll;" + package_cpath;
 
 		auto fmtk_table = lua["fmtk"].get_or_create<sol::table>();
-		fmtk_table.set_function("print", [&](const std::string& msg) { fmtk->print(msg.c_str()); });
+		fmtk_table.set_function("print", [&](const std::string& msg) { fmtk->Log(LogLevel::TRACE, "FMTKLua", msg.c_str()); });
 		fmtk_table.set_function("get_fmtklua_version", [&]() -> sol::table { return lua.create_table_with("major", FMTK_VERSION_MAJOR, "minor", FMTK_VERSION_MINOR, "patch", FMTK_VERSION_PATCH, "tweak", FMTK_VERSION_TWEAK); });
 
 		auto fmtk_fs_table = lua["fmtk"]["fs"].get_or_create<sol::table>();
@@ -36,14 +36,14 @@ public:
 				int pre_stack_size = lua_gettop(L);
 				if (lua_getstack(L, level, &ar) != 1) {
 					// failure: call it quits
-					fmtk->print("error: unable to traverse the stack");
+					fmtk->Log(LogLevel::TRACE, "FMTKLua", "error: unable to traverse the stack");
 					lua_settop(L, pre_stack_size);
 					return "";
 				}
 
 				if (lua_getinfo(L, "fnluS", &ar) == 0)
 				{
-					fmtk->print("get_current_file_path failed");
+					fmtk->Log(LogLevel::TRACE, "FMTKLua", "get_current_file_path failed");
 					return "";
 				}
 
@@ -53,7 +53,7 @@ public:
 				}
 				else
 				{
-					fmtk->print("get_current_file_path not a file");
+					fmtk->Log(LogLevel::TRACE, "FMTKLua", "get_current_file_path not a file");
 					return "";
 				}
 			});
@@ -62,7 +62,7 @@ public:
 
 		if (!result.valid()) {
 			sol::error err = result;
-			fmtk->print(err.what());
+			fmtk->Log(LogLevel::TRACE, "FMTKLua", err.what());
 		}
 	}
 
@@ -75,7 +75,7 @@ public:
 			if (vec = fmtk->GetPlayerPosition())
 			{
 				std::string s = "X: " + std::to_string(vec[0]) + ", Z: " + std::to_string(vec[1]) + ", Y: " + std::to_string(vec[2]);
-				fmtk->print(s.c_str());
+				fmtk->Log(LogLevel::TRACE, "FMTKLua", s.c_str());
 			}
 			timer = 0;
 		}

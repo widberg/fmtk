@@ -8,7 +8,8 @@ long DetachDetours();
 
 float* GetPlayerPosition();
 bool RunCommand(const char* cmd);
-void RegisterCommand(const char* name, bool(*callback)());
+void RegisterCommand(const char* name, bool(*callback)(int argc, const char** argv));
+void UnregisterCommand(const char* name);
 
 #define BROADCAST(name, ...) do { for (auto mod : mods) mod->name(__VA_ARGS__); } while(0)
 

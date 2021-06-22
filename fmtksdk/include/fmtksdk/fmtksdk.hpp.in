@@ -1,4 +1,7 @@
 #ifndef FMTKSDK_HPP
+/**
+ * \internal
+ */
 #define FMTKSDK_HPP
 
 #ifndef FMTK_VERSION
@@ -140,7 +143,15 @@ struct FMTKApi
 	 * \param name A c-style string containing the command name. The abbreviated version of the command name will be generated from the capital letters taken in left to right order.
 	 * \param callback A pointer to a callback function to be run when the command is invoked.
 	 */
-	void (*RegisterCommand)(const char* name, bool(*callback)());
+	void (*RegisterCommand)(const char* name, bool(*callback)(int argc, const char** argv));
+
+	/**
+	 * \brief Unregister a command
+	 *
+	 * Remove a previously registered command callback.
+	 * \param name A c-style string containing the command name. Both the long form and short form are accepted.
+	 */
+	void (*UnregisterCommand)(const char* name);
 
 	/**
 	 * \brief Submit a log message

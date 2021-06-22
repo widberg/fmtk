@@ -18,7 +18,7 @@ endif()
 
 project(fmtk VERSION 0.0.3.0 LANGUAGES CXX)
 
-option(FMTK_READ_THE_DOCS        "Build only the documentation." OFF)
+option(FMTK_DOCS        "Build only the documentation." OFF)
 
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE INTERNAL "")
@@ -26,19 +26,19 @@ add_definitions(-DUNICODE -D_UNICODE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" CACHE INTERNAL "")
 set_property(GLOBAL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE INTERNAL "")
 
+find_package(FUEL)
+add_subdirectory(dependencies)
+
 add_subdirectory(fmtksdk)
+add_subdirectory(common)
+add_subdirectory(fmtklua)
+add_subdirectory(secudll)
+add_subdirectory(fmtkdll)
+add_subdirectory(fmtk)
+add_subdirectory(package)
 
-if(FMTK_READ_THE_DOCS)
+if(FMTK_DOCS)
 	add_subdirectory(docs)
-else()
-	add_subdirectory(dependencies)
-	find_package(FUEL)	
-
-	add_subdirectory(common)
-	add_subdirectory(fmtklua)
-	add_subdirectory(secudll)
-	add_subdirectory(fmtkdll)
-	add_subdirectory(fmtk)
-	add_subdirectory(package)
-	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT fmtk)	
 endif()
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT fmtk)
