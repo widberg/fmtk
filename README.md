@@ -38,7 +38,7 @@ FMTK is fully compatible with legally obtained retail and Steam release copies o
 4. Verify that `fmtk.exe`, `fmtkdll.dll`, `secudll.dll`, `mods`, and your `FUEL.exe` are all in the same directory
 5. Run `fmtk.exe`
 
-In the event of a crash or other game state locking event, i.e. shader compilation error or "The Game Disk Could Not be Read" error, please check the `fmtk.log` file in the root FUEL directory. If you cannot resolve the reported error yourself then please open an issue or contact an FMTK developer directly.
+In the event of a crash or other game state locking event, i.e. "Error: Shaders processing has failed."  or "The Game Disk Could Not be Read", please check the `fmtk.log` file in the root FUEL directory. If you cannot resolve the reported error yourself then please open an issue or contact an FMTK developer directly.
 
 **FMTK mods are only loaded when the fmtk.exe "Blue FUEL" launcher is used to run the game. To run the game without mods enabled, simply launch it how you normally would without FMTK; uninstalling FMTK is unnecessary. You can uninstall FMTK and all FMTK mods at any time by running the included `uninstall_fmtk.bat` script from the root FUEL directory.**
 
@@ -48,7 +48,7 @@ Join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FU
 
 ## Documentation
 
-Documentation for mod developers and FMTK developers is available on the [FMTK Wiki](https://github.com/widberg/fmtk/wiki). Work is being done to migrate FMTKSDK and FMTKLua specific documentation to [Read the Docs](https://fmtk.rtfd.io).
+Documentation for mod developers is available on [Read the Docs](https://fmtk.rtfd.io). Documentation for mod developers and FMTK developers is available on the [FMTK Wiki](https://github.com/widberg/fmtk/wiki). Work is being done to migrate mod developer specific information from the FMTK Wiki to Read the Docs.
 
 ## Related Projects
 

@@ -105,7 +105,7 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 html_theme_options = {
-    'collapse_navigation': False
+    'collapse_navigation': False,
     'style_nav_header_background': '#1e5696'
 }
 
