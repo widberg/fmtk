@@ -122,8 +122,6 @@ public:
 		fmtk_table.set_function("hook", Hook);
 		fmtk_table.set_function("unhook", Unhook);
 
-		fmtk_table.set_function("alias", fmtk->Alias);
-
 		fmtk_table.set_function("get_fmtklua_version", [&]() -> sol::table { return lua.create_table_with("major", FMTK_VERSION_MAJOR, "minor", FMTK_VERSION_MINOR, "patch", FMTK_VERSION_PATCH, "tweak", FMTK_VERSION_TWEAK); });
 		fmtk_table.set_function("run_command", [&](const std::string& cmd) { fmtk->RunCommand(cmd.c_str()); });
 		fmtk_table.set_function("register_command", RegisterCommand);
@@ -138,6 +136,7 @@ public:
 		fmtk_log_table.set_function("critical", [&](const std::string& source, const std::string& msg) { fmtk->Log(LogLevel::CRITICAL, source.c_str(), msg.c_str()); });
 
 		auto fmtk_fs_table = lua["fmtk"]["fs"].get_or_create<sol::table>();
+		fmtk_fs_table.set_function("alias", fmtk->Alias);
 		fmtk_fs_table.set_function("get_mods_directory_path", [&]() { modsDirectory; });
 		fmtk_fs_table.set_function("get_current_file_path",
 			[&](sol::this_state ts) -> std::string
