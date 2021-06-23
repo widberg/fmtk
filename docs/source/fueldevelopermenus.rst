@@ -4,7 +4,7 @@ Developer Menus
 Command Palette
 ---------------
 
-See the :ref:`Commands documentation entry<fuelcommands>`.
+See the :ref:`Commands documentation entry<Commands>`.
 
 Teleport
 --------
