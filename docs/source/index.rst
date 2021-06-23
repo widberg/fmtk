@@ -13,4 +13,5 @@ Welcome to FMTK's documentation!
    :caption: FMTK Lua
    :name: sec-fmtklua
 
+   fmtkluaenvironment
    fmtkluaapi
