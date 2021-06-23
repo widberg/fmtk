@@ -1,0 +1,514 @@
+[
+    {
+        "file_path": "fmtk.luadoc",
+        "classes": [
+            {
+                "name": "event",
+                "name_in_source": "event",
+                "methods": [],
+                "short_desc": "Event enum",
+                "desc": "",
+                "usage": "",
+                "inherits_from": [],
+                "fields": [
+                    {
+                        "name": "INITIALIZE",
+                        "desc": "This hook is called before the game's WinMain entry point. At this point the ScriptManager is unavailable so calls to command functions will fail. This will always be the first hook to run.",
+                        "type": {
+                            "id": "number"
+                        },
+                        "visibility": "public"
+                    },
+                    {
+                        "name": "TICK",
+                        "desc": "This hook is called once per execution of the game's CoreMainLoop function.",
+                        "type": {
+                            "id": "number"
+                        },
+                        "visibility": "public"
+                    },
+                    {
+                        "name": "SCRIPT_MANAGER_INITIALIZE",
+                        "desc": "This hook is called once the ScriptManager is initialized. This is the first legal place to call the register command function. None of the FUEL commands have been registered yet so RunCommand with them will fail.",
+                        "type": {
+                            "id": "number"
+                        },
+                        "visibility": "public"
+                    },
+                    {
+                        "name": "SHUTDOWN",
+                        "desc": "This hook is called before the FMTK dll is unloaded. This will always be the last hook to run.",
+                        "type": {
+                            "id": "number"
+                        },
+                        "visibility": "public"
+                    }
+                ]
+            },
+            {
+                "name": "fs",
+                "name_in_source": "fs",
+                "methods": [
+                    {
+                        "name": "alias",
+                        "short_desc": "alias a file path",
+                        "desc": "",
+                        "params": [
+                            {
+                                "name": "oldPath",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            },
+                            {
+                                "name": "newPath",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            }
+                        ],
+                        "returns": [],
+                        "usage": "",
+                        "is_virtual": false,
+                        "is_abstract": false,
+                        "is_deprecated": false,
+                        "is_static": true,
+                        "visibility": "public",
+                        "start_char": 1512,
+                        "stop_char": 1550
+                    },
+                    {
+                        "name": "unalias",
+                        "short_desc": "unalias a file path",
+                        "desc": "",
+                        "params": [
+                            {
+                                "name": "oldPath",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            }
+                        ],
+                        "returns": [],
+                        "usage": "",
+                        "is_virtual": false,
+                        "is_abstract": false,
+                        "is_deprecated": false,
+                        "is_static": true,
+                        "visibility": "public",
+                        "start_char": 1601,
+                        "stop_char": 1632
+                    },
+                    {
+                        "name": "get_mods_directory_path",
+                        "short_desc": "get the mods directory path",
+                        "desc": "",
+                        "params": [],
+                        "returns": [
+                            {
+                                "desc": "absolute mods directory path",
+                                "type": {
+                                    "id": "string"
+                                }
+                            }
+                        ],
+                        "usage": "",
+                        "is_virtual": false,
+                        "is_abstract": false,
+                        "is_deprecated": false,
+                        "is_static": true,
+                        "visibility": "public",
+                        "start_char": 1713,
+                        "stop_char": 1753
+                    },
+                    {
+                        "name": "get_current_file_path",
+                        "short_desc": "get the current lua file path",
+                        "desc": "",
+                        "params": [],
+                        "returns": [
+                            {
+                                "desc": "absolute current lua file path",
+                                "type": {
+                                    "id": "string"
+                                }
+                            }
+                        ],
+                        "usage": "",
+                        "is_virtual": false,
+                        "is_abstract": false,
+                        "is_deprecated": false,
+                        "is_static": true,
+                        "visibility": "public",
+                        "start_char": 1838,
+                        "stop_char": 1876
+                    }
+                ],
+                "short_desc": "FMTK file system module",
+                "desc": "",
+                "usage": "",
+                "inherits_from": [],
+                "fields": []
+            },
+            {
+                "name": "log",
+                "name_in_source": "log",
+                "methods": [
+                    {
+                        "name": "trace",
+                        "short_desc": "log a trace message",
+                        "desc": "",
+                        "params": [
+                            {
+                                "name": "source",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            },
+                            {
+                                "name": "msg",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            }
+                        ],
+                        "returns": [],
+                        "usage": "",
+                        "is_virtual": false,
+                        "is_abstract": false,
+                        "is_deprecated": false,
+                        "is_static": true,
+                        "visibility": "public",
+                        "start_char": 1990,
+                        "stop_char": 2024
+                    },
+                    {
+                        "name": "debug",
+                        "short_desc": "log a debug message",
+                        "desc": "",
+                        "params": [
+                            {
+                                "name": "source",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            },
+                            {
+                                "name": "msg",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            }
+                        ],
+                        "returns": [],
+                        "usage": "",
+                        "is_virtual": false,
+                        "is_abstract": false,
+                        "is_deprecated": false,
+                        "is_static": true,
+                        "visibility": "public",
+                        "start_char": 2095,
+                        "stop_char": 2129
+                    },
+                    {
+                        "name": "info",
+                        "short_desc": "log an info message",
+                        "desc": "",
+                        "params": [
+                            {
+                                "name": "source",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            },
+                            {
+                                "name": "msg",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            }
+                        ],
+                        "returns": [],
+                        "usage": "",
+                        "is_virtual": false,
+                        "is_abstract": false,
+                        "is_deprecated": false,
+                        "is_static": true,
+                        "visibility": "public",
+                        "start_char": 2200,
+                        "stop_char": 2233
+                    },
+                    {
+                        "name": "warn",
+                        "short_desc": "log a warining",
+                        "desc": "",
+                        "params": [
+                            {
+                                "name": "source",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            },
+                            {
+                                "name": "msg",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            }
+                        ],
+                        "returns": [],
+                        "usage": "",
+                        "is_virtual": false,
+                        "is_abstract": false,
+                        "is_deprecated": false,
+                        "is_static": true,
+                        "visibility": "public",
+                        "start_char": 2299,
+                        "stop_char": 2332
+                    },
+                    {
+                        "name": "error",
+                        "short_desc": "log an error",
+                        "desc": "",
+                        "params": [
+                            {
+                                "name": "source",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            },
+                            {
+                                "name": "msg",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            }
+                        ],
+                        "returns": [],
+                        "usage": "",
+                        "is_virtual": false,
+                        "is_abstract": false,
+                        "is_deprecated": false,
+                        "is_static": true,
+                        "visibility": "public",
+                        "start_char": 2396,
+                        "stop_char": 2430
+                    },
+                    {
+                        "name": "critical",
+                        "short_desc": "log a critical error",
+                        "desc": "",
+                        "params": [
+                            {
+                                "name": "source",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            },
+                            {
+                                "name": "msg",
+                                "desc": "",
+                                "type": {
+                                    "id": "string"
+                                },
+                                "is_opt": false,
+                                "default_value": ""
+                            }
+                        ],
+                        "returns": [],
+                        "usage": "",
+                        "is_virtual": false,
+                        "is_abstract": false,
+                        "is_deprecated": false,
+                        "is_static": true,
+                        "visibility": "public",
+                        "start_char": 2502,
+                        "stop_char": 2539
+                    }
+                ],
+                "short_desc": "FMTK log module",
+                "desc": "",
+                "usage": "",
+                "inherits_from": [],
+                "fields": []
+            }
+        ],
+        "functions": [
+            {
+                "name": "get_fmtklua_version",
+                "short_desc": "get the version of FMTK SDK that was used to build FMTKLua",
+                "desc": "",
+                "params": [],
+                "returns": [
+                    {
+                        "desc": "version",
+                        "type": {
+                            "id": "custom",
+                            "name": "table"
+                        }
+                    }
+                ],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 251,
+                "stop_char": 289
+            },
+            {
+                "name": "run_command",
+                "short_desc": "run a command string",
+                "desc": "",
+                "params": [
+                    {
+                        "name": "cmd",
+                        "desc": "",
+                        "type": {
+                            "id": "string"
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    }
+                ],
+                "returns": [
+                    {
+                        "desc": "success",
+                        "type": {
+                            "id": "boolean"
+                        }
+                    }
+                ],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 361,
+                "stop_char": 394
+            },
+            {
+                "name": "register_command",
+                "short_desc": "register command",
+                "desc": "",
+                "params": [
+                    {
+                        "name": "name",
+                        "desc": "",
+                        "type": {
+                            "id": "string"
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    },
+                    {
+                        "name": "callback",
+                        "desc": "",
+                        "type": {
+                            "id": "callable",
+                            "arg_types": [
+                                {
+                                    "id": "array",
+                                    "type": {
+                                        "id": "string"
+                                    }
+                                }
+                            ],
+                            "return_types": [
+                                {
+                                    "id": "boolean"
+                                }
+                            ]
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    }
+                ],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 482,
+                "stop_char": 531
+            },
+            {
+                "name": "unregister_command",
+                "short_desc": "unregister a command",
+                "desc": "",
+                "params": [
+                    {
+                        "name": "name",
+                        "desc": "",
+                        "type": {
+                            "id": "string"
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    }
+                ],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 580,
+                "stop_char": 621
+            }
+        ],
+        "data": [],
+        "name": "fmtk",
+        "is_class_mod": false,
+        "short_desc": "FMTK module",
+        "desc": "",
+        "usage": ""
+    }
+]
