@@ -142,6 +142,16 @@ public:
 		fmtk_table.set_function("run_command", [&](const std::string& cmd) { fmtk->RunCommand(cmd.c_str()); });
 		fmtk_table.set_function("register_command", RegisterCommand);
 		fmtk_table.set_function("unregister_command", UnregisterCommand);
+		fmtk_table.set_function("get_player_position",
+			[&]()
+			{
+				float* vec;
+				if (vec = fmtk->GetPlayerPosition())
+				{
+					return lua.create_table_with("x", vec[0], "z", vec[1], "y", vec[2]);
+				}
+				return lua.create_table_with("x", 0, "z", 0, "y", 0);
+			});
 
 		auto fmtk_log_table = lua["fmtk"]["log"].get_or_create<sol::table>();
 		fmtk_log_table.set_function("trace", [&](const std::string& source, const std::string& msg) { fmtk->Log(LogLevel::TRACE, source.c_str(), msg.c_str()); });
