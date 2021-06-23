@@ -3,174 +3,6 @@
         "file_path": "fmtk.luadoc",
         "classes": [
             {
-                "name": "fmtk",
-                "name_in_source": "fmtk",
-                "methods": [
-                    {
-                        "name": "hook",
-                        "short_desc": "",
-                        "desc": "",
-                        "params": [],
-                        "returns": [],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": true,
-                        "visibility": "public",
-                        "start_char": 0,
-                        "stop_char": 0
-                    },
-                    {
-                        "name": "unhook",
-                        "short_desc": "",
-                        "desc": "",
-                        "params": [],
-                        "returns": [],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": true,
-                        "visibility": "public",
-                        "start_char": 0,
-                        "stop_char": 0
-                    },
-                    {
-                        "name": "get_fmtklua_version",
-                        "short_desc": "",
-                        "desc": "",
-                        "params": [],
-                        "returns": [
-                            {
-                                "desc": "version",
-                                "type": {
-                                    "id": "custom",
-                                    "name": "table"
-                                }
-                            }
-                        ],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": true,
-                        "visibility": "public",
-                        "start_char": 0,
-                        "stop_char": 0
-                    },
-                    {
-                        "name": "run_command",
-                        "short_desc": "",
-                        "desc": "",
-                        "params": [
-                            {
-                                "name": "cmd",
-                                "desc": "",
-                                "type": {
-                                    "id": "string"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            }
-                        ],
-                        "returns": [
-                            {
-                                "desc": "success",
-                                "type": {
-                                    "id": "boolean"
-                                }
-                            }
-                        ],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": true,
-                        "visibility": "public",
-                        "start_char": 0,
-                        "stop_char": 0
-                    },
-                    {
-                        "name": "register_command",
-                        "short_desc": "",
-                        "desc": "",
-                        "params": [
-                            {
-                                "name": "name",
-                                "desc": "",
-                                "type": {
-                                    "id": "string"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            },
-                            {
-                                "name": "callback",
-                                "desc": "",
-                                "type": {
-                                    "id": "callable",
-                                    "arg_types": [
-                                        {
-                                            "id": "array",
-                                            "type": {
-                                                "id": "string"
-                                            }
-                                        }
-                                    ],
-                                    "return_types": [
-                                        {
-                                            "id": "boolean"
-                                        }
-                                    ]
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            }
-                        ],
-                        "returns": [],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": true,
-                        "visibility": "public",
-                        "start_char": 0,
-                        "stop_char": 0
-                    },
-                    {
-                        "name": "unregister_command",
-                        "short_desc": "",
-                        "desc": "",
-                        "params": [
-                            {
-                                "name": "name",
-                                "desc": "",
-                                "type": {
-                                    "id": "string"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            }
-                        ],
-                        "returns": [],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": true,
-                        "visibility": "public",
-                        "start_char": 0,
-                        "stop_char": 0
-                    }
-                ],
-                "short_desc": "",
-                "desc": "",
-                "usage": "",
-                "inherits_from": [],
-                "fields": []
-            },
-            {
                 "name": "log",
                 "name_in_source": "log",
                 "methods": [
@@ -500,8 +332,8 @@
                 "fields": []
             },
             {
-                "name": "fmtk.event",
-                "name_in_source": "fmtk.event",
+                "name": "event",
+                "name_in_source": "event",
                 "methods": [],
                 "short_desc": "",
                 "desc": "",
@@ -543,7 +375,225 @@
                 ]
             }
         ],
-        "functions": [],
+        "functions": [
+            {
+                "name": "hook",
+                "short_desc": "",
+                "desc": "",
+                "params": [],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 75,
+                "stop_char": 117
+            },
+            {
+                "name": "unhook",
+                "short_desc": "",
+                "desc": "",
+                "params": [],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 159,
+                "stop_char": 193
+            },
+            {
+                "name": "get_fmtklua_version",
+                "short_desc": "",
+                "desc": "",
+                "params": [],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 314,
+                "stop_char": 352
+            },
+            {
+                "name": "get_fmtklua_version",
+                "short_desc": "",
+                "desc": "",
+                "params": [],
+                "returns": [
+                    {
+                        "desc": "version",
+                        "type": {
+                            "id": "custom",
+                            "name": "table"
+                        }
+                    }
+                ],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 314,
+                "stop_char": 352
+            },
+            {
+                "name": "run_command",
+                "short_desc": "",
+                "desc": "",
+                "params": [],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 447,
+                "stop_char": 480
+            },
+            {
+                "name": "run_command",
+                "short_desc": "",
+                "desc": "",
+                "params": [
+                    {
+                        "name": "cmd",
+                        "desc": "",
+                        "type": {
+                            "id": "string"
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    }
+                ],
+                "returns": [
+                    {
+                        "desc": "success",
+                        "type": {
+                            "id": "boolean"
+                        }
+                    }
+                ],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 447,
+                "stop_char": 480
+            },
+            {
+                "name": "register_command",
+                "short_desc": "",
+                "desc": "",
+                "params": [],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 596,
+                "stop_char": 645
+            },
+            {
+                "name": "register_command",
+                "short_desc": "",
+                "desc": "",
+                "params": [
+                    {
+                        "name": "name",
+                        "desc": "",
+                        "type": {
+                            "id": "string"
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    },
+                    {
+                        "name": "callback",
+                        "desc": "",
+                        "type": {
+                            "id": "callable",
+                            "arg_types": [
+                                {
+                                    "id": "array",
+                                    "type": {
+                                        "id": "string"
+                                    }
+                                }
+                            ],
+                            "return_types": [
+                                {
+                                    "id": "boolean"
+                                }
+                            ]
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    }
+                ],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 596,
+                "stop_char": 645
+            },
+            {
+                "name": "unregister_command",
+                "short_desc": "",
+                "desc": "",
+                "params": [],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 724,
+                "stop_char": 765
+            },
+            {
+                "name": "unregister_command",
+                "short_desc": "",
+                "desc": "",
+                "params": [
+                    {
+                        "name": "name",
+                        "desc": "",
+                        "type": {
+                            "id": "string"
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    }
+                ],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 724,
+                "stop_char": 765
+            }
+        ],
         "data": [],
         "name": "fmtk @FMTK module",
         "is_class_mod": false,

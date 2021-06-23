@@ -1,31 +1,31 @@
 ---@module fmtk @FMTK module
 fmtk = {}
 
----@function fmtk.hook @register a hook
+---@function hook @register a hook
 function fmtk.hook(event, id, callback) end
 
----@function fmtk.unhook @unregister a hook
+---@function unhook @unregister a hook
 function fmtk.unhook(event, id) end
 
----@function fmtk.get_fmtklua_version @get the version of FMTK SDK that was used to build FMTKLua
+---@function get_fmtklua_version @get the version of FMTK SDK that was used to build FMTKLua
 ---@return table version
 function fmtk.get_fmtklua_version() end
 
----@function fmtk.run_command @run a command string
+---@function run_command @run a command string
 ---@param cmd string
 ---@return bool success
 function fmtk.run_command(cmd) end
 
----@function fmtk.register_command @register command
+---@function register_command @register command
 ---@param name string
 ---@param callback fun(args:string[]):bool
 function fmtk.register_command(name, callback) end
 
----@function fmtk.unregister_command @unregister a command
+---@function unregister_command @unregister a command
 ---@param name string
 function fmtk.unregister_command(name) end
 
----@table fmtk.log @FMTK logging module
+---@table log @FMTK logging module
 fmtk.log = {}
 
 ---@function log.trace @log a trace message
@@ -58,7 +58,7 @@ function fmtk.log.error(source, msg) end
 ---@param msg string
 function fmtk.log.critical(source, msg) end
 
----@table fmtk.fs @FMTK file system module
+---@table fs @FMTK file system module
 fmtk.fs = {}
 
 ---@function fs.alias @alias a file path
@@ -78,7 +78,7 @@ function fmtk.fs.get_mods_directory_path() end
 ---@return string absolute current lua file path
 function fmtk.fs.get_current_file_path() end
 
----@class fmtk.event @Event enum
+---@class event @Event enum
 ---@field public INITIALIZE number @This hook is called before the game's WinMain entry point. At this point the ScriptManager is unavailable so calls to command functions will fail. This will always be the first hook to run.
 ---@field public TICK number @This hook is called once per execution of the game's CoreMainLoop function.
 ---@field public SCRIPT_MANAGER_INITIALIZE number @This hook is called once the ScriptManager is initialized. This is the first legal place to call the register command function. None of the FUEL commands have been registered yet so RunCommand with them will fail.
