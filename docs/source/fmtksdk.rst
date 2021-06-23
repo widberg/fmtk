@@ -1,5 +1,5 @@
-FMTK SDK Documentation
-======================
+FMTK SDK
+========
 
 .. toctree::
    :maxdepth: 2

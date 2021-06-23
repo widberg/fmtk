@@ -48,7 +48,7 @@ Join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FU
 
 ## Documentation
 
-Documentation for mod developers is available on [Read the Docs](https://fmtk.rtfd.io). Documentation for mod developers and FMTK developers is available on the [FMTK Wiki](https://github.com/widberg/fmtk/wiki). Work is being done to migrate mod developer specific information from the FMTK Wiki to Read the Docs.
+Documentation for users and mod developers is available on [Read the Docs](https://fmtk.rtfd.io). Documentation for FMTK developers is available on the [FMTK Wiki](https://github.com/widberg/fmtk/wiki).
 
 ## Related Projects
 

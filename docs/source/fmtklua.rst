@@ -1,5 +1,5 @@
-FMTK Lua Documentation
-======================
+FMTK Lua
+========
 
 .. toctree::
    :maxdepth: 2
