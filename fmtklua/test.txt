@@ -3,7 +3,7 @@
         "file_path": "fmtk.luadoc",
         "classes": [
             {
-                "name": "fmtk.log",
+                "name": "log",
                 "name_in_source": "log",
                 "methods": [
                     {
@@ -35,10 +35,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": false,
+                        "is_static": true,
                         "visibility": "public",
-                        "start_char": 740,
-                        "stop_char": 774
+                        "start_char": 735,
+                        "stop_char": 769
                     },
                     {
                         "name": "debug",
@@ -69,10 +69,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": false,
+                        "is_static": true,
                         "visibility": "public",
-                        "start_char": 845,
-                        "stop_char": 879
+                        "start_char": 840,
+                        "stop_char": 874
                     },
                     {
                         "name": "info",
@@ -103,10 +103,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": false,
+                        "is_static": true,
                         "visibility": "public",
-                        "start_char": 950,
-                        "stop_char": 983
+                        "start_char": 945,
+                        "stop_char": 978
                     },
                     {
                         "name": "warn",
@@ -137,10 +137,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": false,
+                        "is_static": true,
                         "visibility": "public",
-                        "start_char": 1049,
-                        "stop_char": 1082
+                        "start_char": 1044,
+                        "stop_char": 1077
                     },
                     {
                         "name": "error",
@@ -171,10 +171,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": false,
+                        "is_static": true,
                         "visibility": "public",
-                        "start_char": 1146,
-                        "stop_char": 1180
+                        "start_char": 1141,
+                        "stop_char": 1175
                     },
                     {
                         "name": "critical",
@@ -205,10 +205,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": false,
+                        "is_static": true,
                         "visibility": "public",
-                        "start_char": 1252,
-                        "stop_char": 1289
+                        "start_char": 1247,
+                        "stop_char": 1284
                     }
                 ],
                 "short_desc": "",
@@ -218,7 +218,7 @@
                 "fields": []
             },
             {
-                "name": "fmtk.fs",
+                "name": "fs",
                 "name_in_source": "fs",
                 "methods": [
                     {
@@ -250,10 +250,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": false,
+                        "is_static": true,
                         "visibility": "public",
-                        "start_char": 1415,
-                        "stop_char": 1453
+                        "start_char": 1405,
+                        "stop_char": 1443
                     },
                     {
                         "name": "unalias",
@@ -275,10 +275,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": false,
+                        "is_static": true,
                         "visibility": "public",
-                        "start_char": 1504,
-                        "stop_char": 1535
+                        "start_char": 1494,
+                        "stop_char": 1525
                     },
                     {
                         "name": "get_mods_directory_path",
@@ -297,10 +297,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": false,
+                        "is_static": true,
                         "visibility": "public",
-                        "start_char": 1616,
-                        "stop_char": 1656
+                        "start_char": 1606,
+                        "stop_char": 1646
                     },
                     {
                         "name": "get_current_file_path",
@@ -319,10 +319,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": false,
+                        "is_static": true,
                         "visibility": "public",
-                        "start_char": 1741,
-                        "stop_char": 1779
+                        "start_char": 1731,
+                        "stop_char": 1769
                     }
                 ],
                 "short_desc": "",
@@ -332,7 +332,7 @@
                 "fields": []
             },
             {
-                "name": "fmtk.event",
+                "name": "event",
                 "name_in_source": "event",
                 "methods": [],
                 "short_desc": "",
