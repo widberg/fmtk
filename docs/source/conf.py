@@ -57,7 +57,7 @@ extensions = [
     'sphinx_lua'
 ]
 
-lua_source_path = ["../../fmtklua/fmtklua.luadoc"]
+lua_source_path = ["../../fmtklua/fmtk.luadoc"]
 
 breathe_projects = {
    'fmtk': abspath('../build/doxygen/xml/')
