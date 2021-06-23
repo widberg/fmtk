@@ -30,6 +30,8 @@ jobs:
         release_name: Release ${{ github.ref }}
         body: |
           Check the README for [installation instructions](https://github.com/widberg/fmtk#installing-for-users-and-mod-developers).
+          
+          Check the [documentation for users and mod developers](https://fmtk.readthedocs.io/en/latest/) to see what you can do with FMTK.
         draft: false
         prerelease: false
     

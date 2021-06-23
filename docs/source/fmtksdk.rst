@@ -6,4 +6,5 @@ FMTK SDK
    :caption: FMTK SDK
    :name: sec-fmtksdk
 
+   fmtksdkenvironemt
    fmtksdkapi
