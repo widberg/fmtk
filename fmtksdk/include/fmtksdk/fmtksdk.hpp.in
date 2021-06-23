@@ -191,14 +191,14 @@ public:
 	/**
 	* \brief Initialize Hook
 	*
-	* This function is called before the games WinMain entry point. At this point the ScriptManager is unavailable so calls to command functions will fail. This will always be the first hook to run.
+	* This function is called before the game's WinMain entry point. At this point the ScriptManager is unavailable so calls to command functions will fail. This will always be the first hook to run.
 	*/
 	virtual void Initialize() {}
 	
 	/**
 	* \brief Tick Hook
 	*
-	* This function is called once per execution of the games CoreMainLoop function.
+	* This function is called once per execution of the game's CoreMainLoop function.
 	*/
 	virtual void Tick() {}
 	

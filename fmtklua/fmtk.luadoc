@@ -3,9 +3,14 @@
 fmtk = {}
 
 ---register a hook
+---@param event number and Event enum value
+---@param id string a unique id to refer to this hook as 
+---@param callback function function signature depends on the event
 function fmtk.hook(event, id, callback) end
 
 ---unregister a hook
+---@param event number and Event enum value
+---@param id string the unique id of the hook
 function fmtk.unhook(event, id) end
 
 ---get the version of FMTK SDK that was used to build FMTKLua
