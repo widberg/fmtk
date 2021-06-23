@@ -128,7 +128,7 @@ public:
 
 		auto fmtk_table = lua["fmtk"].get_or_create<sol::table>();
 
-		lua.new_enum("EVENT",
+		fmtk_table.new_enum("event",
 			"INITIALIZE", Event::INITIALIZE,
 			"TICK", Event::TICK,
 			"SCRIPT_MANAGER_INITIALIZE", Event::SCRIPT_MANAGER_INITIALIZE,
