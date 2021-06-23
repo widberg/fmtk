@@ -52,8 +52,12 @@ release = version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'breathe'
+    'breathe',
+    'sphinxcontrib.luadomain',
+    'sphinx_lua'
 ]
+
+lua_source_path = ["../../fmtklua/fmtk.lua"]  # default is "./"
 
 breathe_projects = {
    'fmtk': abspath('../build/doxygen/xml/')

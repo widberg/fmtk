@@ -1,4 +1,4 @@
-socket = require('socket')
+local socket = require('socket')
 
 fmtk.hook(EVENT.INITIALIZE, "test_mod_init_hook", function()
 	fmtk.log.debug("TEST MOD", fmtk.fs.get_current_file_path())
