@@ -86,7 +86,7 @@ enum class LogLevel
 	DEBUG,
 
 	/**
-	 * \brief This is a message for a user that everythong is fine and no action is necessary.
+	 * \brief This is a message for a user that everything is fine and no action is necessary.
 	 */
 	INFO,
 

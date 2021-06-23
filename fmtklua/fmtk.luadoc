@@ -83,32 +83,32 @@ function fs.get_current_file_path() end
 ---@class log
 log = {}
 
----log a trace message
+---log a trace message. This is a message for an FMTK developer. Exclude it from release builds.
 ---@param source string This should be the name of the mod calling the function.
 ---@param msg string
 function log.trace(source, msg) end
 
----log a debug message
+---log a debug message. This is a message for a mod developer.
 ---@param source string This should be the name of the mod calling the function.
 ---@param msg string
 function log.debug(source, msg) end
 
----log an info message
+---log an info message. This is a message for a user that everything is fine and no action is necessary.
 ---@param source string This should be the name of the mod calling the function.
 ---@param msg string
 function log.info(source, msg) end
 
----log a warining
+---log a warning. This is a message for a user that something may be wrong but no action is necessary.
 ---@param source string This should be the name of the mod calling the function.
 ---@param msg string
 function log.warn(source, msg) end
 
----log an error
+---log an error. This is a message for a user that something is wrong but no action is necessary. A recoverable error.
 ---@param source string This should be the name of the mod calling the function.
 ---@param msg string
 function log.error(source, msg) end
 
----log a critical error
+---log a critical error. This is a message for a user that something is wrong and action is necessary. An unrecoverable error.
 ---@param source string This should be the name of the mod calling the function.
 ---@param msg string
 function log.critical(source, msg) end
