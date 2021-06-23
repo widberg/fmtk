@@ -42,28 +42,27 @@ function fmtk.unregister_command(name) end
 fmtk.log = {}
 
 --- log a trace message
---- @function trace
+--- @function log.trace
 function fmtk.log.trace(source, msg) end
 
 --- log a debug message
---- @function debug
+--- @function log.debug
 function fmtk.log.debug(source, msg) end
 
 --- log an info message
---- @function info
+--- @function log.info
 function fmtk.log.info(source, msg) end
 
 --- log a warining
---- @function warn
---- @function warn
+--- @function log.warn
 function fmtk.log.warn(source, msg) end
 
 --- log an error
---- @function error
+--- @function log.error
 function fmtk.log.error(source, msg) end
 
 --- log a critical error
---- @function critical
+--- @function log.critical
 function fmtk.log.critical(source, msg) end
 
 --- FMTK file system module
@@ -71,19 +70,19 @@ function fmtk.log.critical(source, msg) end
 fmtk.fs = {}
 
 --- alias a file path
---- @function alias
+--- @function fs.alias
 function fmtk.fs.alias(oldPath, newPath) end
 
 --- unalias a file path
---- @function unalias
+--- @function fs.unalias
 function fmtk.fs.unalias(oldPath) end
 
 --- get the mods directory path
---- @function get_mods_directory_path
+--- @function fs.get_mods_directory_path
 --- @return string absolute mods directory path
 function fmtk.fs.get_mods_directory_path() end
 
 --- get the current lua file path
---- @function get_current_file_path
+--- @function fs.get_current_file_path
 --- @return string absolute current lua file path
 function get_current_file_path() end
