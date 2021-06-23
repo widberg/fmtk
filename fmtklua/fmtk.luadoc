@@ -81,21 +81,26 @@ function get_current_file_path() end
 return {
 	--- EVENT enum
 	--- @export
+	--- @constant
 	--- @table EVENT
 	EVENT = {
 		--- This hook is called before the game's WinMain entry point. At this point the ScriptManager is unavailable so calls to command functions will fail. This will always be the first hook to run.
+		--- @constant
 		--- @type number
 		INITIALIZE,
 		
 		--- This hook is called once per execution of the game's CoreMainLoop function.
+		--- @constant
 		--- @type number
 		TICK,
 		
 		--- This hook is called once the ScriptManager is initialized. This is the first legal place to call the register command function. None of the FUEL commands have been registered yet so RunCommand with them will fail.
+		--- @constant
 		--- @type number
 		SCRIPT_MANAGER_INITIALIZE,
 		
 		--- This hook is called before the FMTK dll is unloaded. This will always be the last hook to run.
+		--- @constant
 		--- @type number
 		SHUTDOWN,
 	}
