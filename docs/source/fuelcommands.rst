@@ -10,8 +10,8 @@ Only the capital letters in each command name are required. However, I recommend
 
 Due to the excessive number of commands, I will add details to the commands as I see fit. If there is a command that you would like me to add details to, open an issue with the command name and I will get to it when I have a chance.
 
-Commands
---------
+Command List
+------------
 
 .. code-block:: c
 
