@@ -1,4 +1,31 @@
----@class log @FMTK logging module
+---@module fmtk @FMTK module
+fmtk = {}
+
+---register a hook
+function fmtk:hook(event, id, callback) end
+
+---unregister a hook
+function fmtk:unhook(event, id) end
+
+---get the version of FMTK SDK that was used to build FMTKLua
+---@return table version
+function fmtk:get_fmtklua_version() end
+
+---run a command string
+---@param cmd string
+---@return bool success
+function fmtk:run_command(cmd) end
+
+---register command
+---@param name string
+---@param callback fun(args:string[]):bool
+function fmtk:register_command(name, callback) end
+
+---unregister a command
+---@param name string
+function fmtk:unregister_command(name) end
+
+---@class fmtk.log @FMTK logging module
 log = {}
 
 ---log a trace message
@@ -31,7 +58,7 @@ function log:error(source, msg) end
 ---@param msg string
 function log:critical(source, msg) end
 
----@class fs @FMTK file system module
+---@class fmtk.fs @FMTK file system module
 fs = {}
 
 ---alias a file path
@@ -51,39 +78,9 @@ function fs:get_mods_directory_path() end
 ---@return string absolute current lua file path
 function fs:get_current_file_path() end
 
----@class event @Event enum
+---@class fmtk.event @Event enum
 ---@field public INITIALIZE number @This hook is called before the game's WinMain entry point. At this point the ScriptManager is unavailable so calls to command functions will fail. This will always be the first hook to run.
 ---@field public TICK number @This hook is called once per execution of the game's CoreMainLoop function.
 ---@field public SCRIPT_MANAGER_INITIALIZE number @This hook is called once the ScriptManager is initialized. This is the first legal place to call the register command function. None of the FUEL commands have been registered yet so RunCommand with them will fail.
 ---@field public SHUTDOWN number @This hook is called before the FMTK dll is unloaded. This will always be the last hook to run.
 event = {}
-
----@class fmtk @FMTK module
----@field public log log
----@field public fs fs
----@field public event event
-fmtk = {}
-
----register a hook
-function fmtk:hook(event, id, callback) end
-
----unregister a hook
-function fmtk:unhook(event, id) end
-
----get the version of FMTK SDK that was used to build FMTKLua
----@return table version
-function fmtk:get_fmtklua_version() end
-
----run a command string
----@param cmd string
----@return bool success
-function fmtk:run_command(cmd) end
-
----register command
----@param name string
----@param callback fun(args:string[]):bool
-function fmtk:register_command(name, callback) end
-
----unregister a command
----@param name string
-function fmtk:unregister_command(name) end
