@@ -1,107 +1,86 @@
---- FMTK module
---- @module fmtk
+---@module fmtk @FMTK module
 fmtk = {}
 
---- register a hook
---- @function hook
+---@function fmtk.hook @register a hook
 function fmtk.hook(event, id, callback) end
 
---- unregister a hook
---- @function unhook
+---@function fmtk.unhook @unregister a hook
 function fmtk.unhook(event, id) end
 
---- get the version of FMTK SDK that was used to build FMTKLua
---- @return table version
---- @function get_fmtklua_version
+---@function fmtk.get_fmtklua_version @get the version of FMTK SDK that was used to build FMTKLua
+---@return table version
 function fmtk.get_fmtklua_version() end
 
---- run a command string
---- @return bool success
---- @function run_command
+---@function fmtk.run_command @run a command string
+---@param cmd string
+---@return bool success
 function fmtk.run_command(cmd) end
 
---- register command
---- @function register_command
+---@function fmtk.register_command @register command
+---@param name string
+---@param callback fun(args:string[]):bool
 function fmtk.register_command(name, callback) end
 
---- unregister a command
---- @function unregister_command
+---@function fmtk.unregister_command @unregister a command
+---@param name string
 function fmtk.unregister_command(name) end
 
---- FMTK logging module
---- @table log
+---@table fmtk.log @FMTK logging module
 fmtk.log = {}
 
---- log a trace message
---- @function log.trace
+---@function log.trace @log a trace message
+---@param source string
+---@param msg string
 function fmtk.log.trace(source, msg) end
 
---- log a debug message
---- @function log.debug
+---@function log.debug @log a debug message
+---@param source string
+---@param msg string
 function fmtk.log.debug(source, msg) end
 
---- log an info message
---- @function log.info
+---@function log.info @log an info message
+---@param source string
+---@param msg string
 function fmtk.log.info(source, msg) end
 
---- log a warining
---- @function log.warn
+---@function log.warn @log a warining
+---@param source string
+---@param msg string
 function fmtk.log.warn(source, msg) end
 
---- log an error
---- @function log.error
+---@function log.error @log an error
+---@param source string
+---@param msg string
 function fmtk.log.error(source, msg) end
 
---- log a critical error
---- @function log.critical
+---@function log.critical @log a critical error
+---@param source string
+---@param msg string
 function fmtk.log.critical(source, msg) end
 
---- FMTK file system module
---- @table fs
+---@table fmtk.fs @FMTK file system module
 fmtk.fs = {}
 
---- alias a file path
---- @function fs.alias
+---@function fs.alias @alias a file path
+---@param oldPath string
+---@param newPath string
 function fmtk.fs.alias(oldPath, newPath) end
 
---- unalias a file path
---- @function fs.unalias
+---@function fs.unalias @unalias a file path
+---@param oldPath string
 function fmtk.fs.unalias(oldPath) end
 
---- get the mods directory path
---- @function fs.get_mods_directory_path
---- @return string absolute mods directory path
+---@function fs.get_mods_directory_path @get the mods directory path
+---@return string absolute mods directory path
 function fmtk.fs.get_mods_directory_path() end
 
---- get the current lua file path
---- @function fs.get_current_file_path
---- @return string absolute current lua file path
-function get_current_file_path() end
+---@function fs.get_current_file_path @get the current lua file path
+---@return string absolute current lua file path
+function fmtk.fs.get_current_file_path() end
 
---- Event enum
---- @table event
-fmtk.event = {
-	--- This hook is called before the game's WinMain entry point. At this point the ScriptManager is unavailable so calls to command functions will fail. This will always be the first hook to run.
-	--- @field public INITIALIZE number
-	--- @constant
-	--- @type number
-	INITIALIZE,
-	
-	--- This hook is called once per execution of the game's CoreMainLoop function.
-	--- @constant
-	--- @field public TICK number
-	--- @type number
-	TICK,
-	
-	--- This hook is called once the ScriptManager is initialized. This is the first legal place to call the register command function. None of the FUEL commands have been registered yet so RunCommand with them will fail.
-	--- @constant
-	--- @field public SCRIPT_MANAGER_INITIALIZE number
-	--- @type number
-	SCRIPT_MANAGER_INITIALIZE,
-	
-	--- This hook is called before the FMTK dll is unloaded. This will always be the last hook to run.
-	--- @constant
-	--- @field public SHUTDOWN number
-	--- @type number
-	SHUTDOWN,
-}
+---@class fmtk.event @Event enum
+---@field public INITIALIZE number @This hook is called before the game's WinMain entry point. At this point the ScriptManager is unavailable so calls to command functions will fail. This will always be the first hook to run.
+---@field public TICK number @This hook is called once per execution of the game's CoreMainLoop function.
+---@field public SCRIPT_MANAGER_INITIALIZE number @This hook is called once the ScriptManager is initialized. This is the first legal place to call the register command function. None of the FUEL commands have been registered yet so RunCommand with them will fail.
+---@field public SHUTDOWN number @This hook is called before the FMTK dll is unloaded. This will always be the last hook to run.
+fmtk.event = {}
