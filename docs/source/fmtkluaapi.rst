@@ -1,4 +1,4 @@
 FMTK Lua API
 ============
 
-.. lua:autoclass:: fmtk
+.. lua:module:: fmtk
