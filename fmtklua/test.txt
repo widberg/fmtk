@@ -3,221 +3,6 @@
         "file_path": "fmtk.luadoc",
         "classes": [
             {
-                "name": "fmtk",
-                "name_in_source": "",
-                "methods": [
-                    {
-                        "name": "hook",
-                        "short_desc": "register a hook",
-                        "desc": "",
-                        "params": [
-                            {
-                                "name": "event",
-                                "desc": "",
-                                "type": {
-                                    "id": "any"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            },
-                            {
-                                "name": "id",
-                                "desc": "",
-                                "type": {
-                                    "id": "any"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            },
-                            {
-                                "name": "callback",
-                                "desc": "",
-                                "type": {
-                                    "id": "any"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            }
-                        ],
-                        "returns": [],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": false,
-                        "visibility": "public",
-                        "start_char": 0,
-                        "stop_char": 0
-                    },
-                    {
-                        "name": "unhook",
-                        "short_desc": "unregister a hook",
-                        "desc": "",
-                        "params": [
-                            {
-                                "name": "event",
-                                "desc": "",
-                                "type": {
-                                    "id": "any"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            },
-                            {
-                                "name": "id",
-                                "desc": "",
-                                "type": {
-                                    "id": "any"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            }
-                        ],
-                        "returns": [],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": false,
-                        "visibility": "public",
-                        "start_char": 0,
-                        "stop_char": 0
-                    },
-                    {
-                        "name": "get_fmtklua_version",
-                        "short_desc": "get the version of FMTK SDK that was used to build FMTKLua",
-                        "desc": "",
-                        "params": [],
-                        "returns": [
-                            {
-                                "desc": "version",
-                                "type": {
-                                    "id": "custom",
-                                    "name": "table"
-                                }
-                            }
-                        ],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": false,
-                        "visibility": "public",
-                        "start_char": 249,
-                        "stop_char": 287
-                    },
-                    {
-                        "name": "run_command",
-                        "short_desc": "run a command string",
-                        "desc": "",
-                        "params": [
-                            {
-                                "name": "cmd",
-                                "desc": "",
-                                "type": {
-                                    "id": "string"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            }
-                        ],
-                        "returns": [
-                            {
-                                "desc": "success",
-                                "type": {
-                                    "id": "boolean"
-                                }
-                            }
-                        ],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": false,
-                        "visibility": "public",
-                        "start_char": 359,
-                        "stop_char": 392
-                    },
-                    {
-                        "name": "register_command",
-                        "short_desc": "register command",
-                        "desc": "",
-                        "params": [
-                            {
-                                "name": "name",
-                                "desc": "",
-                                "type": {
-                                    "id": "string"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            },
-                            {
-                                "name": "callback",
-                                "desc": "",
-                                "type": {
-                                    "id": "callable",
-                                    "arg_types": [
-                                        {
-                                            "id": "array",
-                                            "type": {
-                                                "id": "string"
-                                            }
-                                        }
-                                    ],
-                                    "return_types": [
-                                        {
-                                            "id": "boolean"
-                                        }
-                                    ]
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            }
-                        ],
-                        "returns": [],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": false,
-                        "visibility": "public",
-                        "start_char": 480,
-                        "stop_char": 529
-                    },
-                    {
-                        "name": "unregister_command",
-                        "short_desc": "unregister a command",
-                        "desc": "",
-                        "params": [
-                            {
-                                "name": "name",
-                                "desc": "",
-                                "type": {
-                                    "id": "string"
-                                },
-                                "is_opt": false,
-                                "default_value": ""
-                            }
-                        ],
-                        "returns": [],
-                        "usage": "",
-                        "is_virtual": false,
-                        "is_abstract": false,
-                        "is_deprecated": false,
-                        "is_static": false,
-                        "visibility": "public",
-                        "start_char": 578,
-                        "stop_char": 619
-                    }
-                ],
-                "short_desc": "",
-                "desc": "",
-                "usage": "",
-                "inherits_from": [],
-                "fields": []
-            },
-            {
                 "name": "fmtk.log",
                 "name_in_source": "log",
                 "methods": [
@@ -590,7 +375,135 @@
                 ]
             }
         ],
-        "functions": [],
+        "functions": [
+            {
+                "name": "get_fmtklua_version",
+                "short_desc": "get the version of FMTK SDK that was used to build FMTKLua",
+                "desc": "",
+                "params": [],
+                "returns": [
+                    {
+                        "desc": "version",
+                        "type": {
+                            "id": "custom",
+                            "name": "table"
+                        }
+                    }
+                ],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 249,
+                "stop_char": 287
+            },
+            {
+                "name": "run_command",
+                "short_desc": "run a command string",
+                "desc": "",
+                "params": [
+                    {
+                        "name": "cmd",
+                        "desc": "",
+                        "type": {
+                            "id": "string"
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    }
+                ],
+                "returns": [
+                    {
+                        "desc": "success",
+                        "type": {
+                            "id": "boolean"
+                        }
+                    }
+                ],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 359,
+                "stop_char": 392
+            },
+            {
+                "name": "register_command",
+                "short_desc": "register command",
+                "desc": "",
+                "params": [
+                    {
+                        "name": "name",
+                        "desc": "",
+                        "type": {
+                            "id": "string"
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    },
+                    {
+                        "name": "callback",
+                        "desc": "",
+                        "type": {
+                            "id": "callable",
+                            "arg_types": [
+                                {
+                                    "id": "array",
+                                    "type": {
+                                        "id": "string"
+                                    }
+                                }
+                            ],
+                            "return_types": [
+                                {
+                                    "id": "boolean"
+                                }
+                            ]
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    }
+                ],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 480,
+                "stop_char": 529
+            },
+            {
+                "name": "unregister_command",
+                "short_desc": "unregister a command",
+                "desc": "",
+                "params": [
+                    {
+                        "name": "name",
+                        "desc": "",
+                        "type": {
+                            "id": "string"
+                        },
+                        "is_opt": false,
+                        "default_value": ""
+                    }
+                ],
+                "returns": [],
+                "usage": "",
+                "is_virtual": false,
+                "is_abstract": false,
+                "is_deprecated": false,
+                "is_static": true,
+                "visibility": "public",
+                "start_char": 578,
+                "stop_char": 619
+            }
+        ],
         "data": [],
         "name": "fmtk @FMTK module",
         "is_class_mod": false,

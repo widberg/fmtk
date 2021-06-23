@@ -2,28 +2,28 @@
 fmtk = {}
 
 ---register a hook
-function fmtk:hook(event, id, callback) end
+function fmtk.hook(event, id, callback) end
 
 ---unregister a hook
-function fmtk:unhook(event, id) end
+function fmtk.unhook(event, id) end
 
 ---get the version of FMTK SDK that was used to build FMTKLua
 ---@return table version
-function fmtk:get_fmtklua_version() end
+function fmtk.get_fmtklua_version() end
 
 ---run a command string
 ---@param cmd string
 ---@return bool success
-function fmtk:run_command(cmd) end
+function fmtk.run_command(cmd) end
 
 ---register command
 ---@param name string
 ---@param callback fun(args:string[]):bool
-function fmtk:register_command(name, callback) end
+function fmtk.register_command(name, callback) end
 
 ---unregister a command
 ---@param name string
-function fmtk:unregister_command(name) end
+function fmtk.unregister_command(name) end
 
 ---@class fmtk.log @FMTK logging module
 log = {}
