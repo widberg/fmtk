@@ -2,6 +2,7 @@
 #include <string>
 #include <list>
 #include <unordered_map>
+#include <functional>
 
 #include <fmtksdk/fmtksdk.hpp>
 #include <sol/sol.hpp>
@@ -42,15 +43,21 @@ struct CommandName
 };
 
 // TODO: It's late and I'm tired. There is probably a better way to store these.
-std::list<std::pair<CommandName, sol::function>> commandCallbacks;
+std::list<std::pair<CommandName, sol::protected_function>> commandCallbacks;
 
 bool GenericCommandCallback(int argc, const char** argv)
 {
 	std::string name = argv[0];
-	auto commandPair = std::find_if(commandCallbacks.begin(), commandCallbacks.end(), [&](const std::pair<CommandName, sol::function>& x) -> bool { return x.first == name; });
+	auto commandPair = std::find_if(commandCallbacks.begin(), commandCallbacks.end(), [&](const std::pair<CommandName, sol::protected_function>& x) -> bool { return x.first == name; });
 	if (commandPair != commandCallbacks.end())
 	{
-		return commandPair->second(argc, argv);
+		std::vector<std::reference_wrapper<const char*>> v(argv, argv + argc);
+		auto result = commandPair->second(v);
+		if (!result.valid())
+		{
+			sol::error err = result;
+			fmtk->Log(LogLevel::ERR, "FMTKLua", err.what());
+		}
 	}
 
 	return false;
@@ -79,21 +86,30 @@ enum class Event
 	SHUTDOWN,
 };
 
-std::unordered_map<Event, std::list<std::pair<std::string, sol::function>>> hooks;
+std::unordered_map<Event, std::list<std::pair<std::string, sol::protected_function>>> hooks;
 
-void Hook(Event event, const std::string& id, sol::function fn)
+void Hook(Event event, const std::string& id, sol::protected_function fn)
 {
 	hooks[event].push_back({ id, fn });
 }
 
 void Unhook(Event event, const std::string& id)
 {
-	std::list<std::pair<std::string, sol::function>>& eventHooks = hooks[event];
-	auto newEnd = std::remove_if(eventHooks.begin(), eventHooks.end(), [&](const std::pair<std::string, sol::function>& x) -> bool { return x.first == id; });
+	std::list<std::pair<std::string, sol::protected_function>>& eventHooks = hooks[event];
+	auto newEnd = std::remove_if(eventHooks.begin(), eventHooks.end(), [&](const std::pair<std::string, sol::protected_function>& x) -> bool { return x.first == id; });
 	eventHooks.erase(newEnd, eventHooks.end());
 }
 
-#define BROADCAST(event, ...) for (const std::pair<std::string, sol::function>& pair : hooks[Event::event]) pair.second(__VA_ARGS__);
+#define BROADCAST(event, ...) \
+	for (const std::pair<std::string, sol::protected_function>& pair : hooks[Event::event]) \
+	{ \
+		auto result = pair.second(__VA_ARGS__); \
+		if (!result.valid()) \
+		{ \
+			sol::error err = result; \
+			fmtk->Log(LogLevel::ERR, "FMTKLua", err.what()); \
+		} \
+	}
 
 class FMTKLua : FMTKMod
 {

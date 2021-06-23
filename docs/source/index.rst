@@ -7,3 +7,10 @@ Welcome to FMTK's documentation!
    :name: sec-fmtksdk
 
    fmtksdkapi
+
+.. toctree::
+   :maxdepth: 2
+   :caption: FMTK Lua
+   :name: sec-fmtklua
+
+   fmtkluaapi
