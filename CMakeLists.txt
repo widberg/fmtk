@@ -16,7 +16,7 @@ if (POLICY CMP0091)
 	cmake_policy(SET CMP0091 NEW)
 endif()
 
-project(fmtk VERSION 0.0.5.0 LANGUAGES CXX)
+project(fmtk VERSION 0.0.6.0 LANGUAGES CXX)
 
 option(FMTK_DOCS        "Build only the documentation." OFF)
 
