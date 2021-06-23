@@ -35,7 +35,7 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": true,
+                        "is_static": false,
                         "visibility": "public",
                         "start_char": 735,
                         "stop_char": 769
@@ -69,7 +69,7 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": true,
+                        "is_static": false,
                         "visibility": "public",
                         "start_char": 840,
                         "stop_char": 874
@@ -103,7 +103,7 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": true,
+                        "is_static": false,
                         "visibility": "public",
                         "start_char": 945,
                         "stop_char": 978
@@ -137,7 +137,7 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": true,
+                        "is_static": false,
                         "visibility": "public",
                         "start_char": 1044,
                         "stop_char": 1077
@@ -171,7 +171,7 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": true,
+                        "is_static": false,
                         "visibility": "public",
                         "start_char": 1141,
                         "stop_char": 1175
@@ -205,22 +205,11 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": true,
+                        "is_static": false,
                         "visibility": "public",
                         "start_char": 1247,
                         "stop_char": 1284
-                    }
-                ],
-                "short_desc": "",
-                "desc": "",
-                "usage": "",
-                "inherits_from": [],
-                "fields": []
-            },
-            {
-                "name": "fs",
-                "name_in_source": "fs",
-                "methods": [
+                    },
                     {
                         "name": "alias",
                         "short_desc": "alias a file path",
@@ -250,10 +239,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": true,
+                        "is_static": false,
                         "visibility": "public",
                         "start_char": 1405,
-                        "stop_char": 1443
+                        "stop_char": 1444
                     },
                     {
                         "name": "unalias",
@@ -275,10 +264,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": true,
+                        "is_static": false,
                         "visibility": "public",
-                        "start_char": 1494,
-                        "stop_char": 1525
+                        "start_char": 1495,
+                        "stop_char": 1527
                     },
                     {
                         "name": "get_mods_directory_path",
@@ -297,10 +286,10 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": true,
+                        "is_static": false,
                         "visibility": "public",
-                        "start_char": 1606,
-                        "stop_char": 1646
+                        "start_char": 1608,
+                        "stop_char": 1649
                     },
                     {
                         "name": "get_current_file_path",
@@ -319,12 +308,22 @@
                         "is_virtual": false,
                         "is_abstract": false,
                         "is_deprecated": false,
-                        "is_static": true,
+                        "is_static": false,
                         "visibility": "public",
-                        "start_char": 1731,
-                        "stop_char": 1769
+                        "start_char": 1734,
+                        "stop_char": 1773
                     }
                 ],
+                "short_desc": "",
+                "desc": "",
+                "usage": "",
+                "inherits_from": [],
+                "fields": []
+            },
+            {
+                "name": "fs",
+                "name_in_source": "fs",
+                "methods": [],
                 "short_desc": "",
                 "desc": "",
                 "usage": "",

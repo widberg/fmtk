@@ -2,28 +2,28 @@
 fmtk = {}
 
 ---register a hook
-function hook(event, id, callback) end
+function fmtk.hook(event, id, callback) end
 
 ---unregister a hook
-function unhook(event, id) end
+function fmtk.unhook(event, id) end
 
 ---get the version of FMTK SDK that was used to build FMTKLua
 ---@return table version
-function get_fmtklua_version() end
+function fmtk.get_fmtklua_version() end
 
 ---run a command string
 ---@param cmd string
 ---@return bool success
-function run_command(cmd) end
+function fmtk.run_command(cmd) end
 
 ---register command
 ---@param name string
 ---@param callback fun(args:string[]):bool
-function register_command(name, callback) end
+function fmtk.register_command(name, callback) end
 
 ---unregister a command
 ---@param name string
-function unregister_command(name) end
+function fmtk.unregister_command(name) end
 
 ---@class log @FMTK logging module
 log = {}
@@ -31,32 +31,32 @@ log = {}
 ---log a trace message
 ---@param source string
 ---@param msg string
-function log.trace(source, msg) end
+function log:trace(source, msg) end
 
 ---log a debug message
 ---@param source string
 ---@param msg string
-function log.debug(source, msg) end
+function log:debug(source, msg) end
 
 ---log an info message
 ---@param source string
 ---@param msg string
-function log.info(source, msg) end
+function log:info(source, msg) end
 
 ---log a warining
 ---@param source string
 ---@param msg string
-function log.warn(source, msg) end
+function log:warn(source, msg) end
 
 ---log an error
 ---@param source string
 ---@param msg string
-function log.error(source, msg) end
+function log:error(source, msg) end
 
 ---log a critical error
 ---@param source string
 ---@param msg string
-function log.critical(source, msg) end
+function log:critical(source, msg) end
 
 ---@class fs @FMTK file system module
 fs = {}
@@ -64,19 +64,19 @@ fs = {}
 ---alias a file path
 ---@param oldPath string
 ---@param newPath string
-function fs.alias(oldPath, newPath) end
+function log:alias(oldPath, newPath) end
 
 ---unalias a file path
 ---@param oldPath string
-function fs.unalias(oldPath) end
+function log:unalias(oldPath) end
 
 ---get the mods directory path
 ---@return string absolute mods directory path
-function fs.get_mods_directory_path() end
+function log:get_mods_directory_path() end
 
 ---get the current lua file path
 ---@return string absolute current lua file path
-function fs.get_current_file_path() end
+function log:get_current_file_path() end
 
 ---@class event @Event enum
 ---@field public INITIALIZE number @This hook is called before the game's WinMain entry point. At this point the ScriptManager is unavailable so calls to command functions will fail. This will always be the first hook to run.
