@@ -29,11 +29,14 @@ struct CommandName
 
 	bool operator==(const char* str) const
 	{
-		return (std::string(str) == longName || std::string(str) == shortName);
+		std::string name = str;
+		std::transform(name.begin(), name.end(), name.begin(), std::toupper);
+		return (name == longName || name == shortName);
 	}
 
 	bool operator==(const std::string& str) const
 	{
+		std::transform(str.begin(), str.end(), str.begin(), std::toupper);
 		return (str == longName || str == shortName);
 	}
 
@@ -49,7 +52,7 @@ std::list<std::pair<CommandName, bool(*)(int, const char**)>> commandCallbacks;
 bool GenericCommandCallback()
 {
 	const char** pArg0 = (const char**)((char*)*pGlobalCommandState + 0xa3b0);
-	const char* name = *pArg0;
+	std::string name = *pArg0;
 	int argc = *(int*)((char*)*pGlobalCommandState + 0x23ac);
 
 	static const char* argv[32];
