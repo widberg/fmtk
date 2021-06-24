@@ -30,14 +30,15 @@ struct CommandName
 	bool operator==(const char* str) const
 	{
 		std::string name = str;
-		std::transform(name.begin(), name.end(), name.begin(), std::toupper);
+		std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return std::toupper(c); });
 		return (name == longName || name == shortName);
 	}
 
 	bool operator==(const std::string& str) const
 	{
-		std::transform(str.begin(), str.end(), str.begin(), std::toupper);
-		return (str == longName || str == shortName);
+		std::string name = str;
+		std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return std::toupper(c); });
+		return (name == longName || name == shortName);
 	}
 
 	bool operator==(const CommandName& c) const
