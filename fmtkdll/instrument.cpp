@@ -31,6 +31,45 @@ returnType callingConvention FMTK_XLive_##name(__VA_ARGS__)
 bool AttachDetoursXLive();
 bool DetachDetoursXLive();
 
+FUNCTIONXLIVE(CreateFileW, CreateFileW, HANDLE, WINAPI,
+	LPCWSTR               lpFileName,
+	DWORD                 dwDesiredAccess,
+	DWORD                 dwShareMode,
+	LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+	DWORD                 dwCreationDisposition,
+	DWORD                 dwFlagsAndAttributes,
+	HANDLE                hTemplateFile)
+{
+	std::wstring fileName;
+
+	try
+	{
+		fileName = std::filesystem::absolute(lpFileName);
+	}
+	catch (const std::filesystem::filesystem_error&)
+	{
+		fileName = lpFileName;
+	}
+
+	LOGW(trace, FMTK, "XLive opening file: {}", fileName);
+
+	HANDLE rv = Real_XLive_CreateFileW(fileName.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+
+	if (rv == INVALID_HANDLE_VALUE)
+	{
+		DWORD dwError = GetLastError();
+		LPSTR lpBuffer = nullptr;
+		FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL, dwError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpBuffer, 0, NULL);
+
+		LOG(trace, FMTK, "{} : {}", dwError, lpBuffer);
+
+		LocalFree(lpBuffer);
+	}
+
+	return rv;
+}
+
 const void** pGlobalCommandState = reinterpret_cast<const void**>(0x00a7c080);
 
 using p_float_t = float*;
@@ -55,29 +94,15 @@ bool AttachDetoursXLive()
 {
 	ULONG result = 1;
 
-	/*HINSTANCE hiXLive = GetModuleHandleA("xlive.dll");
+	HINSTANCE hiXLive = GetModuleHandleA("xlive.dll");
 
-    BYTE signature_ValidateMemory[] = {
-		0x8b, 0xff, 0x55, 0x8b, 0xec, 0x83, 0xec, 0x20, 0x53, 0x56,
-		0x57, 0x8d, 0x45, 0xe0, 0x33, 0xf6, 0x50, 0xff, 0x75, 0x0c,
-		0x8b, 0xf9, 0x8b, 0x4d, 0x08, 0x89, 0x75, 0xe0, 0x89, 0x75,
-		0xe4, 0x89, 0x75, 0xf8, 0x89, 0x75, 0xf0, 0xe8, 0x3f, 0xf4,
-		0xff, 0xff, 0x8b, 0xd8, 0x3b, 0xde, 0x0f, 0x8c, 0x5c, 0x01,
-		0x00, 0x00, 0xff, 0x75, 0x0c, 0x8b, 0x4d, 0x08, 0xe8, 0x04,
-		0xf3, 0xff, 0xff, 0x8b
-	};
+	DetourTransactionBegin();
+	DetourUpdateThread(GetCurrentThread());
 
-	if (memcmp(signature_ValidateMemory, (const void*)((DWORD_PTR)hiXLive + (DWORD_PTR)0x004f36b3 - (DWORD_PTR)XLIVE_DLL_BASE_ADDRESS), sizeof(signature_ValidateMemory)) == 0)
-	{
-		patchXLive = true;
+	//ATTACHXLIVE(ValidateMemory);
+	//ATTACHXLIVE(CreateFileW);
 
-		DetourTransactionBegin();
-		DetourUpdateThread(GetCurrentThread());
-
-		ATTACHXLIVE(ValidateMemory);
-
-		result = DetourTransactionCommit();
-	}*/
+	result = DetourTransactionCommit();
 	
 	return result;
 }
@@ -86,15 +111,13 @@ bool DetachDetoursXLive()
 {
 	LONG result = 1;
 
-	/*if (patchXLive)
-	{
-		DetourTransactionBegin();
-		DetourUpdateThread(GetCurrentThread());
+	DetourTransactionBegin();
+	DetourUpdateThread(GetCurrentThread());
 
-		DETACHXLIVE(ValidateMemory);
+	//DETACHXLIVE(ValidateMemory);
+	//ATTACHXLIVE(CreateFileW);
 
-		result = DetourTransactionCommit();
-	}*/
+	result = DetourTransactionCommit();
 
 	return result;
 }

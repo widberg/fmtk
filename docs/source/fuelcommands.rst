@@ -4,7 +4,7 @@ Commands
 Notes
 -----
 
-To access the console in game make sure you have the debug hud enabled. This is most easily done by loading the default ``debug_tools`` mod or uncommenting the ``adhud`` line in the ``usergame.tsc`` file in the FUEL root directory.
+``ActiveDebugHUD`` is the command to enable this feature. To access the console in game make sure you have the debug hud enabled. This is most easily done by loading the default ``debug_tools`` mod or uncommenting the ``adhud`` line in the ``usergame.tsc`` file in the FUEL root directory.
 
 Only the capital letters in each command name are required. However, I recommend using the full command name in scripts. The in-game console can be accessed by pressing the ``y`` key in the game world. The game is paused while the console is open so you have to close it for your commands to take effect. Use the ``wasd`` keys to navigate the console keyboard. Use ``r`` to insert a space character and ``x`` to delete the last character. Pressing ``y`` while the console is open will close the console. Be careful not to confuse the letter ``O`` in the first row with the digit ``0`` in the second and third rows.
 
