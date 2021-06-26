@@ -115,7 +115,7 @@ bool DetachDetoursXLive()
 	DetourUpdateThread(GetCurrentThread());
 
 	//DETACHXLIVE(ValidateMemory);
-	//ATTACHXLIVE(CreateFileW);
+	//DETACHXLIVE(CreateFileW);
 
 	result = DetourTransactionCommit();
 
