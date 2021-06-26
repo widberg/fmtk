@@ -8,6 +8,7 @@ Welcome to FMTK's documentation!
 
    fueldevelopermenus
    fuelcommands
+   fuelerrors
 
 .. toctree::
    :maxdepth: 2
