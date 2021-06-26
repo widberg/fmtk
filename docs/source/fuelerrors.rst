@@ -12,7 +12,7 @@ The Game Disc could not be read
 Error: Shaders processing has failed
 ------------------------------------
 
-``Error: Shaders processing has failed. The game FUEL™ will quit. Please read the Readme file for more information. Continue
+``Error: Shaders processing has failed. The game FUEL™ will quit. Please read the Readme file for more information. Continue``
 
 .. image:: img/Error_Shaders_processing_has_failed.png
    :width: 800
@@ -23,4 +23,4 @@ Please make sure your hardware is supported by this application
 ``Please make sure your hardware is supported by this application. Please refer to the Readme file. (WinLiveNetPlayManager_Z)``
 
 .. image:: img/WinLiveNetPlayManager_Z.png
-   :width: 800
+   :width: 600
