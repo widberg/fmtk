@@ -8,14 +8,30 @@ The Game Disc could not be read
 
 .. image:: img/The_Game_Disc_could_not_be_read.png
    :width: 800
+   
+Causes:
+
+* A game file is missing or coruoted. Likely a .DPC file.
+
+Solutions:
+
+* Check the output log for the error message and report it to the mod author.
 
 Error: Shaders processing has failed
 ------------------------------------
 
-``Error: Shaders processing has failed. The game FUEL™ will quit. Please read the Readme file for more information. Continue``
+``Error: Shaders processing has failed. The game FUEL™ will quit. Please read the Readme file for more information.``
 
 .. image:: img/Error_Shaders_processing_has_failed.png
    :width: 800
+   
+Causes:
+
+* A shader compiler error has occured.
+
+Solutions:
+
+* Check the output log for the error message and report it to the mod author.
 
 Please make sure your hardware is supported by this application
 ---------------------------------------------------------------
@@ -24,3 +40,11 @@ Please make sure your hardware is supported by this application
 
 .. image:: img/WinLiveNetPlayManager_Z.png
    :width: 600
+   
+Causes:
+
+* GFWL is not properly installed
+
+Solutions:
+
+* Reinstalling Windows seems to fix this :(
