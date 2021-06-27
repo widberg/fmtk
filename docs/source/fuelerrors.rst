@@ -11,7 +11,7 @@ The Game Disc could not be read
    
 Causes:
 
-* A game file is missing or coruoted. Likely a .DPC file.
+* A game file is missing or corrupted. Likely a .DPC file.
 
 Solutions:
 
