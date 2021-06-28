@@ -13,7 +13,7 @@ FUEL Modding Toolkit
 
 * Fully compatible with "FUEL: REFUELED", "FUEL: RESHADED", and other legacy mods by default
 * Lua scripting engine
-* C++ Native Plugin interface for advanced mods
+* C++ Native Mod interface for advanced mods
 * Callback hooks to game events
 * Interface functions to peek and poke game data
 * Full integration with the in-game command palette
@@ -57,6 +57,7 @@ These are projects that are related to researching FUEL but not directly part of
 * [dpc](https://github.com/widberg/dpc) - Tar analogous utility to work with the DPC file format
 * [fuel-brute](https://github.com/widberg/fuel-brute) - CRC32 Brute Force Solver For FUEL
 * [fuel-map](https://github.com/widberg/fuel-map) - It's just information about the map
+* [fmt_fuel](https://github.com/widberg/fmt_fuel) - Noesis scripts for object formats
 
 ## Getting Started (For FMTK Developers)
 
