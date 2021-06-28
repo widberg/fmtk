@@ -34,7 +34,7 @@ Command Line Options
      Unknown
 
    -mce
-     Likely related to `Windows XP Media Center Edition <https://en.wikipedia.org/wiki/Windows_XP_Media_Center_Edition>`. Appears to toggle Virtual Memory stuff.
+     Likely related to `Windows XP Media Center Edition <https://en.wikipedia.org/wiki/Windows_XP_Media_Center_Edition>`_. Appears to toggle Virtual Memory stuff.
 
    -W
      Launch in windowed mode with right-click menu.
