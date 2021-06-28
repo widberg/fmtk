@@ -50,6 +50,10 @@ Join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FU
 
 Documentation for users and mod developers is available on [Read the Docs](https://fmtk.rtfd.io). Documentation for FMTK developers is available on the [FMTK Wiki](https://github.com/widberg/fmtk/wiki).
 
+## Contributing
+
+See the [FMTK Contributing Guidelines](https://github.com/widberg/fmtk/blob/master/CONTRIBUTING.md).
+
 ## Related Projects
 
 These are projects that are related to researching FUEL but not directly part of the modding process.
