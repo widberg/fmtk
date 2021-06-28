@@ -34,8 +34,8 @@ We use GitHub issues to track bugs. Report a bug by [opening a new issue](https:
 
 ## Coding Style
 
-* We use `clang-format` for style unification
+* As long as there is some attempt at consistency we should be fine.
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the [MIT License](https://github.com/widberg/fmtk/blob/master/LICENSE).
