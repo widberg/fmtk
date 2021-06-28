@@ -8,6 +8,7 @@ Welcome to FMTK's documentation!
 
    fueldevelopermenus
    fuelcommands
+   fuelcommandlineoptions
    fuelerrors
 
 .. toctree::
