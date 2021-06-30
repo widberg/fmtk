@@ -14,8 +14,3 @@ python:
 formats:
   - epub
   - pdf
-
-submodules:
-  include:
-    - docs/ext/breathe
-  recursive: true
