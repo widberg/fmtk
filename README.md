@@ -52,7 +52,7 @@ Documentation for users and mod developers is available on [Read the Docs](https
 
 ## Contributing
 
-See the [FMTK Contributing Guidelines](https://github.com/widberg/fmtk/blob/master/CONTRIBUTING.md).
+See the [FMTK Contributing Guidelines](https://github.com/widberg/fmtk/blob/master/CONTRIBUTING.md). For an inexhaustive list of things you can help with check out the [How To Help](https://github.com/widberg/fmtk/wiki/How-To-Help) wiki entry.
 
 ## Related Projects
 

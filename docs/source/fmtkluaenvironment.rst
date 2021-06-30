@@ -24,3 +24,5 @@ By default the following standard Lua packages are available:
 By default the following 3rd-party Lua packages are available:
 
 * sockets
+
+For a quick introduction to Lua check out the `Learn X in Y minutes page on Lua <https://learnxinyminutes.com/docs/lua/>`_.
