@@ -23,6 +23,8 @@ FUNCTION(CreateFileW, CreateFileW, HANDLE, WINAPI,
 
 	std::transform(fileName.begin(), fileName.end(), fileName.begin(), std::towlower);
 
+	// FMTK_BREAKPOINT_IF(fileName == L"d:\\steamlibrary\\steamapps\\common\\fuel\\datas\\p_moto.dpc");
+
 	if (aliases.count(fileName))
 	{
 		std::wstring alias = aliases.at(fileName);

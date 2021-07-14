@@ -10,6 +10,7 @@ Welcome to FMTK's documentation!
    fuelcommands
    fuelcommandlineoptions
    fuelerrors
+   fuelcontrolcodes
 
 .. toctree::
    :maxdepth: 2

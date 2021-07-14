@@ -62,6 +62,7 @@ These are projects that are related to researching FUEL but not directly part of
 * [fuel-brute](https://github.com/widberg/fuel-brute) - CRC32 Brute Force Solver For FUEL
 * [fuel-map](https://github.com/widberg/fuel-map) - It's just information about the map
 * [fmt_fuel](https://github.com/widberg/fmt_fuel) - Noesis scripts for object formats
+* [atk](https://github.com/widberg/atk) - Frida agent for asobo games
 
 ## Getting Started (For FMTK Developers)
 
