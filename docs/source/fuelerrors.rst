@@ -56,7 +56,7 @@ Please wait
 ``Games For Windows LIVE Please wait``
 
 .. image:: img/Please_wait.png
-   :width: 600
+   :width: 300
    
 Causes:
 
