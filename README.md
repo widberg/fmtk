@@ -38,7 +38,7 @@ FMTK is fully compatible with legally obtained retail and Steam release copies o
 4. Verify that `fmtk.exe`, `fmtkdll.dll`, `secudll.dll`, `lua5.1.dll`, `mods`, and your `FUEL.exe` are all in the same directory. The number of binaries will be reduced in future releases.
 5. Run `fmtk.exe`. Windows smart screen will probably warn you that the executable is not from a trusted vendor because I have not paid for a CA to sign the executable; once again I encourage you to scan the files with virustotal or windows defender if you want to confirm their safety. Alternatively you can [build the project from the source code](https://github.com/widberg/fmtk#getting-started-for-fmtk-developers).
 
-In the event of a crash or other game state locking event, i.e. "Error: Shaders processing has failed."  or "The Game Disk Could Not be Read", please check the `fmtk.log` file in the root FUEL directory. If you cannot resolve the reported error yourself then please open an issue or contact an FMTK developer directly.
+In the event of a crash or other game state locking event, i.e. "Error: Shaders processing has failed."  or "The Game Disc could not be read.", please check the `fmtk.log` file in the root FUEL directory. If you cannot resolve the reported error yourself then please open an issue or contact an FMTK developer directly.
 
 **FMTK mods are only loaded when the fmtk.exe "Blue FUEL" launcher is used to run the game. To run the game without mods enabled, simply launch it how you normally would without FMTK; uninstalling FMTK is unnecessary. You can uninstall FMTK and all FMTK mods at any time by running the included `uninstall_fmtk.bat` script from the root FUEL directory.**
 
@@ -48,7 +48,7 @@ Join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FU
 
 ## Documentation
 
-Documentation for users and mod developers is available on [Read the Docs](https://fmtk.rtfd.io). Documentation for FMTK developers is available on the [FMTK Wiki](https://github.com/widberg/fmtk/wiki).
+Documentation for users and mod developers is available on [Read the Docs](https://fmtk.rtfd.io). Documentation for FMTK developers is available on the [FMTK Wiki](https://github.com/widberg/fmtk/wiki). Bad documentation is a bug! If a piece of documentation is incomplete/incorrect open an issue so it can be improved.
 
 ## Contributing
 
@@ -63,6 +63,10 @@ These are projects that are related to researching FUEL but not directly part of
 * [fuel-map](https://github.com/widberg/fuel-map) - It's just information about the map
 * [fmt_fuel](https://github.com/widberg/fmt_fuel) - Noesis scripts for object formats
 * [atk](https://github.com/widberg/atk) - Frida agent for asobo games
+
+## Support
+
+You can support the project by [contributing](#Contributing) or [donating](https://liberapay.com/widberg/).
 
 ## Getting Started (For FMTK Developers)
 
