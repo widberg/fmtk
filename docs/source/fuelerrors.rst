@@ -43,8 +43,25 @@ Please make sure your hardware is supported by this application
    
 Causes:
 
-* GFWL is not properly installed
+* GFWL is not properly installed.
 
 Solutions:
 
-* Reinstalling Windows seems to fix this :(
+* Use a liveless mod.
+* If you want the real GFWL then reinstalling Windows seems to fix this :(
+
+Please wait
+---------------------------------------------------------------
+
+``Games For Windows LIVE Please wait``
+
+.. image:: img/Please_wait.png
+   :width: 600
+   
+Causes:
+
+* GFWL is a terrible piece of software.
+
+Solutions:
+
+* Wait. I had to wait ~30mins the last time I had this.
