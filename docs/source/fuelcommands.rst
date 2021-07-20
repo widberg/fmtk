@@ -2072,7 +2072,7 @@ Enables the Y console menu
 
    SwitchCameraUser
 
-``SwithCameraUser 0``
+``SwitchCameraUser 0``
 
 Free cam toggle
 
