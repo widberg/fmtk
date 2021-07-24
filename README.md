@@ -17,6 +17,7 @@ FUEL Modding Toolkit
 * Callback hooks to game events
 * Interface functions to peek and poke game data
 * Full integration with the in-game command palette
+* Works with Games for Windows Live if present
 * Better error messages for shaders and crashes
 * File aliasing (like a programmatic REFUELED)
 * Seamless mod compatibility so everyone plays nice
