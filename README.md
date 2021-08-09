@@ -67,7 +67,7 @@ These are projects that are related to researching FUEL but not directly part of
 
 ## Support
 
-You can support the project by [contributing](#Contributing) or [donating](https://liberapay.com/widberg/).
+You can support the project by [contributing](#Contributing).
 
 ## Getting Started (For FMTK Developers)
 
