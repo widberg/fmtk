@@ -62,7 +62,8 @@ These are projects that are related to researching FUEL but not directly part of
 * [dpc](https://github.com/widberg/dpc) - Tar analogous utility to work with the DPC file format
 * [fuel-brute](https://github.com/widberg/fuel-brute) - CRC32 Brute Force Solver For FUEL
 * [fuel-map](https://github.com/widberg/fuel-map) - It's just information about the map
-* [fmt_fuel](https://github.com/widberg/fmt_fuel) - Noesis scripts for object formats
+* ~~[fmt_fuel](https://github.com/widberg/fmt_fuel) - Noesis scripts for object formats~~ replaced with blender_fuel
+* [blender_fuel](https://github.com/widberg/blender_fuel) - Blender scripts for object formats
 * [atk](https://github.com/widberg/atk) - Frida agent for asobo games
 
 ## Support
