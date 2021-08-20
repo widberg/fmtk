@@ -46,7 +46,7 @@ Causes:
 Solutions:
 
 * For NVIDIA GPUs, open the ``NVIDIA Control Panel``. Navigate to ``3D Settings -> Manage 3D settings``. Select the ``Program Settings`` tab and select ``FUEL.exe`` as the program to customize. Under ``Specify the settings for this program``, set ``Antialiasing - Mode`` to ``Off``.
-* For Intel GPUs, open the ``Intel® Graphics Command Center``. On the ``Home`` page in the ``Games`` tab, click the ``+``/``Add Games`` button to the right of ``My Games`` and add ``FUEL.exe``. Once added, click the new ``FUEL`` entry. Under ``DRIVER OVERRIDES``, set ``Anti-Aliasing`` to ``Always Off``.
+* For Intel GPUs, open the ``Intel® Graphics Command Center``. On the ``Home`` page in the ``Games`` tab, click the ``+``/``Add Games`` button to the right of ``My Games``, or ``Manually Select`` if you haven't added any games before, and add ``FUEL.exe``. Once added, click the new ``FUEL`` entry. Under ``DRIVER OVERRIDES``, set ``Anti-Aliasing`` to ``Always Off``.
 
 Please make sure your hardware is supported by this application
 ---------------------------------------------------------------
