@@ -28,16 +28,3 @@ Button
    ^000
 
 Reset format
-
-.. code-block:: c
-
-   ^~Sh~
-
-Newline?
-
-
-.. code-block:: c
-
-   ^~~
-
-Bold?
