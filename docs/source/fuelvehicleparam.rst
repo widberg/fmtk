@@ -4,12 +4,12 @@ Vehicle Parameters
 Param/VehicleParam.tsc
 ----------------------
 
-The ``Param/VehicleParam.tsc`` file starts with ``DisableConsole on`` then contains series of 679 ``VehiclePP`` commands each separated by a ``EndOfVehiclePP`` command. and ends with ``DisableConsole``. The ``DisableConsole`` bookend commands are to ensure that the command processor is accepting commands while the the file is run. Each sequence of 679 ``VehiclePP`` commands sets up the parameter buffer for an individual vehicle. Once all 679 ``VehiclePP`` commands for a vehicle have run, ``EndOfVehiclePP`` is run to commit the parameter buffer to the vehicle corresponding to the name given by parameter index 0.
+The ``Param/VehicleParam.tsc`` file starts with ``DisableConsole on`` then contains series of 679 ``VehiclePP`` commands each separated by a ``EndOfVehiclePP`` command. and ends with ``DisableConsole``. The ``DisableConsole`` bookend commands are to ensure that the command processor is accepting commands while the the file is run. Each sequence of 679 ``VehiclePP`` commands sets up the parameter buffer for an individual vehicle. Once all 679 ``VehiclePP`` commands for a vehicle have run, ``EndOfVehiclePP`` is run to commit the parameter buffer to the vehicle corresponding to the name given by parameter index 0. A few of the parameters have been investigated on the `FUEL Fandom Wiki VehiclesParam.tsc entry <https://fuel.fandom.com/wiki/VehiclesParam.tsc>`_.
 
 Hot Reload
 ----------
 
-The ``Param/VehicleParam.tsc`` can be hot reloaded by editing and saving ``Param/VehicleParam.tsc`` then running ``ReloadVehicleParameters`` or ``RVP`` via the in-game developer command palette and switching to another vehicle and back for the changes to take place without restarting the game. A few of the parameters have been investigated on the `FUEL Fandom Wiki VehiclesParam.tsc entry <https://fuel.fandom.com/wiki/VehiclesParam.tsc>`_.
+The ``Param/VehicleParam.tsc`` file can be hot reloaded by editing and saving ``Param/VehicleParam.tsc`` then running ``ReloadVehicleParameters`` or ``RVP`` via the in-game developer command palette and switching to another vehicle and back for the changes to take place without restarting the game.
 
 Parameter Table
 ---------------
