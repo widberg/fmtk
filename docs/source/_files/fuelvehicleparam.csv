@@ -1,4 +1,5 @@
-ID,Type,Description,Notes
+Index,Type,Description,Notes
+0,String,Vehicle Internal Name,The first argument to AddVehicleInfo in VehicleDef.tsc
 1,,,
 2,,,
 3,,,
