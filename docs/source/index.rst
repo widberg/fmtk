@@ -20,3 +20,4 @@ Welcome to FMTK's documentation!
 
    fmtksdk
    fmtklua
+   fmtkmodreleaseguidelines
