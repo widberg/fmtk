@@ -24,7 +24,7 @@ em space. Invisible non-whitespace character with a width of approximately 1 spa
 
    £
 
-1px space. Invisible non-whitespace character with a width of 1 pixel.
+1px space. Invisible non-whitespace character with a width of approximately 1 pixel.
 
 .. code-block:: c
 
@@ -49,6 +49,7 @@ Zero-width space. Invisible non-whitespace character with a zero width. This may
    µ
 
 Right justify. Following the first occurrence of ``µ`` in the string, align the text to the right side of the panel and use weird "indent on new-line" behavior. If a line following the first occurrence of ``µ`` in the string has characters before the first occurrence of ``µ`` in the line, those characters will be indented. If a line following the first occurrence of ``µ`` in the string has characters after the first occurrence of ``µ`` in the line, those characters will not be indented regardless of if indented characters exist previously on the line. This can lead to weird overlapping text on the same line with the right combination of ``~`` and ``µ`` characters. The last line will always be indented if there exists a line containing ``µ`` before it regardless of ``µ`` being present in the last line.
+
 TransText Specific Control Codes
 ---------------------------------
 
