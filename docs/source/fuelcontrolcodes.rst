@@ -9,7 +9,6 @@ General Control Codes
 ---------------------
 
 .. admonition::
-   :class: sig
 
    ~
 
@@ -25,7 +24,7 @@ em space. Invisible non-whitespace character with a width of approximately 1 spa
 
    |
 
-Zero-width space. Invisible non-whitespace character with a width of zero. This may have other uses.
+Zero-width space. Invisible non-whitespace character with a width of zero. This may have another use.
 
 .. code-block:: c
 
