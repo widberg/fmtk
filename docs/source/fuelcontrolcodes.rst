@@ -93,7 +93,7 @@ Some strings are interpreted as 8-bit Extended ASCII (EASCII) while others are i
 Non-Printing Characters
 -----------------------
 
-Characters that are not present in the current font, e.g. `\x00-\x1F`, will not be printed. Just because a character does not print does not mean it is a control code; it might just not have an associated glyph in the current font.
+Characters that are not present in the current font, e.g. ``\x00-\x1F``, will not be printed. Just because a character does not print does not mean it is a control code; it might just not have an associated glyph in the current font.
 
 Escape Sequence
 ---------------
