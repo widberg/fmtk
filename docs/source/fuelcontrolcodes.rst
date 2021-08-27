@@ -18,7 +18,7 @@ Newline.
 
    ²
 
-em space. Invisible non-whitespace character with a width of approximately 1 space, `` ``, character scaled to the current font size. Useful for when you want to print a space but cannot have ``char c`` such that ``std::isspace(c) == true``.
+em space. Invisible non-whitespace character with a width of approximately 1 space character scaled to the current font size. Useful for when you want to print a space but cannot have ``char c`` such that ``std::isspace(c) == true``.
 
 .. code-block:: c
 
