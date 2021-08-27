@@ -36,7 +36,7 @@ Zero-width space. Invisible non-whitespace character with a width of zero. The g
 
    ^
 
-``^`` followed by 3 digits, ``\^\d{3}``, will set the color. ``^RGB`` will result in ``Color(R / 9 * 255, G / 9 * 255, B / 9 * 255)``. The one exception to this rule is ``^000`` which resets the color to the default, white. Since ``^000`` is a special case, you must use ``^001`` to achieve the closest thing to the color black. Advanced note: Characters outside of the ``0-9`` range are allowed; however, the ASCII value of the characters are used so technically ``^XYZ``, ``\^.{3}``, will result in ``Color(std::clamp((X - '0') / 9 * 255, 0, 255), std::clamp((Y - '0') / 9 * 255, 0, 255), std::clamp((Z - '0') / 9 * 255, 0, 255))``.
+``^`` followed by 3 digits, ``\^\d{3}``, will set the color. ``^RGB`` will result in ``Color(R / 9 * 255, G / 9 * 255, B / 9 * 255)``. The one exception to this rule is ``^000`` which resets the color to the default, white. Since ``^000`` is a special case, you must use ``^001`` to achieve the closest thing to the color black. Advanced note: Characters outside of the ``0-9`` range are allowed; however, the ASCII value of the characters are used so ``^XYZ``, ``\^.{3}``, will result in unexpected interpretations of the color value. This is because for ``char c`` the digit value is determined by ``c - '0'`` leading to negative or large numbers for individual place values when ``std::isdigit(c) == false``.
 
 .. code-block:: c
 
