@@ -11,9 +11,7 @@ General Control Codes
 .. admonition::
    :class: sig
 
-   .. code-block:: c
-
-      ~
+   ~
 
 Newline.
 
