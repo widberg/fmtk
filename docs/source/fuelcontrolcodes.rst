@@ -8,9 +8,12 @@ Some strings accept C standard library ``printf`` format specifiers.
 General Control Codes
 ---------------------
 
-.. code-block:: c
+.. admonition::
+   :class: sig
 
-   ~
+   .. code-block:: c
+
+      ~
 
 Newline.
 
