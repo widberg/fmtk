@@ -8,7 +8,7 @@ Some strings accept C standard library ``printf`` format specifiers.
 General Control Codes
 ---------------------
 
-.. admonition::
+.. code-block:: c
 
    ~
 
@@ -24,7 +24,7 @@ em space. Invisible non-whitespace character with a width of approximately 1 spa
 
    |
 
-Zero-width space. Invisible non-whitespace character with a width of zero. This may have another use.
+Zero-width space. Invisible non-whitespace character with a width of zero. The game tries to print the literal ``|`` character as a separator in a few places but it does not show up as expected.
 
 .. code-block:: c
 
@@ -89,3 +89,13 @@ Multibyte Characters
 ---------------------
 
 Some strings are interpreted as 8-bit Extended ASCII (EASCII) while others are interpreted as UTF-8. If the control codes listed above are not working, it is possible that the string is expecting the character as UTF-8 and not EASCII. For example, ``§`` is ``\xA7`` in EASCII and ``\xC2\xA7`` in UTF-8. You may find `this table <https://kellykjones.tripod.com/webtools/ascii_utf8_table.html>`_ to be a useful reference for ASCII and UTF-8 comparisons.
+
+Non-Printing Characters
+-----------------------
+
+Characters that are not present in the current font, e.g. `\x00-\x1F`, will not be printed. Just because a character does not print does not mean it is a control code; it might just not have an associated glyph in the current font.
+
+Escape Sequence
+---------------
+
+There is no way to escape control codes. This is incredibly inconvenient since ``~``, ``|``, and ``^`` are standard printable ASCII characters with no way to be displayed.
