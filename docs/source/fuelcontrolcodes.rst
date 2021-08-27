@@ -1,7 +1,7 @@
 Control Codes
 =============
 
-Control codes for translation text and other strings.
+Control codes for TransText and other strings.
 
 Some strings accept C standard library ``printf`` format specifiers.
 
@@ -18,7 +18,13 @@ Newline.
 
    ²
 
-Space.
+Space. Invisible non-whitespace character with a non-zero width. Useful for when you want to print a space but cannot have ``char c`` such that ``std::isspace(c) == true``.
+
+.. code-block:: c
+
+   |
+
+Zero-width space. Invisible non-whitespace character with a zero width. This may have other uses.
 
 .. code-block:: c
 
@@ -30,21 +36,21 @@ Space.
 
    §
 
-``§`` followed by 3 digits, ``\§\d{3}``, will set the text size. ``§HXY`` can be interpreted as a one digit header value followed by a two digit size value. When the header is zero, the size value may range from 0, text is so small it is not visible, to 99, the largest size. When the header value is non-zero, the text is first scaled inversely to the header value, 1 is the largest and 9 is the smallest, then it is scaled again inversely by the size value, 0 is the largest size for that header value and 99 is the smallest size for that header value. Advanced note: the same behavior for non-digit characters applies as above.
+``§`` followed by 3 digits, ``\§\d{3}``, will set the text size. ``§HXY`` can be interpreted as a one digit header,  ``H``, value followed by a two digit size value, ``XY``. When the header is zero, the size value may range from 0, text is so small it is not visible, to 99, the largest size. When the header value is non-zero, the text is first scaled inversely to the header value, 1 is the largest and 9 is the smallest, then it is scaled again inversely by the size value, 0 is the largest size for that header value and 99 is the smallest size for that header value. Advanced note: the same behavior for non-digit characters applies as with ``^``.
 
 .. code-block:: c
 
    µ
 
-Right justify. Align the text to the right side of the panel and use weird indent on new-line behavior. If a line in a string with ``µ`` in it does not have ``µ`` in it, it will be indented. The last line will always be indented.
+Right justify. Following the first occurrence of ``µ`` in the string, align the text to the right side of the panel and use weird "indent on new-line" behavior. If a line following the first occurrence of ``µ`` in the string has characters before the first occurrence of ``µ`` in the line, those characters will be indented. If a line following the first occurrence of ``µ`` in the string has characters after the first occurrence of ``µ`` in the line, those characters will not be indented regardless of if indented characters exist previously on the line. This can lead to weird overlapping text on the same line with the right combination of ``~`` and ``µ`` characters. The last line will always be indented if there exists a line containing ``µ`` before it regardless of ``µ`` being present in the last line.
 
 .. code-block:: c
 
    £
 
-Sets some one time thing related to the width of the rest of the string or something. I really have no idea what this does.
+Sets some one time thing related to the width of the rest of the string or something. This control code is only checked during the coloring function. Earlier games do not appear to support this control code. I really have no idea what this does. I cannot find any use of this control code in any of the game files or string dump.
 
-Trans Text Specific Control Codes
+TransText Specific Control Codes
 ---------------------------------
 
 The following control codes only have an effect when used in TransText strings.
@@ -71,10 +77,15 @@ When ``$`` is the only character in a string, the string is empty. This is used 
 
    BITMAP_
 
-The two variants of this control code are ``BITMAP_GAMESPY`` and ``BITMAP_BINK`` although ``BITMAP_BINK`` is recognized by not being ``BITMAP_GAMESPY`` rather than being an explicit check for that value. This control code is used to display the logo of the respective entities during the credits.
+The two observed variants of this control code are ``BITMAP_GAMESPY`` and ``BITMAP_BINK``. This control code is used to display the logo of the respective entities during the credits.
 
 .. code-block:: c
 
    END OF CREDITS
 
 When the full string is ``END OF CREDITS``, the credits end.
+
+Multi-Byte Characters
+---------------------
+
+Some strings are interpreted as ASCII while others are interpreted as UTF-8. If the control codes listed above are not working, it is possible that the string is expecting the character as UTF-8 and not ASCII. For example, ``§`` is ``\xA7`` in ASCII and ``\xC2\xA7`` in UTF-8. You may find `this table <https://kellykjones.tripod.com/webtools/ascii_utf8_table.html>`_ to be a useful reference for ASCII and UTF-8 comparisons.
