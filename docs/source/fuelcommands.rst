@@ -481,6 +481,10 @@ Enables the Y console menu
 
    CloseAVI
 
+``CloseAVI|CAVI``
+
+Stop recording. See ``MakeAVI``.
+
 .. code-block:: c
 
    CloseBF
@@ -1219,6 +1223,10 @@ Enables the Y console menu
 .. code-block:: c
 
    MakeAVI
+
+``MakeAVI|MAVI [fps0] [fps1]``
+
+both arguments default to 30 if not present. They may be overwritten individually by providing 1 or 2 arguments optionally. The directory ``C:\temp`` must exist for this command to work. A menu will pop up to configure the recording options. See ``CloseAVI``.
 
 .. code-block:: c
 
