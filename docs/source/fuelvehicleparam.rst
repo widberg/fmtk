@@ -9,7 +9,12 @@ The ``Param/VehicleParam.tsc`` file starts with ``DisableConsole on`` then conta
 Hot Reload
 ----------
 
-The ``Param/VehicleParam.tsc`` file can be hot reloaded by editing and saving ``Param/VehicleParam.tsc`` then running ``ReloadVehicleParameters`` or ``RVP`` via the in-game developer command palette and switching to another vehicle and back for the changes to take place without restarting the game.
+The ``Param/VehicleParam.tsc`` file can be hot reloaded by editing and saving ``Param/VehicleParam.tsc`` then running the ``ReloadVehicleParameters`` command via the in-game developer command palette and switching to another vehicle and back for the changes to take place without restarting the game.
+
+Debugging
+---------
+
+The ``DeBugInfos`` command will enable a debug view of the current vehicle's configuration.
 
 Parameter Table
 ---------------
