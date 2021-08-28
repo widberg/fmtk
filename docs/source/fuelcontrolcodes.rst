@@ -85,6 +85,23 @@ The two observed variants of this control code are ``BITMAP_GAMESPY`` and ``BITM
 
 When the full string is ``END OF CREDITS``, the credits end.
 
+Configuration Specific Control Codes
+------------------------------------
+
+The following control codes only have an effect during the controls layout menu.
+
+.. code-block:: c
+
+   END OF ACTION
+
+When the full string is ``END OF ACTION``, the sequential parsing of TransText key names ends. This is used to separate different input categories; however, the game does not handle separate input categories.
+
+.. code-block:: c
+
+   END OF CONTEXT
+
+When the full string is ``END OF CONTEXT`` and the TransText string with the ID one less than the current one is ``END OF ACTION``, the context ends. This signals the end of the last input category.
+
 Multibyte Characters
 ---------------------
 
