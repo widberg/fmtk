@@ -59,7 +59,7 @@ The following control codes only have an effect when used in TransText strings.
 
    STR_
 
-The full sequence of ``STR_\S+``, where the part following ``STR_`` is a registered ``LanguageHandleSTR``, is replaced with the registered substitute. The substitute may be text or a bitmap. This is mainly used to insert button icons into TransText strings.
+The full sequence of ``STR_\S+``, where the part following ``STR_`` is a registered ``LanguageHandleSTR``, is replaced with the registered substitute. This is mainly used to insert the characters corresponding to button icon glyphs into TransText strings without having to use the actual characters which most text editors will not be able to display and are not easy to remember.
 
 Credits Specific Control Codes
 ------------------------------
