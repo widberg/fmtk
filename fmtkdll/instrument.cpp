@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <detours.h>
 
+#include <dsound.h>
+
 #include <filesystem>
 
 #include <usercall_hpp/usercall.hpp>
@@ -87,6 +89,7 @@ using p_float_t = float*;
 #include "gadgets/createwindowexw.hpp"
 #include "gadgets/getplayerposition.hpp"
 #include "gadgets/readfile.hpp"
+#include "gadgets/idirectsoundbufferplay.hpp"
 
 bool patchXLive = false;
 
@@ -141,6 +144,8 @@ LONG AttachDetours()
 	ATTACH(RegisterCommand);
 	ATTACH(ScriptManagerInit);
 	ATTACH(ReadFile);
+
+	ATTACH(IDirectSoundBuffer_Play);
 
     LOG(trace, FMTK, "Ready to commit");
 
