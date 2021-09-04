@@ -13,3 +13,11 @@ fmtk.hook(fmtk.event.SCRIPT_MANAGER_INITIALIZE, "test_mod_smi_hook", function()
 		fmtk.log.info("TEST MOD", "Our command was called")
 	end)
 end)
+
+local bbb = false;
+fmtk.hook(fmtk.event.TICK, "test_mod_tick", function()
+	if ~bbb then
+		fmtk.run_command("DisableMOvie")
+		bbb = true
+	end
+end)

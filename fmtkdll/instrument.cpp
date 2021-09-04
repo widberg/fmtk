@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <detours.h>
 
-#include <dsound.h>
+//#include <dsound.h>
 
 #include <filesystem>
 
@@ -89,7 +89,7 @@ using p_float_t = float*;
 #include "gadgets/createwindowexw.hpp"
 #include "gadgets/getplayerposition.hpp"
 #include "gadgets/readfile.hpp"
-#include "gadgets/idirectsoundbufferplay.hpp"
+//#include "gadgets/idirectsoundbufferplay.hpp"
 
 bool patchXLive = false;
 
@@ -125,6 +125,11 @@ bool DetachDetoursXLive()
 	return result;
 }
 
+
+//#define DSOUND_DLL_BASE_ADDRESS (0x000000)
+//#define ATTACHDSOUND(x)  Real_DSOUND_##x = reinterpret_cast<decltype(Real_DSOUND_##x)>((DWORD_PTR)hiDSOUND +  (DWORD_PTR)Real_DSOUND_##x - (DWORD_PTR)DSOUND_DLL_BASE_ADDRESS); DetourAttach(&(PVOID&)Real_DSOUND_##x, FMTK_DSOUND_##x)
+//#define DETACHDSOUND(x)  DetourDetach(&(PVOID&)Real_DSOUND_##x, FMTK_DSOUND_##x)
+
 // Instrument
 LONG AttachDetours()
 {
@@ -145,7 +150,12 @@ LONG AttachDetours()
 	ATTACH(ScriptManagerInit);
 	ATTACH(ReadFile);
 
-	ATTACH(IDirectSoundBuffer_Play);
+	//HINSTANCE hiDSOUND = GetModuleHandleA("dsound.dll");
+
+	//ATTACHDSOUND(IDirectSoundBuffer_Play);
+	//ATTACHDSOUND(IDirectSoundBuffer_SetVolume);
+	//ATTACHDSOUND(IDirectSoundBuffer_Release);
+	//ATTACHDSOUND(IDirectSound_CreateSoundBuffer);
 
     LOG(trace, FMTK, "Ready to commit");
 
@@ -172,6 +182,11 @@ LONG DetachDetours()
 	DETACH(RegisterCommand);
 	DETACH(ScriptManagerInit);
 	DETACH(ReadFile);
+
+	//DETACHDSOUND(IDirectSoundBuffer_Play);
+	//DETACHDSOUND(IDirectSoundBuffer_SetVolume);
+	//DETACHDSOUND(IDirectSoundBuffer_Release);
+	//DETACHDSOUND(IDirectSound_CreateSoundBuffer);
 
     LOG(trace, FMTK, "Ready to commit");
 

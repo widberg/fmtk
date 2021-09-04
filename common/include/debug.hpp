@@ -6,7 +6,7 @@
 #include <cstring>
 
 #define FMTK_ASSERT(condition, message) assert((message, condition))
-#define FMTK_STATIC_ASSERT(condition, message) static_assert(condition, message)
+#define FMTK_ASSERT_NOT_REACHED() assert(("FMTK_ASSERT_NOT_REACHED", false))
 
 #if defined(_DEBUG) || defined(DEBUG) || !defined(NDEBUG)
 #define FMTK_DEBUG 1

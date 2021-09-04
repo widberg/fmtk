@@ -9,7 +9,7 @@ The ``Param/VehicleParam.tsc`` file starts with ``DisableConsole on`` then conta
 Hot Reload
 ----------
 
-The ``Param/VehicleParam.tsc`` file can be hot reloaded by editing and saving ``Param/VehicleParam.tsc`` then running the ``ReloadVehicleParameters`` command via the in-game developer command palette and switching to another vehicle and back for the changes to take place without restarting the game.
+The ``Param/VehicleParam.tsc`` file can be hot reloaded by editing and saving ``Param/VehicleParam.tsc`` then running the ``ReloadVehicleParameters`` command via the in-game developer command palette and switching to another vehicle and back for the changes to take place without restarting the game. Only code reading parameters after the reload will use the new values. Code that reads a parameter once at startup will not receive the new value.
 
 Debugging
 ---------
