@@ -67,20 +67,20 @@ Index,Type,Description,Notes
 83-89,Unused,Unused,Unused
 90,,,Related to MeterHUD
 91-100,Unused,Unused,Unused
-101,,, 
-102,,,
-103,,,
-104,,,
-105,,,
-106,,,
-107,,,
-108,,,
-109,,,
-110,,,
-111,,,
-112,,,
-113,,,
-114,,,
+101,,,The game boots fine without this
+102,,,The game boots fine without this
+103,,,The game boots fine without this
+104,,,The game boots fine without this
+105,,,The game boots fine without this
+106,,,The game boots fine without this
+107,,,The game boots fine without this
+108,,,The game boots fine without this
+109,,,The game boots fine without this
+110,,,The game boots fine without this
+111,,,The game boots fine without this
+112,,,The game boots fine without this
+113,,,The game boots fine without this
+114,,,The game boots fine without this
 115-119,Unused,Unused,Unused
 120,,,Related to IT_COLLECTMove_G
 121-129,Unused,Unused,Unused
@@ -89,46 +89,46 @@ Index,Type,Description,Notes
 150,,,Related to IT_DYNOBJMove_G
 151,,,Related to IT_DYNOBJMove_G
 152-199,Unused,Unused,Unused
-200,,,
-201,,,
-202,,,
-203,,,
-204,,,
-205,,,
-206,,,
-207,,,
-208,,,
-209,,,
-210,,,
-211,,,
-212,,,
-213,,,
-214,,,
-215,,,
-216,,,
-217,,,
-218,,,
-219,,,
-220,,,
-221,,,
-222,,,
-223,,,
-224,,,
-225,,,
-226,,,
-227,,,
-228,,,
-229,,,
-230,,,
-231,,,
-232,,,
-233,,,
-234,,,
-235,,,
-236,,,
-237,,,
-238,,,
-239,,,
+200,,,The game boots fine without this
+201,,,The game boots fine without this
+202,,,The game boots fine without this
+203,,,The game boots fine without this
+204,,,The game boots fine without this
+205,,,The game boots fine without this
+206,,,The game boots fine without this
+207,,,The game boots fine without this
+208,,,The game boots fine without this
+209,,,The game boots fine without this
+210,,,The game boots fine without this
+211,,,The game boots fine without this
+212,,,The game boots fine without this
+213,,,The game boots fine without this
+214,,,The game boots fine without this
+215,,,The game boots fine without this
+216,,,The game boots fine without this
+217,,,The game boots fine without this
+218,,,The game boots fine without this
+219,,,The game boots fine without this
+220,,,The game boots fine without this
+221,,,The game boots fine without this
+222,,,The game boots fine without this
+223,,,The game boots fine without this
+224,,,The game boots fine without this
+225,,,The game boots fine without this
+226,,,The game boots fine without this
+227,,,The game boots fine without this
+228,,,The game boots fine without this
+229,,,The game boots fine without this
+230,,,The game boots fine without this
+231,,,The game boots fine without this
+232,,,The game boots fine without this
+233,,,The game boots fine without this
+234,,,The game boots fine without this
+235,,,The game boots fine without this
+236,,,The game boots fine without this
+237,,,The game boots fine without this
+238,,,The game boots fine without this
+239,,,The game boots fine without this
 240-249,Unused,Unused,Unused
 250,,,Related to ScriptManager_G
 251,,,Related to ScriptManager_G
