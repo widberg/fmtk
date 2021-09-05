@@ -18,7 +18,7 @@ Index,Type,Description,Notes
 17,,,Related to Navigator3dHUD
 18,,,Related to Navigator3dHUD
 19,,,Related to Navigator3dHUD
-20,,,
+20,,,Related to TT and RtcScriptAgent_G
 21,Unused,Unused,Unused
 22,,,Related to ViewportHUD
 23,,,Related to ViewportHUD
@@ -31,39 +31,39 @@ Index,Type,Description,Notes
 30,,,
 31,,,
 32-38,Unused,Unused,Unused
-39,,,Related to ViewportHUD
-40,,,Related to ViewportHUD
-41,,,Related to ViewportHUD
-42,,,Related to ViewportHUD
-43,,,Related to ViewportHUD
+39,,,Related to ViewportHUD and MapHUD
+40,,,Related to ViewportHUD and MapHUD
+41,,,Related to ViewportHUD and MapHUD
+42,,,Related to ViewportHUD and MapHUD
+43,,,Related to ViewportHUD and MapHUD
 44,Unused,Unused,Unused
 45,,,Related to menus
 46,,,
 47,,,Related to menus
 48,,,Related to menus
 49,Unused,Unused,Unused
-50,,,Related to MissionStatus_G
-51,,,
-52,,,Related to MissionStatus_G
+50,,,Related to MissionStatus_G and LoadingDraw_C and LevelManipulator_G
+51,,,Related to LoadingDraw_C
+52,,,Related to MissionStatus_G and LoadingDraw_C and LevelManipulator_G
 53-59,Unused,Unused,Unused
-60,,,
-61,,,
-62,,,
+60,,,Dead end Xref related to INT_MENU_3D
+61,,,Dead end Xref related to INT_MENU_3D
+62,,,Related to menu
 63,,,Related to menu
 64,,,Related to menu
 65,,,Related to menu
-66,,,
-67,,,
-68,,,
-69,,,
-70,,,
-71,,,
+66,,,Related to menu
+67,,,Related to menu
+68,,,Related to menu
+69,,,Related to menu
+70,,,Related to menu
+71,,,Related to menu
 72,,,Related to InGame3DVehicle
 73,,,Related to InGame3DVehicle
 74-79,Unused,Unused,Unused
-80,,,
-81,,,
-82,,,
+80,,,Related to F14Move_G
+81,,,Related to F14Move_G
+82,,,Related to F14Move_G
 83-89,Unused,Unused,Unused
 90,,,Related to MeterHUD
 91-100,Unused,Unused,Unused
@@ -82,12 +82,12 @@ Index,Type,Description,Notes
 113,,,
 114,,,
 115-119,Unused,Unused,Unused
-120,,,
+120,,,Related to IT_COLLECTMove_G
 121-129,Unused,Unused,Unused
 130,,,
 131-149,Unused,Unused,Unused
-150,,,
-151,,,
+150,,,Related to IT_DYNOBJMove_G
+151,,,Related to IT_DYNOBJMove_G
 152-199,Unused,Unused,Unused
 200,,,
 201,,,
@@ -130,9 +130,9 @@ Index,Type,Description,Notes
 238,,,
 239,,,
 240-249,Unused,Unused,Unused
-250,,,
-251,,,
-252,,,
+250,,,Related to ScriptManager_G
+251,,,Related to ScriptManager_G
+252,,,Related to ScriptManager_G
 253-299,Unused,Unused,Unused
 300,,,0 X related to menu
 301,,,0 Y related to menu
@@ -191,7 +191,7 @@ Index,Type,Description,Notes
 354-359,Unused,Unused,Unused
 360,,,Related to GeneratedOfflineVisibleObject and player position radius
 361-369,Unused,Unused,Unused
-370,,,
+370,,,Related to WeatherManager_G
 371,,,Related to WeatherManager_G
 372,,,
 373-379,Unused,Unused,Unused
@@ -417,78 +417,78 @@ Index,Type,Description,Notes
 927,,,341's 7
 928,,,341's 8
 929-2000,Unused,Unused,Unused
-2001,,,Platform specific
-2002,,,Platform specific
+2001,,,Platform specific and related to Manipulator_Z
+2002,,,Platform specific and related to Manipulator_Z
 2003,,,Platform specific
 2004,,,Platform specific
 2005,,,Platform specific
 2006,,,Platform specific
 2007,,,Platform specific
-2008,,,Platform specific
-2009,,,Platform specific
+2008,,,Platform specific and related to Manipulator_Z
+2009,,,Platform specific and related to Manipulator_Z
 2010,,,Platform specific
 2011,,,Platform specific
 2012-2019,Unused,Unused,Unused
-2020,,,Platform specific
-2021,,,Platform specific
-2022,,,Platform specific
-2023,,,Platform specific
-2024,,,Platform specific
-2025,,,Platform specific
-2026,,,Platform specific
-2027,,,Platform specific
-2028,,,Platform specific
-2029,,,Platform specific
-2030,,,Platform specific
-2031,,,Platform specific
-2032,,,Platform specific
-2033,,,Platform specific
-2034,,,Platform specific
+2020,,,Platform specific 0's 0
+2021,,,Platform specific 0's 1
+2022,,,Platform specific 0's 2
+2023,,,Platform specific 0's 3
+2024,,,Platform specific 0's 4
+2025,,,Platform specific 0's 5
+2026,,,Platform specific 0's 6
+2027,,,Platform specific 0's 7
+2028,,,Platform specific 0's 8
+2029,,,Platform specific 0's 9
+2030,,,Platform specific 0's 10
+2031,,,Platform specific 0's 11
+2032,,,Platform specific 0's 12
+2033,,,Platform specific 0's 13
+2034,,,Platform specific 0's 14
 2035-2049,Unused,Unused,Unused
-2050,,,Platform specific
-2051,,,Platform specific
-2052,,,Platform specific
-2053,,,Platform specific
-2054,,,Platform specific
-2055,,,Platform specific
-2056,,,Platform specific
-2057,,,Platform specific
-2058,,,Platform specific
-2059,,,Platform specific
-2060,,,Platform specific
-2061,,,Platform specific
-2062,,,Platform specific
-2063,,,Platform specific
-2064,,,Platform specific
+2050,,,Platform specific 1's 0
+2051,,,Platform specific 1's 1
+2052,,,Platform specific 1's 2
+2053,,,Platform specific 1's 3
+2054,,,Platform specific 1's 4
+2055,,,Platform specific 1's 5
+2056,,,Platform specific 1's 6
+2057,,,Platform specific 1's 7
+2058,,,Platform specific 1's 8
+2059,,,Platform specific 1's 9
+2060,,,Platform specific 1's 10
+2061,,,Platform specific 1's 11
+2062,,,Platform specific 1's 12
+2063,,,Platform specific 1's 13
+2064,,,Platform specific 1's 14
 2065-2079,Unused,Unused,Unused
-2080,,,Platform specific
-2081,,,Platform specific
-2082,,,Platform specific
-2083,,,Platform specific
-2084,,,Platform specific
-2085,,,Platform specific
-2086,,,Platform specific
-2087,,,Platform specific
-2088,,,Platform specific
-2089,,,Platform specific
-2090,,,Platform specific
-2091,,,Platform specific
-2092,,,Platform specific
-2093,,,Platform specific
-2094,,,Platform specific
+2080,,,Platform specific 2's 0
+2081,,,Platform specific 2's 1
+2082,,,Platform specific 2's 2
+2083,,,Platform specific 2's 3
+2084,,,Platform specific 2's 4
+2085,,,Platform specific 2's 5
+2086,,,Platform specific 2's 6
+2087,,,Platform specific 2's 7
+2088,,,Platform specific 2's 8
+2089,,,Platform specific 2's 9
+2090,,,Platform specific 2's 10
+2091,,,Platform specific 2's 11
+2092,,,Platform specific 2's 12
+2093,,,Platform specific 2's 13
+2094,,,Platform specific 2's 14
 2095-2149,Unused,Unused,Unused
-2150,,,Platform specific
-2151,,,Platform specific
-2152,,,Platform specific
-2153,,,Platform specific
-2154,,,Platform specific
-2155,,,Platform specific
-2156,,,Platform specific
+2150,,,Platform specific and related to Manipulator_Z
+2151,,,Platform specific and related to Manipulator_Z
+2152,,,Platform specific and related to Manipulator_Z
+2153,,,Platform specific and related to Manipulator_Z
+2154,,,Platform specific and related to Manipulator_Z
+2155,,,Platform specific and related to Manipulator_Z
+2156,,,Platform specific and related to Manipulator_Z
 2157-2199,Unused,Unused,Unused
 2200,,,Platform specific
-2201,,,Platform specific
-2202,,,Platform specific
-2203,,,Platform specific
+2201,,,Platform specific and related to Game_SoundMgr
+2202,,,Platform specific and related to SpecialEffectsThunder_G
+2203,,,Platform specific and related to BirdAnimal
 2204-2209,Unused,Unused,Unused
 2210,,,Platform specific
 2211,,,Platform specific
@@ -497,12 +497,12 @@ Index,Type,Description,Notes
 2214,,,Platform specific
 2215,,,Platform specific
 2216-2219,Unused,Unused,Unused
-2220,,,Platform specific
-2221,,,Platform specific
-2222,,,Platform specific and related to MissionHUD
-2223,,,Platform specific
-2224,,,Platform specific
-2225,,,Platform specific
+2220,,,Platform specific and related to Manipulator_Z
+2221,,,Platform specific and related to Manipulator_Z
+2222,,,Platform specific and related to Manipulator_Z
+2223,,,Platform specific and related to Manipulator_Z
+2224,,,Platform specific and related to Manipulator_Z
+2225,,,Platform specific and related to Manipulator_Z
 2226-2999,Unused,Unused,Unused
 3000,String,,"Equals ""DEFAULT"""
 3001,,,
@@ -1070,14 +1070,14 @@ Index,Type,Description,Notes
 4398,Float,SP_SOFTSNOW ROLLING DAMAGE Road Type Property Value,
 4399-4999,Unused,Unused,Unused
 5000,,,
-5001,,,
-5002,,,
+5001,,,Related to SpecialEffectsSnowTank_G
+5002,,,Related to SpecialEffectsSnowTank_G
 5003,,,
-5004,,,
-5005,,,
-5006,,,
-5007,,,
-5008,,,
+5004,,,Related to SpecialEffectsSnowTank_G
+5005,,,Related to SpecialEffectsSnowTank_G
+5006,,,Related to SpecialEffectsSnowTank_G
+5007,,,Related to SpecialEffectsSnowTank_G
+5008,,,Related to SpecialEffectsSnowTank_G
 5009,,,
 5010,,,
 5011,,,
@@ -1095,43 +1095,43 @@ Index,Type,Description,Notes
 5023,,,
 5024,,,
 5025,,,
-5026,,,
-5027,,,
+5026,,,Related to SpecialEffectsSnowTank_G
+5027,,,Related to SpecialEffectsSnowTank_G
 5028-5029,Unused,Unused,Unused
-5030,,,
-5031,,,
-5032,,,
-5033,,,
-5034,,,
-5035,,,
-5036,,,
-5037,,,
+5030,,,Related to SpecialEffectsSplashTank_G
+5031,,,Related to SpecialEffectsSplashTank_G
+5032,,,Related to SpecialEffectsSplashTank_G
+5033,,,Related to SpecialEffectsSplashTank_G
+5034,,,Related to SpecialEffectsSplashTank_G
+5035,,,Related to SpecialEffectsSplashTank_G
+5036,,,Related to SpecialEffectsSplashTank_G
+5037,,,Related to SpecialEffectsSplashTank_G
 5038,,,
-5039,,,
-5040,,,
+5039,,,Related to SpecialEffectsSplashTank_G
+5040,,,Related to SpecialEffectsRainTank_G
 5041,,,
-5042,,,
-5043,,,
-5044,,,
-5045,,,
-5046,,,
-5047,,,
-5048,,,
-5049,,,
-5050,,,
-5051,,,
-5052,,,
-5053,,,
-5054,,,
-5055,,,
-5056,,,
-5057,,,
-5058,,,
-5059,,,
-5060,,,
-5061,,,
-5062,,,
-5063,,,
+5042,,,Related to SpecialEffectsRainTank_G
+5043,,,Related to SpecialEffectsRainTank_G
+5044,,,Related to SpecialEffectsRainTank_G
+5045,,,Related to SpecialEffectsRainTank_G
+5046,,,Related to SpecialEffectsRainTank_G
+5047,,,Related to SpecialEffectsRainTank_G
+5048,,,Related to SpecialEffectsRainTank_G
+5049,,,Related to SpecialEffectsRainTank_G
+5050,,,Related to SpecialEffectsRainTank_G
+5051,,,Related to SpecialEffectsRainTank_G
+5052,,,Related to SpecialEffectsRainTank_G
+5053,,,Related to SpecialEffectsRainTank_G
+5054,,,Related to SpecialEffectsRainTank_G
+5055,,,Related to SpecialEffectsRainTank_G
+5056,,,Related to SpecialEffectsRainTank_G
+5057,,,Related to SpecialEffectsRainTank_G
+5058,,,Related to SpecialEffectsRainTank_G
+5059,,,Related to SpecialEffectsRainTank_G
+5060,,,Related to SpecialEffectsRainTank_G
+5061,,,Related to SpecialEffectsRainTank_G
+5062,,,Related to SpecialEffectsRainTank_G
+5063,,,Related to SpecialEffectsRainTank_G
 5064-5069,Unused,Unused,Unused
 5070,,,Related to SpecialEffectsWheelEmitter_G
 5071,,,Related to SpecialEffectsWheelEmitter_G
@@ -1226,23 +1226,23 @@ Index,Type,Description,Notes
 5226,,,
 5227,,,
 5228-5229,Unused,Unused,Unused
-5230,,,
-5231,,,
-5232,,,
-5233,,,
-5234,,,
-5235,,,
+5230,,,Related to SpecialEffectsThunder_G
+5231,,,Related to SpecialEffectsThunder_G
+5232,,,Related to SpecialEffectsThunder_G
+5233,,,Related to SpecialEffectsThunder_G
+5234,,,Related to SpecialEffectsThunder_G
+5235,,,Related to SpecialEffectsThunder_G
 5236,,,
 5237,,,
-5238,,,
-5239,,,
-5240,,,
-5241,,,
-5242,,,
-5243,,,
+5238,,,Related to SpecialEffectsThunder_G
+5239,,,Related to SpecialEffectsThunder_G
+5240,,,Related to SpecialEffectsThunder_G
+5241,,,Related to SpecialEffectsThunder_G
+5242,,,Related to SpecialEffectsThunder_G
+5243,,,Related to SpecialEffectsThunder_G
 5244,,,
-5245,,,
-5246,,,
+5245,,,Related to SpecialEffectsThunder_G
+5246,,,Related to SpecialEffectsThunder_G
 5247-5249,Unused,Unused,Unused
 5250,,,
 5251,,,
@@ -1260,13 +1260,13 @@ Index,Type,Description,Notes
 5265,,,
 5266,,,
 5267-5269,Unused,Unused,Unused
-5270,,,
-5271,,,
-5272,,,
-5273,,,
-5274,,,
-5275,,,
-5276,,,
+5270,,,Related to SpecialEffectsWindTank_G
+5271,,,Related to SpecialEffectsWindTank_G
+5272,,,Related to SpecialEffectsWindTank_G
+5273,,,Related to SpecialEffectsWindTank_G
+5274,,,Related to SpecialEffectsWindTank_G
+5275,,,Related to SpecialEffectsWindTank_G
+5276,,,Related to SpecialEffectsWindTank_G
 5277,,,
 5278-5279,Unused,Unused,Unused
 5280,,,Related to SpecialEffectsWheelEmitter_G
@@ -1301,20 +1301,20 @@ Index,Type,Description,Notes
 5313,,,
 5314,,,
 5315-5319,Unused,Unused,Unused
-5320,,,
-5321,,,
+5320,,,Related to vehicle
+5321,,,Related to vehicle
 5322,,,
-5323,,,
-5324,,,
-5325,,,
-5326,,,
-5327,,,
-5328,,,
-5329,,,
+5323,,,Related to vehicle
+5324,,,Related to vehicle
+5325,,,Related to vehicle
+5326,,,Related to vehicle
+5327,,,Related to vehicle
+5328,,,Related to vehicle
+5329,,,Related to vehicle
 5330,,,
-5331,,,
-5332,,,
-5333,,,
+5331,,,Related to vehicle
+5332,,,Related to vehicle
+5333,,,Related to vehicle
 5334-5339,Unused,Unused,Unused
 5340,,,Related to SpecialEffectsWheelEmitter_G
 5341,,,Related to SpecialEffectsWheelEmitter_G
@@ -1371,26 +1371,26 @@ Index,Type,Description,Notes
 5397,,,
 5398,,,
 5399,,,
-5400,,,
-5401,,,
-5402,,,
-5403,,,
-5404,,,
-5405,,,
-5406,,,
-5407,,,
+5400,,,Related to SpecialEffectsWindTank_G
+5401,,,Related to SpecialEffectsWindTank_G
+5402,,,Related to SpecialEffectsWindTank_G
+5403,,,Related to SpecialEffectsWindTank_G
+5404,,,Related to SpecialEffectsWindTank_G
+5405,,,Related to SpecialEffectsWindTank_G
+5406,,,Related to SpecialEffectsWindTank_G
+5407,,,Related to SpecialEffectsWindTank_G
 5408,,,
-5409,,,
-5410,,,
-5411,,,
-5412,,,
-5413,,,
-5414,,,
-5415,,,
-5416,,,
-5417,,,
-5418,,,
-5419,,,
+5409,,,Related to SpecialEffectsWindTank_G
+5410,,,Related to SpecialEffectsWindTank_G
+5411,,,Related to SpecialEffectsWindTank_G
+5412,,,Related to SpecialEffectsWindTank_G
+5413,,,Related to SpecialEffectsWindTank_G
+5414,,,Related to SpecialEffectsWindTank_G
+5415,,,Related to SpecialEffectsWindTank_G
+5416,,,Related to SpecialEffectsWindTank_G
+5417,,,Related to SpecialEffectsWindTank_G
+5418,,,Related to SpecialEffectsWindTank_G
+5419,,,Related to SpecialEffectsWindTank_G
 5420-5429,Unused,Unused,Unused
 5430,,,
 5431,,,
@@ -1403,7 +1403,7 @@ Index,Type,Description,Notes
 5444,,,Related to WeatherManager_G
 5445,,,Related to WeatherManager_G
 5446-5459,Unused,Unused,Unused
-5460,,,Related to WeatherManager_G
+5460,,,Related to WeatherManager_G and BirdAnimal
 5461,,,Related to WeatherManager_G
 5462,,,Related to WeatherManager_G
 5463,,,Related to WeatherManager_G
@@ -1450,7 +1450,7 @@ Index,Type,Description,Notes
 5530,,,Related to SpecialEffectsManager_G
 5531,,,Related to SpecialEffectsManager_G
 5532-5549,Unused,Unused,Unused
-5550,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5550,,,Related to SpecialEffectsPlayerWheelEmitter_G and BirdAnimal
 5551,,,Related to SpecialEffectsPlayerWheelEmitter_G
 5552,,,
 5553,,,
