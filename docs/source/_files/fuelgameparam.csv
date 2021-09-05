@@ -1207,24 +1207,24 @@ Index,Type,Description,Notes
 5207,,,Related to WeatherManager_G
 5208,,,Related to WeatherManager_G
 5209,,,Related to WeatherManager_G
-5210,,,
-5211,,,
-5212,,,
-5213,,,
-5214,,,
-5215,,,
-5216,,,
-5217,,,
-5218,,,
-5219,,,
-5220,,,
-5221,,,
-5222,,,
-5223,,,
-5224,,,
-5225,,,
-5226,,,
-5227,,,
+5210,,,Related to TornadoManipulator_G
+5211,,,Related to TornadoManipulator_G
+5212,,,Related to TornadoManipulator_G
+5213,,,Related to TornadoManipulator_G
+5214,,,Related to TornadoManipulator_G
+5215,,,Related to TornadoManipulator_G
+5216,,,Related to TornadoManipulator_G
+5217,,,Related to TornadoManipulator_G
+5218,,,Related to TornadoManipulator_G
+5219,,,Related to TornadoManipulator_G
+5220,,,Related to TornadoManipulator_G
+5221,,,Related to TornadoManipulator_G
+5222,,,Related to TornadoManipulator_G
+5223,,,Related to TornadoManipulator_G
+5224,,,Related to TornadoManipulator_G
+5225,,,Related to TornadoManipulator_G
+5226,,,Related to TornadoManipulator_G
+5227,,,Related to TornadoManipulator_G
 5228-5229,Unused,Unused,Unused
 5230,,,Related to SpecialEffectsThunder_G
 5231,,,Related to SpecialEffectsThunder_G
@@ -1247,18 +1247,18 @@ Index,Type,Description,Notes
 5250,,,
 5251,,,
 5252,,,
-5253,,,
-5254,,,
-5255,,,
-5256,,,
+5253,,,Related to TornadoManipulator_G
+5254,,,Related to TornadoManipulator_G
+5255,,,Related to TornadoManipulator_G
+5256,,,Related to TornadoManipulator_G
 5257-5259,Unused,Unused,Unused
 5260,,,
 5261,,,
 5262,,,
-5263,,,
-5264,,,
-5265,,,
-5266,,,
+5263,,,Related to TornadoManipulator_G
+5264,,,Related to TornadoManipulator_G
+5265,,,Related to TornadoManipulator_G
+5266,,,Related to TornadoManipulator_G
 5267-5269,Unused,Unused,Unused
 5270,,,Related to SpecialEffectsWindTank_G
 5271,,,Related to SpecialEffectsWindTank_G
@@ -1351,26 +1351,26 @@ Index,Type,Description,Notes
 5374,,,Related to SpecialEffectsWheelEmitter_G
 5375,,,Related to SpecialEffectsWheelEmitter_G
 5376-5379,Unused,Unused,Unused
-5380,,,
-5381,,,
-5382,,,
-5383,,,
-5384,,,
-5385,,,
-5386,,,
-5387,,,
-5388,,,
-5389,,,
-5390,,,
+5380,,,Related to SpecialEffectsSandMesh_G
+5381,,,Related to SpecialEffectsSandMesh_G
+5382,,,Related to SpecialEffectsSandMesh_G
+5383,,,Related to SpecialEffectsSandMesh_G
+5384,,,Related to SpecialEffectsSandMesh_G
+5385,,,Related to SpecialEffectsSandMesh_G
+5386,,,Related to SpecialEffectsSandMesh_G
+5387,,,Related to SpecialEffectsSandMesh_G
+5388,,,Related to SpecialEffectsSandMesh_G
+5389,,,Related to SpecialEffectsSandMesh_G
+5390,,,Related to SpecialEffectsSandMesh_G
 5391,,,
-5392,,,
-5393,,,
-5394,,,
-5395,,,
-5396,,,
-5397,,,
-5398,,,
-5399,,,
+5392,,,Related to SpecialEffectsSandTank_G
+5393,,,Related to SpecialEffectsSandTank_G
+5394,,,Related to SpecialEffectsSandMesh_G
+5395,,,Related to SpecialEffectsSandMesh_G
+5396,,,Related to SpecialEffectsSandMesh_G
+5397,,,Related to SpecialEffectsSandTank_G
+5398,,,Related to SpecialEffectsSandTank_G
+5399,,,Related to SpecialEffectsSandTank_G
 5400,,,Related to SpecialEffectsWindTank_G
 5401,,,Related to SpecialEffectsWindTank_G
 5402,,,Related to SpecialEffectsWindTank_G
@@ -1411,25 +1411,25 @@ Index,Type,Description,Notes
 5465,,,Related to WeatherManager_G
 5466,,,Related to WeatherManager_G
 5467-5479,Unused,Unused,Unused
-5480,,,
+5480,,,Related to SpecialEffectsSandMesh_G
 5481,,,
-5482,,,
-5483,,,
-5484,,,
-5485,,,
-5486,,,
+5482,,,Related to SpecialEffectsSandMesh_G
+5483,,,Related to SpecialEffectsSandMesh_G
+5484,,,Related to SpecialEffectsSandMesh_G
+5485,,,Related to SpecialEffectsSandMesh_G
+5486,,,Related to SpecialEffectsSandMesh_G
 5487,,,
 5488,,,
 5489,,,
 5490,,,
 5491-5499,Unused,Unused,Unused
-5500,,,
-5501,,,
-5502,,,
-5503,,,
-5504,,,
-5505,,,
-5506,,,
+5500,,,Related to SpecialEffectsTornadoDebris_G
+5501,,,Related to SpecialEffectsTornadoDebris_G
+5502,,,Related to SpecialEffectsTornadoDebris_G
+5503,,,Related to SpecialEffectsTornadoDebris_G
+5504,,,Related to SpecialEffectsTornadoDebris_G
+5505,,,Related to SpecialEffectsTornadoDebris_G
+5506,,,Related to SpecialEffectsTornadoDebris_G
 5507,,,
 5508-5509,Unused,Unused,Unused
 5510,,,Related to SpecialEffectsManager_G
