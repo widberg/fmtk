@@ -1,27 +1,27 @@
 Index,Type,Description,Notes
 1,Int,pp001.tsc version,Must equal 88
-2,,,
-3,,,
-4,,,
-5,,,
-6,,,
-7,,,
+2,,,Related to Navigator3dHUD
+3,,,Related to Navigator3dHUD
+4,,,Related to Navigator3dHUD
+5,,,Related to Navigator3dHUD
+6,,,Related to Navigator3dHUD
+7,,,Related to Navigator3dHUD
 8,,,
 9,,,
 10,,,
-11,,,
-12,,,
-13,,,
+11,,,Related to Navigator3dHUD
+12,,,Related to Navigator3dHUD
+13,,,Related to Navigator3dHUD
 14,,,
 15,,,
 16,,,
-17,,,
-18,,,
-19,,,
+17,,,Related to Navigator3dHUD
+18,,,Related to Navigator3dHUD
+19,,,Related to Navigator3dHUD
 20,,,
 21,Unused,Unused,Unused
-22,,,
-23,,,
+22,,,Related to ViewportHUD
+23,,,Related to ViewportHUD
 24,Unused,Unused,Unused
 25,,,
 26,,,
@@ -1447,73 +1447,73 @@ Index,Type,Description,Notes
 5522,,,
 5523,,,
 5524-5529,Unused,Unused,Unused
-5530,,,
-5531,,,
+5530,,,Related to SpecialEffectsManager_G
+5531,,,Related to SpecialEffectsManager_G
 5532-5549,Unused,Unused,Unused
-5550,,,
-5551,,,
+5550,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5551,,,Related to SpecialEffectsPlayerWheelEmitter_G
 5552,,,
 5553,,,
-5554,,,
-5555,,,
-5556,,,
-5557,,,
-5558,,,
-5559,,,
-5560,,,
-5561,,,
-5562,,,
-5563,,,
-5564,,,
-5565,,,
+5554,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5555,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5556,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5557,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5558,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5559,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5560,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5561,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5562,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5563,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5564,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5565,,,Related to SpecialEffectsPlayerWheelEmitter_G
 5566-5579,Unused,Unused,Unused
-5580,,,
-5581,,,
-5582,,,
-5583,,,
-5584,,,
-5585,,,
-5586,,,
-5587,,,
-5588,,,
-5589,,,
+5580,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5581,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5582,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5583,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5584,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5585,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5586,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5587,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5588,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5589,,,Related to SpecialEffectsPlayerWheelEmitter_G
 5590,,,
 5591,,,
-5592,,,
-5593,,,
-5594,,,
-5595,,,
+5592,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5593,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5594,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5595,,,Related to SpecialEffectsPlayerWheelEmitter_G
 5596-5609,Unused,Unused,Unused
-5610,,,
-5611,,,
-5612,,,
-5613,,,
-5614,,,
-5615,,,
-5616,,,
-5617,,,
-5618,,,
-5619,,,
-5620,,,
-5621,,,
-5622,,,
-5623,,,
-5624,,,
-5625,,,
+5610,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5611,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5612,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5613,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5614,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5615,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5616,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5617,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5618,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5619,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5620,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5621,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5622,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5623,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5624,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5625,,,Related to SpecialEffectsPlayerWheelEmitter_G
 5626-5639,Unused,Unused,Unused
-5640,,,
-5641,,,
-5642,,,
-5643,,,
-5644,,,
-5645,,,
-5646,,,
-5647,,,
-5648,,,
-5649,,,
-5650,,,
-5651,,,
-5652,,,
-5653,,,
-5654,,,
-5655,,,
+5640,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5641,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5642,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5643,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5644,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5645,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5646,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5647,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5648,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5649,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5650,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5651,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5652,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5653,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5654,,,Related to SpecialEffectsPlayerWheelEmitter_G
+5655,,,Related to SpecialEffectsPlayerWheelEmitter_G
