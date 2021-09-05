@@ -22,10 +22,3 @@ Parameter Table
 .. csv-table::
    :file: _files/fuelvehicleparam.csv
    :header-rows: 1
-
-Values Table
-------------
-
-.. csv-table::
-   :file: _files/fuelvehicleparamvalues.csv
-   :header-rows: 1
