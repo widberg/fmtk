@@ -67,7 +67,7 @@ Index,Type,Description,Notes
 83-89,Unused,Unused,Unused
 90,,,Related to MeterHUD
 91-100,Unused,Unused,Unused
-101,,,
+101,,, 
 102,,,
 103,,,
 104,,,
@@ -504,170 +504,170 @@ Index,Type,Description,Notes
 2224,,,Platform specific and related to Manipulator_Z
 2225,,,Platform specific and related to Manipulator_Z
 2226-2999,Unused,Unused,Unused
-3000,String,,"Equals ""DEFAULT"""
-3001,,,
-3002,,,
-3003,,,
-3004,,,
-3005,,,
-3006,,,
-3007,,,
-3008,,,
-3009,,,
-3010,,,
-3011,,,
-3012,,,
-3013,,,
-3014,,,
-3015,,,
-3016,,,
-3017,,,
-3018,,,
-3019,,,
-3020,,,
-3021,,,
-3022,,,
-3023,,,
-3024,,,
-3025,,,
-3026,,,
-3027,,,
-3028,,,
-3029,,,
-3030,,,
-3031,,,
-3032,,,
-3033,,,
-3034,,,
-3035,,,
-3036,,,
-3037,,,
-3038,,,
-3039,,,
-3040,,,
-3041,,,
-3042,,,
-3043,,,
-3044,,,
+3000,String,,"PlayerPP 0 Equals ""DEFAULT"""
+3001,,,PlayerPP 1
+3002,,,PlayerPP 2
+3003,,,PlayerPP 3
+3004,,,PlayerPP 4
+3005,,,PlayerPP 5
+3006,,,PlayerPP 6
+3007,,,PlayerPP 7
+3008,,,PlayerPP 8
+3009,,,PlayerPP 9
+3010,,,PlayerPP 10
+3011,,,PlayerPP 11
+3012,,,PlayerPP 12
+3013,,,PlayerPP 13
+3014,,,PlayerPP 14
+3015,,,PlayerPP 15
+3016,,,PlayerPP 16
+3017,,,PlayerPP 17
+3018,,,PlayerPP 18
+3019,,,PlayerPP 19
+3020,,,PlayerPP 20
+3021,,,PlayerPP 21
+3022,,,PlayerPP 22
+3023,,,PlayerPP 23
+3024,,,PlayerPP 24
+3025,,,PlayerPP 25
+3026,,,PlayerPP 26
+3027,,,PlayerPP 27
+3028,,,PlayerPP 28
+3029,,,PlayerPP 29
+3030,,,PlayerPP 30
+3031,,,PlayerPP 31
+3032,,,PlayerPP 32
+3033,,,PlayerPP 33
+3034,,,PlayerPP 34
+3035,,,PlayerPP 35
+3036,,,PlayerPP 36
+3037,,,PlayerPP 37
+3038,,,PlayerPP 38
+3039,,,PlayerPP 39
+3040,,,PlayerPP 40
+3041,,,PlayerPP 41
+3042,,,PlayerPP 42
+3043,,,PlayerPP 43
+3044,,,PlayerPP 44
 3045-3049,Unused,Unused,Unused
-3050,,,
-3051,,,
-3052,,,
-3053,,,
-3054,,,
-3055,,,
-3056,,,
-3057,,,
-3058,,,
-3059,,,
+3050,,,PlayerPP 50
+3051,,,PlayerPP 51
+3052,,,PlayerPP 52
+3053,,,PlayerPP 53
+3054,,,PlayerPP 54
+3055,,,PlayerPP 55
+3056,,,PlayerPP 56
+3057,,,PlayerPP 57
+3058,,,PlayerPP 58
+3059,,,PlayerPP 59
 3060-3069,Unused,Unused,Unused
-3070,,,
-3071,,,
-3072,,,
-3073,,,
-3074,,,
-3075,,,
+3070,,,PlayerPP 70
+3071,,,PlayerPP 71
+3072,,,PlayerPP 72
+3073,,,PlayerPP 73
+3074,,,PlayerPP 74
+3075,,,PlayerPP 75
 3076-3079,Unused,Unused,Unused
-3080,,,
-3081,,,
+3080,,,PlayerPP 80
+3081,,,PlayerPP 81
 3082-3099,Unused,Unused,Unused
-3100,,,
-3101,,,
-3102,,,
-3103,,,
-3104,,,
-3105,,,
-3106,,,
-3107,,,
-3108,,,
-3109,,,
-3110,,,
-3111,,,
-3112,,,
-3113,,,
+3100,,,PlayerPP 100
+3101,,,PlayerPP 101
+3102,,,PlayerPP 102
+3103,,,PlayerPP 103
+3104,,,PlayerPP 104
+3105,,,PlayerPP 105
+3106,,,PlayerPP 106
+3107,,,PlayerPP 107
+3108,,,PlayerPP 108
+3109,,,PlayerPP 109
+3110,,,PlayerPP 110
+3111,,,PlayerPP 111
+3112,,,PlayerPP 112
+3113,,,PlayerPP 113
 3114-3119,Unused,Unused,Unused
-3120,,,
-3121,,,
-3122,,,
-3123,,,
-3124,,,
+3120,,,PlayerPP 120
+3121,,,PlayerPP 121
+3122,,,PlayerPP 122
+3123,,,PlayerPP 123
+3124,,,PlayerPP 124
 3125-3129,Unused,Unused,Unused
-3130,,,
-3131,,,
-3132,,,
+3130,,,PlayerPP 130
+3131,,,PlayerPP 131
+3132,,,PlayerPP 132
 3133-3149,Unused,Unused,Unused
-3150,,,
-3151,,,
-3152,,,
-3153,,,
-3154,,,
-3155,,,
-3156,,,
-3157,,,
-3158,,,
-3159,,,
-3160,,,
-3161,,,
-3162,,,
+3150,,,PlayerPP 150
+3151,,,PlayerPP 151
+3152,,,PlayerPP 152
+3153,,,PlayerPP 153
+3154,,,PlayerPP 154
+3155,,,PlayerPP 155
+3156,,,PlayerPP 156
+3157,,,PlayerPP 157
+3158,,,PlayerPP 158
+3159,,,PlayerPP 159
+3160,,,PlayerPP 160
+3161,,,PlayerPP 161
+3162,,,PlayerPP 162
 3163-3169,Unused,Unused,Unused
-3170,,,
-3171,,,
-3172,,,
-3173,,,
-3174,,,
-3175,,,
+3170,,,PlayerPP 170
+3171,,,PlayerPP 171
+3172,,,PlayerPP 172
+3173,,,PlayerPP 173
+3174,,,PlayerPP 174
+3175,,,PlayerPP 175
 3176-3179,Unused,Unused,Unused
-3180,,,
-3181,,,
-3182,,,
-3183,,,
-3184,,,
-3185,,,
+3180,,,PlayerPP 180
+3181,,,PlayerPP 181
+3182,,,PlayerPP 182
+3183,,,PlayerPP 183
+3184,,,PlayerPP 184
+3185,,,PlayerPP 185
 3186-3190,Unused,Unused,Unused
-3191,,,
-3192,,,
-3193,,,
-3194,,,
-3195,,,
-3196,,,
-3197,,,
-3198,,,
-3199,,,
-3200,,,
-3201,,,
-3202,,,
-3203,,,
-3204,,,
-3205,,,
+3191,,,PlayerPP 191
+3192,,,PlayerPP 192
+3193,,,PlayerPP 193
+3194,,,PlayerPP 194
+3195,,,PlayerPP 195
+3196,,,PlayerPP 196
+3197,,,PlayerPP 197
+3198,,,PlayerPP 198
+3199,,,PlayerPP 199
+3200,,,PlayerPP 200
+3201,,,PlayerPP 201
+3202,,,PlayerPP 202
+3203,,,PlayerPP 203
+3204,,,PlayerPP 204
+3205,,,PlayerPP 205
 3206-3209,Unused,Unused,Unused
-3210,,,
-3211,,,
-3212,,,
-3213,,,
-3214,,,
+3210,,,PlayerPP 210
+3211,,,PlayerPP 211
+3212,,,PlayerPP 212
+3213,,,PlayerPP 213
+3214,,,PlayerPP 214
 3215-3219,Unused,Unused,Unused
-3220,,,
-3221,,,
-3222,,,
-3223,,,
-3224,,,
-3225,,,
-3226,,,
-3227,,,
-3228,,,
+3220,,,PlayerPP 220
+3221,,,PlayerPP 221
+3222,,,PlayerPP 222
+3223,,,PlayerPP 223
+3224,,,PlayerPP 224
+3225,,,PlayerPP 225
+3226,,,PlayerPP 226
+3227,,,PlayerPP 227
+3228,,,PlayerPP 228
 3229-3239,Unused,Unused,Unused
-3240,,,
-3241,,,
-3242,,,
-3243,,,
-3244,,,
-3245,,,
-3246,,,
-3247,,,
-3248,,,
-3249,,,
-3250,,,
-3251,,,
+3240,,,PlayerPP 240
+3241,,,PlayerPP 241
+3242,,,PlayerPP 242
+3243,,,PlayerPP 243
+3244,,,PlayerPP 244
+3245,,,PlayerPP 245
+3246,,,PlayerPP 246
+3247,,,PlayerPP 247
+3248,,,PlayerPP 248
+3249,,,PlayerPP 249
+3250,,,PlayerPP 250
+3251,,,PlayerPP 251
 3252-3999,Unused,Unused,Unused
 4000,String,STATIC Road Type Property Name,"Equals ""STATIC"""
 4001,Float,SP_TARMAC STATIC Road Type Property Value,
