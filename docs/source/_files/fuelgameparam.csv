@@ -31,41 +31,41 @@ Index,Type,Description,Notes
 30,,,
 31,,,
 32-38,Unused,Unused,Unused
-39,,,
-40,,,
-41,,,
-42,,,
-43,,,
+39,,,Related to ViewportHUD
+40,,,Related to ViewportHUD
+41,,,Related to ViewportHUD
+42,,,Related to ViewportHUD
+43,,,Related to ViewportHUD
 44,Unused,Unused,Unused
-45,,,
+45,,,Related to menus
 46,,,
-47,,,
-48,,,
+47,,,Related to menus
+48,,,Related to menus
 49,Unused,Unused,Unused
-50,,,
+50,,,Related to MissionStatus_G
 51,,,
-52,,,
+52,,,Related to MissionStatus_G
 53-59,Unused,Unused,Unused
 60,,,
 61,,,
 62,,,
-63,,,
-64,,,
-65,,,
+63,,,Related to menu
+64,,,Related to menu
+65,,,Related to menu
 66,,,
 67,,,
 68,,,
 69,,,
 70,,,
 71,,,
-72,,,
-73,,,
+72,,,Related to InGame3DVehicle
+73,,,Related to InGame3DVehicle
 74-79,Unused,Unused,Unused
 80,,,
 81,,,
 82,,,
 83-89,Unused,Unused,Unused
-90,,,
+90,,,Related to MeterHUD
 91-100,Unused,Unused,Unused
 101,,,
 102,,,
@@ -134,377 +134,377 @@ Index,Type,Description,Notes
 251,,,
 252,,,
 253-299,Unused,Unused,Unused
-300,,,
-301,,,
-302,,,
-303,,,
-304,,,
-305,,,
-306,,,
-307,,,
-308,,,
-309,,,
-310,,,
-311,,,
-312,,,
-313,,,
-314,,,
-315,,,
-316,,,
-317,,,
-318,,,
-319,,,
-320,,,Related to prices
-321,,,Related to prices
-322,,,Related to prices
-323,,,Related to prices
-324,,,Related to prices
-325,,,Related to prices
-326,,,Related to prices
-327,,,Related to prices
-328,,,Related to prices
-329,,,Related to prices
-330,,,Related to prices
-331,,,Related to prices
-332,,,Related to prices
-333,,,Related to prices
-334,,,Related to prices
-335,,,Related to prices
-336,,,Related to prices
-337,,,Related to prices
-338,,,Related to prices
-339,,,Related to prices
-340,,,Related to prices
-341,,,
-342,,,
-343,,,
-344,,,
-345,,,
-346,,,
-347,,,
-348,,,
-349,,,
-350,,,
-351,,,
-352,,,
-353,,,
+300,,,0 X related to menu
+301,,,0 Y related to menu
+302,,,0 Z related to menu
+303,,,1 X related to menu
+304,,,1 Y related to menu
+305,,,1 Z related to menu
+306,,,2 X related to menu
+307,,,2 Y related to menu
+308,,,2 Z related to menu
+309,,,3 X related to menu
+310,,,3 Y related to menu
+311,,,3 Z related to menu
+312,,,4 X related to menu
+313,,,4 Y related to menu
+314,,,4 Z related to menu
+315,,,Value is excluded
+316,,,Value is excluded
+317,,,Value is excluded
+318,,,Value is excluded
+319,,,Value is excluded
+320,,,Related to prices or InGameMapHUD
+321,,,Related to prices or InGameMapHUD
+322,,,Related to prices or InGameMapHUD
+323,,,Related to prices or InGameMapHUD
+324,,,Related to prices or InGameMapHUD
+325,,,Related to prices or InGameMapHUD
+326,,,Related to prices or InGameMapHUD
+327,,,Related to prices or InGameMapHUD
+328,,,Related to prices or InGameMapHUD
+329,,,Related to prices or InGameMapHUD
+330,,,Related to prices or InGameMapHUD
+331,,,Related to prices or InGameMapHUD
+332,,,Related to prices or InGameMapHUD
+333,,,Related to prices or InGameMapHUD
+334,,,Related to prices or InGameMapHUD
+335,,,Related to prices or InGameMapHUD
+336,,,Related to prices or InGameMapHUD
+337,,,Related to prices or InGameMapHUD
+338,,,Related to prices or InGameMapHUD
+339,,,Related to prices or InGameMapHUD
+340,,,Related to prices or InGameMapHUD
+341,,,Value is excluded
+342,,,Value is excluded
+343,,,Value is excluded
+344,,,Value is excluded
+345,,,Value is excluded
+346,,,Value is excluded
+347,,,Value is excluded
+348,,,Value is excluded
+349,,,Value is excluded
+350,,,Value is excluded
+351,,,Value is excluded
+352,,,Value is excluded
+353,,,Value is excluded
 354-359,Unused,Unused,Unused
-360,,,
+360,,,Related to GeneratedOfflineVisibleObject and player position radius
 361-369,Unused,Unused,Unused
 370,,,
-371,,,
+371,,,Related to WeatherManager_G
 372,,,
 373-379,Unused,Unused,Unused
 380,,,
 381-499,Unused,Unused,Unused
-500,,,
-501,,,
-502,,,
-503,,,
-504,,,
-505,,,
-506,,,
-507,,,
-508,,,
+500,,,320's 0
+501,,,320's 1
+502,,,320's 2
+503,,,320's 3
+504,,,320's 4
+505,,,320's 5
+506,,,320's 6
+507,,,320's 7
+508,,,320's 8
 509-519,Unused,Unused,Unused
-520,,,
-521,,,
-522,,,
-523,,,
-524,,,
-525,,,
-526,,,
-527,,,
-528,,,
+520,,,321's 0
+521,,,321's 1
+522,,,321's 2
+523,,,321's 3
+524,,,321's 4
+525,,,321's 5
+526,,,321's 6
+527,,,321's 7
+528,,,321's 8
 529-539,Unused,Unused,Unused
-540,,,
-541,,,
-542,,,
-543,,,
-544,,,
-545,,,
-546,,,
-547,,,
-548,,,
+540,,,322's 0
+541,,,322's 1
+542,,,322's 2
+543,,,322's 3
+544,,,322's 4
+545,,,322's 5
+546,,,322's 6
+547,,,322's 7
+548,,,322's 8
 549-559,Unused,Unused,Unused
-560,,,
-561,,,
-562,,,
-563,,,
-564,,,
-565,,,
-566,,,
-567,,,
-568,,,
+560,,,323's 0
+561,,,323's 1
+562,,,323's 2
+563,,,323's 3
+564,,,323's 4
+565,,,323's 5
+566,,,323's 6
+567,,,323's 7
+568,,,323's 8
 569-579,Unused,Unused,Unused
-580,,,
-581,,,
-582,,,
-583,,,
-584,,,
-585,,,
-586,,,
-587,,,
-588,,,
+580,,,324's 0
+581,,,324's 1
+582,,,324's 2
+583,,,324's 3
+584,,,324's 4
+585,,,324's 5
+586,,,324's 6
+587,,,324's 7
+588,,,324's 8
 589-599,Unused,Unused,Unused
-600,,,
-601,,,
-602,,,
-603,,,
-604,,,
-605,,,
-606,,,
-607,,,
-608,,,
+600,,,325's 0
+601,,,325's 1
+602,,,325's 2
+603,,,325's 3
+604,,,325's 4
+605,,,325's 5
+606,,,325's 6
+607,,,325's 7
+608,,,325's 8
 609-619,Unused,Unused,Unused
-620,,,
-621,,,
-622,,,
-623,,,
-624,,,
-625,,,
-626,,,
-627,,,
-628,,,
+620,,,326's 0
+621,,,326's 1
+622,,,326's 2
+623,,,326's 3
+624,,,326's 4
+625,,,326's 5
+626,,,326's 6
+627,,,326's 7
+628,,,326's 8
 629-639,Unused,Unused,Unused
-640,,,
-641,,,
-642,,,
-643,,,
-644,,,
-645,,,
-646,,,
-647,,,
-648,,,
+640,,,327's 0
+641,,,327's 1
+642,,,327's 2
+643,,,327's 3
+644,,,327's 4
+645,,,327's 5
+646,,,327's 6
+647,,,327's 7
+648,,,327's 8
 649-659,Unused,Unused,Unused
-660,,,
-661,,,
-662,,,
-663,,,
-664,,,
-665,,,
-666,,,
-667,,,
-668,,,
+660,,,328's 0
+661,,,328's 1
+662,,,328's 2
+663,,,328's 3
+664,,,328's 4
+665,,,328's 5
+666,,,328's 6
+667,,,328's 7
+668,,,328's 8
 669-679,Unused,Unused,Unused
-680,,,
-681,,,
-682,,,
-683,,,
-684,,,
-685,,,
-686,,,
-687,,,
-688,,,
+680,,,329's 0
+681,,,329's 1
+682,,,329's 2
+683,,,329's 3
+684,,,329's 4
+685,,,329's 5
+686,,,329's 6
+687,,,329's 7
+688,,,329's 8
 689-699,Unused,Unused,Unused
-700,,,
-701,,,
-702,,,
-703,,,
-704,,,
-705,,,
-706,,,
-707,,,
-708,,,
+700,,,330's 0
+701,,,330's 1
+702,,,330's 2
+703,,,330's 3
+704,,,330's 4
+705,,,330's 5
+706,,,330's 6
+707,,,330's 7
+708,,,330's 8
 709-719,Unused,Unused,Unused
-720,,,
-721,,,
-722,,,
-723,,,
-724,,,
-725,,,
-726,,,
-727,,,
-728,,,
+720,,,331's 0
+721,,,331's 1
+722,,,331's 2
+723,,,331's 3
+724,,,331's 4
+725,,,331's 5
+726,,,331's 6
+727,,,331's 7
+728,,,331's 8
 729-739,Unused,Unused,Unused
-740,,,
-741,,,
-742,,,
-743,,,
-744,,,
-745,,,
-746,,,
-747,,,
-748,,,
+740,,,332's 0
+741,,,332's 1
+742,,,332's 2
+743,,,332's 3
+744,,,332's 4
+745,,,332's 5
+746,,,332's 6
+747,,,332's 7
+748,,,332's 8
 749-759,Unused,Unused,Unused
-760,,,
-761,,,
-762,,,
-763,,,
-764,,,
-765,,,
-766,,,
-767,,,
-768,,,
+760,,,333's 0
+761,,,333's 1
+762,,,333's 2
+763,,,333's 3
+764,,,333's 4
+765,,,333's 5
+766,,,333's 6
+767,,,333's 7
+768,,,333's 8
 769-779,Unused,Unused,Unused
-780,,,
-781,,,
-782,,,
-783,,,
-784,,,
-785,,,
-786,,,
-787,,,
-788,,,
+780,,,334's 0
+781,,,334's 1
+782,,,334's 2
+783,,,334's 3
+784,,,334's 4
+785,,,334's 5
+786,,,334's 6
+787,,,334's 7
+788,,,334's 8
 789-799,Unused,Unused,Unused
-800,,,
-801,,,
-802,,,
-803,,,
-804,,,
-805,,,
-806,,,
-807,,,
-808,,,
+800,,,335's 0
+801,,,335's 1
+802,,,335's 2
+803,,,335's 3
+804,,,335's 4
+805,,,335's 5
+806,,,335's 6
+807,,,335's 7
+808,,,335's 8
 809-819,Unused,Unused,Unused
-820,,,
-821,,,
-822,,,
-823,,,
-824,,,
-825,,,
-826,,,
-827,,,
-828,,,
+820,,,336's 0
+821,,,336's 1
+822,,,336's 2
+823,,,336's 3
+824,,,336's 4
+825,,,336's 5
+826,,,336's 6
+827,,,336's 7
+828,,,336's 8
 829-839,Unused,Unused,Unused
-840,,,
-841,,,
-842,,,
-843,,,
-844,,,
-845,,,
-846,,,
-847,,,
-848,,,
+840,,,337's 0
+841,,,337's 1
+842,,,337's 2
+843,,,337's 3
+844,,,337's 4
+845,,,337's 5
+846,,,337's 6
+847,,,337's 7
+848,,,337's 8
 849-859,Unused,Unused,Unused
-860,,,
-861,,,
-862,,,
-863,,,
-864,,,
-865,,,
-866,,,
-867,,,
-868,,,
+860,,,338's 0
+861,,,338's 1
+862,,,338's 2
+863,,,338's 3
+864,,,338's 4
+865,,,338's 5
+866,,,338's 6
+867,,,338's 7
+868,,,338's 8
 869-879,Unused,Unused,Unused
-880,,,
-881,,,
-882,,,
-883,,,
-884,,,
-885,,,
-886,,,
-887,,,
-888,,,
+880,,,339's 0
+881,,,339's 1
+882,,,339's 2
+883,,,339's 3
+884,,,339's 4
+885,,,339's 5
+886,,,339's 6
+887,,,339's 7
+888,,,339's 8
 889-899,Unused,Unused,Unused
-900,,,
-901,,,
-902,,,
-903,,,
-904,,,
-905,,,
-906,,,
-907,,,
-908,,,
+900,,,340's 0
+901,,,340's 1
+902,,,340's 2
+903,,,340's 3
+904,,,340's 4
+905,,,340's 5
+906,,,340's 6
+907,,,340's 7
+908,,,340's 8
 909-919,Unused,Unused,Unused
-920,,,
-921,,,
-922,,,
-923,,,
-924,,,
-925,,,
-926,,,
-927,,,
-928,,,
+920,,,341's 0
+921,,,341's 1
+922,,,341's 2
+923,,,341's 3
+924,,,341's 4
+925,,,341's 5
+926,,,341's 6
+927,,,341's 7
+928,,,341's 8
 929-2000,Unused,Unused,Unused
-2001,,,
-2002,,,
-2003,,,
-2004,,,
-2005,,,
-2006,,,
-2007,,,
-2008,,,
-2009,,,
-2010,,,
-2011,,,
+2001,,,Platform specific
+2002,,,Platform specific
+2003,,,Platform specific
+2004,,,Platform specific
+2005,,,Platform specific
+2006,,,Platform specific
+2007,,,Platform specific
+2008,,,Platform specific
+2009,,,Platform specific
+2010,,,Platform specific
+2011,,,Platform specific
 2012-2019,Unused,Unused,Unused
-2020,,,
-2021,,,
-2022,,,
-2023,,,
-2024,,,
-2025,,,
-2026,,,
-2027,,,
-2028,,,
-2029,,,
-2030,,,
-2031,,,
-2032,,,
-2033,,,
-2034,,,
+2020,,,Platform specific
+2021,,,Platform specific
+2022,,,Platform specific
+2023,,,Platform specific
+2024,,,Platform specific
+2025,,,Platform specific
+2026,,,Platform specific
+2027,,,Platform specific
+2028,,,Platform specific
+2029,,,Platform specific
+2030,,,Platform specific
+2031,,,Platform specific
+2032,,,Platform specific
+2033,,,Platform specific
+2034,,,Platform specific
 2035-2049,Unused,Unused,Unused
-2050,,,
-2051,,,
-2052,,,
-2053,,,
-2054,,,
-2055,,,
-2056,,,
-2057,,,
-2058,,,
-2059,,,
-2060,,,
-2061,,,
-2062,,,
-2063,,,
-2064,,,
+2050,,,Platform specific
+2051,,,Platform specific
+2052,,,Platform specific
+2053,,,Platform specific
+2054,,,Platform specific
+2055,,,Platform specific
+2056,,,Platform specific
+2057,,,Platform specific
+2058,,,Platform specific
+2059,,,Platform specific
+2060,,,Platform specific
+2061,,,Platform specific
+2062,,,Platform specific
+2063,,,Platform specific
+2064,,,Platform specific
 2065-2079,Unused,Unused,Unused
-2080,,,
-2081,,,
-2082,,,
-2083,,,
-2084,,,
-2085,,,
-2086,,,
-2087,,,
-2088,,,
-2089,,,
-2090,,,
-2091,,,
-2092,,,
-2093,,,
-2094,,,
+2080,,,Platform specific
+2081,,,Platform specific
+2082,,,Platform specific
+2083,,,Platform specific
+2084,,,Platform specific
+2085,,,Platform specific
+2086,,,Platform specific
+2087,,,Platform specific
+2088,,,Platform specific
+2089,,,Platform specific
+2090,,,Platform specific
+2091,,,Platform specific
+2092,,,Platform specific
+2093,,,Platform specific
+2094,,,Platform specific
 2095-2149,Unused,Unused,Unused
-2150,,,
-2151,,,
-2152,,,
-2153,,,
-2154,,,
-2155,,,
-2156,,,
+2150,,,Platform specific
+2151,,,Platform specific
+2152,,,Platform specific
+2153,,,Platform specific
+2154,,,Platform specific
+2155,,,Platform specific
+2156,,,Platform specific
 2157-2199,Unused,Unused,Unused
-2200,,,
-2201,,,
-2202,,,
-2203,,,
+2200,,,Platform specific
+2201,,,Platform specific
+2202,,,Platform specific
+2203,,,Platform specific
 2204-2209,Unused,Unused,Unused
-2210,,,
-2211,,,
-2212,,,
-2213,,,
-2214,,,
-2215,,,
+2210,,,Platform specific
+2211,,,Platform specific
+2212,,,Platform specific
+2213,,,Platform specific
+2214,,,Platform specific
+2215,,,Platform specific
 2216-2219,Unused,Unused,Unused
-2220,,,
-2221,,,
-2222,,,
-2223,,,
-2224,,,
-2225,,,
+2220,,,Platform specific
+2221,,,Platform specific
+2222,,,Platform specific and related to MissionHUD
+2223,,,Platform specific
+2224,,,Platform specific
+2225,,,Platform specific
 2226-2999,Unused,Unused,Unused
-3000,,,
+3000,String,,"Equals ""DEFAULT"""
 3001,,,
 3002,,,
 3003,,,
@@ -1133,80 +1133,80 @@ Index,Type,Description,Notes
 5062,,,
 5063,,,
 5064-5069,Unused,Unused,Unused
-5070,,,
-5071,,,
-5072,,,
-5073,,,
+5070,,,Related to SpecialEffectsWheelEmitter_G
+5071,,,Related to SpecialEffectsWheelEmitter_G
+5072,,,Related to SpecialEffectsWheelEmitter_G
+5073,,,Related to SpecialEffectsWheelEmitter_G
 5074,,,
-5075,,,
-5076,,,
-5077,,,
-5078,,,
-5079,,,
-5080,,,
-5081,,,
-5082,,,
-5083,,,
+5075,,,Related to SpecialEffectsWheelEmitter_G
+5076,,,Related to SpecialEffectsWheelEmitter_G
+5077,,,Related to SpecialEffectsWheelEmitter_G
+5078,,,Related to SpecialEffectsWheelEmitter_G
+5079,,,Related to SpecialEffectsWheelEmitter_G
+5080,,,Related to SpecialEffectsWheelEmitter_G
+5081,,,Related to SpecialEffectsWheelEmitter_G
+5082,,,Related to SpecialEffectsWheelEmitter_G
+5083,,,Related to SpecialEffectsWheelEmitter_G
 5084,,,
 5085,,,
-5086,,,
-5087,,,
-5088,,,
-5089,,,
-5090,,,
-5091,,,
-5092,,,
-5093,,,
-5094,,,
-5095,,,
-5096,,,
-5097,,,
-5098,,,
-5099,,,
-5100,,,
+5086,,,Related to SpecialEffectsWheelEmitter_G
+5087,,,Related to SpecialEffectsWheelEmitter_G
+5088,,,Related to SpecialEffectsWheelEmitter_G
+5089,,,Related to SpecialEffectsWheelEmitter_G
+5090,,,Related to SpecialEffectsWheelEmitter_G
+5091,,,Related to SpecialEffectsWheelEmitter_G
+5092,,,Related to SpecialEffectsWheelEmitter_G
+5093,,,Related to SpecialEffectsWheelEmitter_G
+5094,,,Related to SpecialEffectsWheelEmitter_G
+5095,,,Related to SpecialEffectsWheelEmitter_G
+5096,,,Related to SpecialEffectsWheelEmitter_G
+5097,,,Related to SpecialEffectsWheelEmitter_G
+5098,,,Related to SpecialEffectsWheelEmitter_G
+5099,,,Related to SpecialEffectsWheelEmitter_G
+5100,,,Related to SpecialEffectsWheelEmitter_G
 5101,,,
 5102,,,
-5103,,,
-5104,,,
-5105,,,
-5106,,,
-5107,,,
-5108,,,
+5103,,,Related to SpecialEffectsWheelEmitter_G
+5104,,,Related to SpecialEffectsWheelEmitter_G
+5105,,,Related to SpecialEffectsWheelEmitter_G
+5106,,,Related to SpecialEffectsWheelEmitter_G
+5107,,,Related to SpecialEffectsWheelEmitter_G
+5108,,,Related to SpecialEffectsWheelEmitter_G
 5109,Unused,Unused,Unused
-5110,,,
-5111,,,
-5112,,,
-5113,,,
-5114,,,
-5115,,,
-5116,,,
+5110,,,Related to SpecialEffectsWheelEmitter_G
+5111,,,Related to SpecialEffectsWheelEmitter_G
+5112,,,Related to SpecialEffectsWheelEmitter_G
+5113,,,Related to SpecialEffectsWheelEmitter_G
+5114,,,Related to SpecialEffectsWheelEmitter_G
+5115,,,Related to SpecialEffectsWheelEmitter_G
+5116,,,Related to SpecialEffectsWheelEmitter_G
 5117,,,
-5118,,,
+5118,,,Related to SpecialEffectsWheelEmitter_G
 5119,,,
-5120,,,
-5121,,,
-5122,,,
-5123,,,
-5124,,,
-5125,,,
-5126,,,
-5127,,,
-5128,,,
-5129,,,
+5120,,,Related to SpecialEffectsWheelEmitter_G
+5121,,,Related to SpecialEffectsWheelEmitter_G
+5122,,,Related to SpecialEffectsWheelEmitter_G
+5123,,,Related to SpecialEffectsWheelEmitter_G
+5124,,,Related to SpecialEffectsWheelEmitter_G
+5125,,,Related to SpecialEffectsWheelEmitter_G
+5126,,,Related to SpecialEffectsWheelEmitter_G
+5127,,,Related to SpecialEffectsWheelEmitter_G
+5128,,,Related to SpecialEffectsWheelEmitter_G
+5129,,,Related to SpecialEffectsWheelEmitter_G
 5130,,,
-5131,,,
-5132,,,
+5131,,,Related to SpecialEffectsWheelEmitter_G
+5132,,,Related to SpecialEffectsWheelEmitter_G
 5133-5199,Unused,Unused,Unused
 5200,,,
-5201,,,
-5202,,,
-5203,,,
+5201,,,Related to SpecialEffectsCloudTank_G
+5202,,,Related to WeatherManager_G
+5203,,,Related to WeatherManager_G
 5204,,,
 5205,,,
-5206,,,
-5207,,,
-5208,,,
-5209,,,
+5206,,,Related to WeatherManager_G
+5207,,,Related to WeatherManager_G
+5208,,,Related to WeatherManager_G
+5209,,,Related to WeatherManager_G
 5210,,,
 5211,,,
 5212,,,
@@ -1269,21 +1269,21 @@ Index,Type,Description,Notes
 5276,,,
 5277,,,
 5278-5279,Unused,Unused,Unused
-5280,,,
-5281,,,
-5282,,,
-5283,,,
-5284,,,
-5285,,,
-5286,,,
-5287,,,
-5288,,,
-5289,,,
-5290,,,
+5280,,,Related to SpecialEffectsWheelEmitter_G
+5281,,,Related to SpecialEffectsWheelEmitter_G
+5282,,,Related to SpecialEffectsWheelEmitter_G
+5283,,,Related to SpecialEffectsWheelEmitter_G
+5284,,,Related to SpecialEffectsWheelEmitter_G
+5285,,,Related to SpecialEffectsWheelEmitter_G
+5286,,,Related to SpecialEffectsWheelEmitter_G
+5287,,,Related to SpecialEffectsWheelEmitter_G
+5288,,,Related to SpecialEffectsWheelEmitter_G
+5289,,,Related to SpecialEffectsWheelEmitter_G
+5290,,,Related to SpecialEffectsWheelEmitter_G
 5291,,,
-5292,,,
-5293,,,
-5294,,,
+5292,,,Related to SpecialEffectsWheelEmitter_G
+5293,,,Related to SpecialEffectsWheelEmitter_G
+5294,,,Related to SpecialEffectsWheelEmitter_G
 5295-5299,Unused,Unused,Unused
 5300,,,
 5301,,,
@@ -1316,40 +1316,40 @@ Index,Type,Description,Notes
 5332,,,
 5333,,,
 5334-5339,Unused,Unused,Unused
-5340,,,
-5341,,,
-5342,,,
-5343,,,
-5344,,,
+5340,,,Related to SpecialEffectsWheelEmitter_G
+5341,,,Related to SpecialEffectsWheelEmitter_G
+5342,,,Related to SpecialEffectsWheelEmitter_G
+5343,,,Related to SpecialEffectsWheelEmitter_G
+5344,,,Related to SpecialEffectsWheelEmitter_G
 5345,,,
-5346,,,
-5347,,,
-5348,,,
+5346,,,Related to SpecialEffectsWheelEmitter_G
+5347,,,Related to SpecialEffectsWheelEmitter_G
+5348,,,Related to SpecialEffectsWheelEmitter_G
 5349,,,
 5350,,,
-5351,,,
-5352,,,
-5353,,,
-5354,,,
-5355,,,
-5356,,,
+5351,,,Related to SpecialEffectsWheelEmitter_G
+5352,,,Related to SpecialEffectsWheelEmitter_G
+5353,,,Related to SpecialEffectsWheelEmitter_G
+5354,,,Related to SpecialEffectsWheelEmitter_G
+5355,,,Related to SpecialEffectsWheelEmitter_G
+5356,,,Related to SpecialEffectsWheelEmitter_G
 5357-5359,Unused,Unused,Unused
-5360,,,
-5361,,,
-5362,,,
-5363,,,
-5364,,,
-5365,,,
-5366,,,
-5367,,,
-5368,,,
+5360,,,Related to SpecialEffectsWheelEmitter_G
+5361,,,Related to SpecialEffectsWheelEmitter_G
+5362,,,Related to SpecialEffectsWheelEmitter_G
+5363,,,Related to SpecialEffectsWheelEmitter_G
+5364,,,Related to SpecialEffectsWheelEmitter_G
+5365,,,Related to SpecialEffectsWheelEmitter_G
+5366,,,Related to SpecialEffectsWheelEmitter_G
+5367,,,Related to SpecialEffectsWheelEmitter_G
+5368,,,Related to SpecialEffectsWheelEmitter_G
 5369,,,
-5370,,,
-5371,,,
-5372,,,
-5373,,,
-5374,,,
-5375,,,
+5370,,,Related to SpecialEffectsWheelEmitter_G
+5371,,,Related to SpecialEffectsWheelEmitter_G
+5372,,,Related to SpecialEffectsWheelEmitter_G
+5373,,,Related to SpecialEffectsWheelEmitter_G
+5374,,,Related to SpecialEffectsWheelEmitter_G
+5375,,,Related to SpecialEffectsWheelEmitter_G
 5376-5379,Unused,Unused,Unused
 5380,,,
 5381,,,
@@ -1396,20 +1396,20 @@ Index,Type,Description,Notes
 5431,,,
 5432,,,
 5433-5439,Unused,Unused,Unused
-5440,,,
-5441,,,
-5442,,,
-5443,,,
-5444,,,
-5445,,,
+5440,,,Related to WeatherManager_G
+5441,,,Related to WeatherManager_G
+5442,,,Related to WeatherManager_G
+5443,,,Related to WeatherManager_G
+5444,,,Related to WeatherManager_G
+5445,,,Related to WeatherManager_G
 5446-5459,Unused,Unused,Unused
-5460,,,
-5461,,,
-5462,,,
-5463,,,
-5464,,,
-5465,,,
-5466,,,
+5460,,,Related to WeatherManager_G
+5461,,,Related to WeatherManager_G
+5462,,,Related to WeatherManager_G
+5463,,,Related to WeatherManager_G
+5464,,,Related to WeatherManager_G
+5465,,,Related to WeatherManager_G
+5466,,,Related to WeatherManager_G
 5467-5479,Unused,Unused,Unused
 5480,,,
 5481,,,
@@ -1438,14 +1438,14 @@ Index,Type,Description,Notes
 5513,,,Related to SpecialEffectsManager_G
 5514,,,Related to SpecialEffectsManager_G
 5515,,,Related to SpecialEffectsManager_G
-5516,,,
-5517,,,
-5518,,,
-5519,,,
-5520,,,
-5521,,,
-5522,,,
-5523,,,
+5516,,,Related to SpecialEffectsWaterProjection_G
+5517,,,Related to SpecialEffectsWaterProjection_G
+5518,,,Related to SpecialEffectsWaterProjection_G
+5519,,,Related to SpecialEffectsWaterProjection_G
+5520,,,Related to SpecialEffectsManager_G
+5521,,,Related to SpecialEffectsManager_G
+5522,,,Related to SpecialEffectsMudProjection_G
+5523,,,Related to SpecialEffectsMudProjection_G
 5524-5529,Unused,Unused,Unused
 5530,,,Related to SpecialEffectsManager_G
 5531,,,Related to SpecialEffectsManager_G
