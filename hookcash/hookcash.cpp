@@ -25,6 +25,27 @@ struct Module
 	std::string base_address;
 	std::unordered_map<std::string, std::string> hashes;
 	std::unordered_map<std::string, Symbol> symbols;
+
+	bool set(const std::string& variable_name, const std::string& variable_value)
+	{
+		if (variable_name == "export_prefix")
+		{
+			export_prefix = variable_value;
+		}
+		else if (variable_name == "emit_prefix")
+		{
+			emit_prefix = variable_value;
+		}
+		else if (variable_name == "base_address")
+		{
+			base_address = variable_value;
+		}
+		else
+		{
+			return false;
+		}
+		return true;
+	}
 };
 
 int main(int argc, const char* argv[])
@@ -97,12 +118,13 @@ int main(int argc, const char* argv[])
 				if (*c != '\0') return 1;
 			}
 
-			if (!modules.count(module_name))
+			if (!modules.count(module_name) && module_name[0] != '*' && module_name[1] != '\0')
 			{
 				modules[module_name] = Module { module_value };
 			}
 			else
 			{
+				std::cout << "module already exists" << std::endl;
 				return 1;
 			}
 		}
@@ -133,26 +155,26 @@ int main(int argc, const char* argv[])
 
 			if (modules.count(module_name))
 			{
-				if (!std::strcmp(variable_name, "export_prefix"))
-				{
-					modules[module_name].export_prefix = variable_value;
-				}
-				else if (!std::strcmp(variable_name, "emit_prefix"))
-				{
-					modules[module_name].emit_prefix = variable_value;
-				}
-				else if (!std::strcmp(variable_name, "base_address"))
-				{
-					modules[module_name].base_address = variable_value;
-				}
-				else
+				if(!modules[module_name].set(variable_name, variable_value))
 				{
 					std::cout << "bad variable" << "\n";
 					return 1;
 				}
 			}
+			else if (module_name[0] == '*' && module_name[1] == '\0')
+			{
+				for (auto it = modules.begin(); it != modules.end(); ++it)
+				{
+					if (!it->second.set(variable_name, variable_value))
+					{
+						std::cout << "bad variable" << "\n";
+						return 1;
+					}
+				}
+			}
 			else
 			{
+				std::cout << "bad module" << std::endl;
 				return 1;
 			}
 		}
@@ -183,17 +205,19 @@ int main(int argc, const char* argv[])
 
 			if (modules.count(module_name))
 			{
-				if (!modules[module_name].hashes.count(version_name))
+				if (!modules[module_name].hashes.count(version_name) && version_name[0] != '*' && version_name[1] != '\0')
 				{
 					modules[module_name].hashes[version_name] = hash_value;
 				}
 				else
 				{
+					std::cout << "module already has version by that name" << std::endl;
 					return 1;
 				}
 			}
 			else
 			{
+				std::cout << "bad module" << std::endl;
 				return 1;
 			}
 		}
@@ -230,11 +254,13 @@ int main(int argc, const char* argv[])
 				}
 				else
 				{
+					std::cout << "module already has symbol by that name" << std::endl;
 					return 1;
 				}
 			}
 			else
 			{
+				std::cout << "bad module" << std::endl;
 				return 1;
 			}
 		}
@@ -274,22 +300,35 @@ int main(int argc, const char* argv[])
 			{
 				if (modules[module_name].symbols.count(symbol_name))
 				{
-					if (!modules[module_name].symbols[symbol_name].addresses.count(version_name))
+					if (!modules[module_name].symbols[symbol_name].addresses.count(version_name) && modules[module_name].hashes.count(version_name))
 					{
 						modules[module_name].symbols[symbol_name].addresses[version_name] = address_value;
 					}
+					else if (version_name[0] == '*' && version_name[1] == '\0')
+					{
+						for (auto it = modules[module_name].hashes.begin(); it != modules[module_name].hashes.end(); ++it)
+						{
+							if (!modules[module_name].symbols[symbol_name].addresses.count(it->first))
+							{
+								modules[module_name].symbols[symbol_name].addresses[it->first] = address_value;
+							}
+						}
+					}
 					else
 					{
+						std::cout << "bad version name" << std::endl;
 						return 1;
 					}
 				}
 				else
 				{
+					std::cout << "module does not have symbol" << std::endl;
 					return 1;
 				}
 			}
 			else
 			{
+				std::cout << "bad module" << std::endl;
 				return 1;
 			}
 		}
@@ -354,11 +393,13 @@ int main(int argc, const char* argv[])
 				}
 				else
 				{
+					std::cout << "module does not have symbol" << std::endl;
 					return 1;
 				}
 			}
 			else
 			{
+				std::cout << "bad module" << std::endl;
 				return 1;
 			}
 		}
@@ -429,11 +470,13 @@ int main(int argc, const char* argv[])
 				}
 				else
 				{
+					std::cout << "module does not have symbol" << std::endl;
 					return 1;
 				}
 			}
 			else
 			{
+				std::cout << "bad module" << std::endl;
 				return 1;
 			}
 		}
@@ -462,10 +505,58 @@ int main(int argc, const char* argv[])
 
 				for (auto it = modules.begin(); it != modules.end(); ++it)
 				{
-					std::string emit_prefix = it->second.emit_prefix;
+					++out_line_number;
+					out << "std::unordered_map<std::string, std::string> hashes = { ";
+					for (auto jt = it->second.hashes.begin(); jt != it->second.hashes.end(); ++jt)
+					{
+						out << "{ \"" << jt->second << "\", \"" << jt->first << "\" }, ";
+					}
+					out << "};\n";
+
+
+					++out_line_number;
+					out << "HINSTANCE hiModule = GetModuleHandleA(" << it->second.value << ");" \
+						"CHAR lpPath[MAX_PATH + 1];" \
+						"GetModuleFileNameW(" << it->second.value << ", lpPath, MAX_PATH + 1);" \
+						"std::string module_hash = md5sum(lpPath);" \
+						"std::string version_name = hashes.count(module_hash) ? hashes[module_hash] : \"\";" << "\n";
+
+					std::string export_prefix = it->second.export_prefix;
 
 					for (auto jt = it->second.symbols.begin(); jt != it->second.symbols.end(); ++jt)
 					{
+						++out_line_number;
+						out << "std::unordered_map<std::string, std::string> addresses = { ";
+						for (auto kt = jt->second.addresses.begin(); kt != jt->second.addresses.end(); ++kt)
+						{
+							out << "{ \"" << kt->first << "\", " << kt->second << " }, ";
+						}
+						out << "};\n";
+
+						++out_line_number;
+						out << "std::vector<std::vector<std::uint16_t>> patterns = { ";
+						for (auto kt : jt->second.patterns)
+						{
+							out << "{ ";
+							for (std::uint16_t x : kt)
+							{
+								out << x << ", ";
+							}
+							out << " }, ";
+						}
+						out << "};\n";
+
+						++out_line_number;
+						out << "void* " << export_prefix << jt->first << " = nullptr; if (addresses.count(version_name)) { " << export_prefix << jt->first << " = addresses[version_name];";
+						if (!it->second.base_address.empty())
+						{
+							out << export_prefix << jt->first << " = " << export_prefix << jt->first << " - " << it->second.base_address  << " + hiModule;";
+						}
+						out << "} else { for (auto pattern : patterns) { if (" << export_prefix << jt->first << " = find_pattern(hiModule, pattern)) { break; } } if (!" << export_prefix << jt->first << " && " << jt->second.required << ") { assert(false); } }\n";
+
+						std::string emit_prefix = it->second.emit_prefix;
+
+						++out_line_number;
 						out << emit_prefix << emit_macro_name << "(" << jt->first << ");" << "\n";
 					}
 				}
@@ -493,6 +584,7 @@ int main(int argc, const char* argv[])
 			}
 			else
 			{
+				std::cout << "bad emit section" << std::endl;
 				return 1;
 			}
 		}
