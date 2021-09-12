@@ -552,7 +552,17 @@ int main(int argc, const char* argv[])
 						{
 							out << export_prefix << jt->first << " = " << export_prefix << jt->first << " - " << it->second.base_address << " + hiModule;";
 						}
-						out << "} else { for (auto pattern : patterns) { if (" << export_prefix << jt->first << " = find_pattern(hiModule, pattern)) { break; } } if (!" << export_prefix << jt->first << " && " << jt->second.required << ") { assert(false); } }\n";
+						out << "} else { for (auto pattern : patterns) { if (" << export_prefix << jt->first << " = find_pattern(hiModule, pattern)) { break; } } if (!" << export_prefix << jt->first << ") { do {";
+						for (auto kt : jt->second.pattern_reads)
+						{
+							out << "if (" << export_prefix << jt->first << " = find_pattern({ ";
+							for (std::uint16_t x : kt.pattern)
+							{
+								out << x << ", ";
+							}
+							out << " }) { " << export_prefix << jt->first << " = *(void**)(" << export_prefix << jt->first << kt.read_offset_value << "); break; }";
+						}
+						out << "} while(false); } if (!" << export_prefix << jt->first << " && " << jt->second.required << ") { assert(false); }}\n";
 
 						++out_line_number;
 						if (!jt->second.required)
