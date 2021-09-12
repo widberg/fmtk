@@ -48,6 +48,35 @@ struct Module
 	}
 };
 
+struct FunctionParameter
+{
+	std::string parameter_type;
+	std::string parameter_name;
+	std::string parameter_register;
+};
+
+struct FunctionSignature
+{
+	FunctionSignature(const std::string& data)
+	{
+		const char* c = data.c_str();
+
+		while (std::isspace(*c)) ++c;
+		if (*c == '\0') return;
+
+		const char* beginning = c;
+
+		valid = true;
+	}
+
+	bool valid = false;
+	std::string return_type;
+	bool is_usercall = false;
+	std::string function_name;
+	std::string return_register;
+	std::vector<FunctionParameter> parameters;
+};
+
 int main(int argc, const char* argv[])
 {
 	if (argc != 3) return 1;
@@ -306,6 +335,16 @@ int main(int argc, const char* argv[])
 					}
 					else if (version_name[0] == '*' && version_name[1] == '\0')
 					{
+						if (!modules[module_name].symbols[symbol_name].addresses.count(""))
+						{
+							modules[module_name].symbols[symbol_name].addresses[""] = address_value;
+						}
+						else
+						{
+							std::cout << "This symbol already has a wildcard" << std::endl;
+							return 1;
+						}
+
 						for (auto it = modules[module_name].hashes.begin(); it != modules[module_name].hashes.end(); ++it)
 						{
 							if (!modules[module_name].symbols[symbol_name].addresses.count(it->first))
@@ -479,6 +518,29 @@ int main(int argc, const char* argv[])
 				std::cout << "bad module" << std::endl;
 				return 1;
 			}
+		}
+		else if (!std::strcmp(command, "usercall"))
+		{
+			if (*c != '\0') return 1;
+
+			std::string signature;
+			std::string line;
+			while (std::getline(in, line) && line.find('{') == std::string::npos)
+			{
+				++in_line_number;
+				signature += line;
+			}
+
+			signature += line.substr(0, line.find('{'));
+
+			++out_line_number;
+			out << "#line " << out_line_number + 1 << " \"" << argv[2] << "\"" << "\n";
+
+			FunctionSignature function_signature(signature);
+			if (!function_signature.valid) return 1;
+
+			++out_line_number;
+			out << "#line " << in_line_number + 1 << " \"" << argv[1] << "\"" << "\n";
 		}
 		else if (!std::strcmp(command, "emit"))
 		{
