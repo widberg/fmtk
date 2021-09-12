@@ -46,15 +46,21 @@ int main(int argc, const char* argv[])
 
 	std::unordered_map<std::string, Module> modules;
 
+	std::size_t in_line_number = 0;
+	std::size_t out_line_number = 0;
+
 	std::string line;
 	while (std::getline(in, line))
 	{
+		++in_line_number;
+		++out_line_number;
+
 		char* c = line.data();
 		while (std::isspace(*c)) ++c;
 
+		out << line << "\n";
 		if (c[0] != '/' || c[1] != '/' || c[2] != '$')
 		{
-			out << line << "\n";
 			continue;
 		}
 
@@ -86,8 +92,6 @@ int main(int argc, const char* argv[])
 				while (std::isspace(*c)) ++c;
 				if (*c != '\0') return 1;
 			}
-
-			out << "MODULE " << module_name << " " << module_value << "\n";
 
 			if (!modules.count(module_name))
 			{
@@ -122,8 +126,6 @@ int main(int argc, const char* argv[])
 				while (std::isspace(*c)) ++c;
 				if (*c != '\0') return 1;
 			}
-
-			out << "SET " << module_name << " " << variable_name << " " << variable_value << "\n";
 
 			if (modules.count(module_name))
 			{
@@ -171,8 +173,6 @@ int main(int argc, const char* argv[])
 				if (*c != '\0') return 1;
 			}
 
-			out << "HASH " << module_name << " " << version_name << " " << hash_value << "\n";
-
 			if (modules.count(module_name))
 			{
 				if (!modules[module_name].hashes.count(version_name))
@@ -213,8 +213,6 @@ int main(int argc, const char* argv[])
 				while (std::isspace(*c)) ++c;
 				if (*c != '\0') return 1;
 			}
-
-			out << "SYMBOL " << module_name << " " << symbol_name << " " << required_value << "\n";
 
 			if (modules.count(module_name))
 			{
@@ -263,8 +261,6 @@ int main(int argc, const char* argv[])
 				while (std::isspace(*c)) ++c;
 				if (*c != '\0') return 1;
 			}
-
-			out << "ADDRESS " << module_name << " " << symbol_name << " " << version_name << " " << address_value << "\n";
 
 			if (modules.count(module_name))
 			{
@@ -315,8 +311,6 @@ int main(int argc, const char* argv[])
 				while (std::isspace(*c)) ++c;
 				if (*c != '\0') return 1;
 			}
-
-			out << "PATTERN " << module_name << " " << symbol_name << " " << pattern_value << "\n";
 
 			if (modules.count(module_name))
 			{
@@ -393,8 +387,6 @@ int main(int argc, const char* argv[])
 				if (*c != '\0') return 1;
 			}
 
-			out << "PATTERN_READ " << module_name << " " << symbol_name << " " << read_offset_value << " " << pattern_value << "\n";
-
 			if (modules.count(module_name))
 			{
 				if (modules[module_name].symbols.count(symbol_name))
@@ -450,18 +442,28 @@ int main(int argc, const char* argv[])
 
 			if (!std::strcmp(emit_section, "attach"))
 			{
+				++out_line_number;
+				out << "#line " << out_line_number << " \"" << argv[2] << "\"" << "\n";
 
+
+
+				++out_line_number;
+				out << "#line " << in_line_number << " \"" << argv[1] << "\"" << "\n";
 			}
 			else if (!std::strcmp(emit_section, "detach"))
 			{
+				++out_line_number;
+				out << "#line " << out_line_number << " \"" << argv[2] << "\"" << "\n";
 
+
+
+				++out_line_number;
+				out << "#line " << in_line_number << " \"" << argv[1] << "\"" << "\n";
 			}
 			else
 			{
 				return 1;
 			}
-
-			out << "EMIT " << emit_section << "\n";
 		}
 		else
 		{
