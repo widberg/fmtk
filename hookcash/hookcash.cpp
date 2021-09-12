@@ -550,14 +550,21 @@ int main(int argc, const char* argv[])
 						out << "void* " << export_prefix << jt->first << " = nullptr; if (addresses.count(version_name)) { " << export_prefix << jt->first << " = addresses[version_name];";
 						if (!it->second.base_address.empty())
 						{
-							out << export_prefix << jt->first << " = " << export_prefix << jt->first << " - " << it->second.base_address  << " + hiModule;";
+							out << export_prefix << jt->first << " = " << export_prefix << jt->first << " - " << it->second.base_address << " + hiModule;";
 						}
 						out << "} else { for (auto pattern : patterns) { if (" << export_prefix << jt->first << " = find_pattern(hiModule, pattern)) { break; } } if (!" << export_prefix << jt->first << " && " << jt->second.required << ") { assert(false); } }\n";
 
-						std::string emit_prefix = it->second.emit_prefix;
-
 						++out_line_number;
-						out << emit_prefix << emit_macro_name << "(" << jt->first << ");" << "\n";
+						if (!jt->second.required)
+						{
+							out << "if (" << export_prefix << jt->first << ") {";
+						}
+						out << it->second.emit_prefix << emit_macro_name << "(" << jt->first << ");";
+						if (!jt->second.required)
+						{
+							out << "}";
+						}
+						out << "\n";
 					}
 				}
 
@@ -575,7 +582,17 @@ int main(int argc, const char* argv[])
 
 					for (auto jt = it->second.symbols.begin(); jt != it->second.symbols.end(); ++jt)
 					{
-						out << emit_prefix << emit_macro_name << "(" << jt->first << ");" << "\n";
+						++out_line_number;
+						if (!jt->second.required)
+						{
+							out << "if (" << it->second.export_prefix << jt->first << ") {";
+						}
+						out << it->second.emit_prefix << emit_macro_name << "(" << jt->first << ");";
+						if (!jt->second.required)
+						{
+							out << "}";
+						}
+						out << "\n";
 					}
 				}
 
