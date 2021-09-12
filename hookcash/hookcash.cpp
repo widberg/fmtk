@@ -64,7 +64,99 @@ struct FunctionSignature
 		while (std::isspace(*c)) ++c;
 		if (*c == '\0') return;
 
-		const char* beginning = c;
+		const char* return_type_begin = c;
+		while (*c != '\0' && !std::isspace(*c)) ++c;
+		if (*c == '\0') return;
+		return_type = std::string(return_type_begin, c - return_type_begin);
+		while (std::isspace(*c)) ++c;
+		if (*c == '\0') return;
+
+		const char* calling_convention_begin = c;
+		while (*c != '\0' && !std::isspace(*c)) ++c;
+		if (*c == '\0') return;
+		std::string calling_convention(calling_convention_begin, c - calling_convention_begin);
+		if (calling_convention == "__usercall" || calling_convention == "__userpurge")
+		{
+			is_usercall = calling_convention == "__usercall";
+		}
+		else
+		{
+			return;
+		}
+		while (std::isspace(*c)) ++c;
+		if (*c == '\0') return;
+
+		const char* function_name_begin = c;
+		while (*c != '\0' && !std::isspace(*c)) ++c;
+		if (*c == '\0') return;
+		function_name = std::string(function_name_begin, c - function_name_begin);
+		while (std::isspace(*c)) ++c;
+		if (*c == '\0') return;
+
+		if (*c == '@')
+		{
+			++c;
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+
+			const char* return_register_begin = c;
+			while (*c != '\0' && *c != '(' && !std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+			return_register = std::string(return_register_begin, c - return_register_begin);
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+		}
+
+		if (*c != '(') return;
+		++c;
+		while (std::isspace(*c)) ++c;
+		if (*c == '\0') return;
+
+		while (*c != '\0')
+		{
+			FunctionParameter parameter;
+
+			const char* parameter_type = c;
+			while (*c != '\0' && !std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+			parameter.parameter_type = std::string(parameter_type, c - parameter_type);
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+
+			const char* parameter_name = c;
+			while (*c != '\0' && !std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+			parameter.parameter_name = std::string(parameter_name, c - parameter_name);
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+
+			if (*c == '@')
+			{
+				++c;
+				while (std::isspace(*c)) ++c;
+				if (*c == '\0') return;
+
+				const char* parameter_register = c;
+				while (*c != '\0' && *c != ')' && !std::isspace(*c)) ++c;
+				if (*c == '\0') return;
+				parameter.parameter_register = std::string(parameter_register, c - parameter_register);
+				while (std::isspace(*c)) ++c;
+				if (*c == '\0') return;
+			}
+
+			parameters.push_back(parameter);
+
+			if (*c == ')') break;
+			if (*c != ',') return;
+			++c;
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+		}
+
+		if (*c != ')') return;
+		++c;
+		while (std::isspace(*c)) ++c;
+		if (*c != '\0') return;
 
 		valid = true;
 	}
@@ -109,10 +201,12 @@ int main(int argc, const char* argv[])
 		++in_line_number;
 		++out_line_number;
 
+		out << line << "\n";
+
+		line.push_back('\0');
 		char* c = line.data();
 		while (std::isspace(*c)) ++c;
 
-		out << line << "\n";
 		if (c[0] != '/' || c[1] != '/' || c[2] != '$')
 		{
 			continue;
@@ -124,10 +218,8 @@ int main(int argc, const char* argv[])
 
 		const char* command = c;
 		while (*c != '\0' && !std::isspace(*c)) ++c;
-		if (*c == '\0') return 1;
 		*c++ = '\0';
 		while (std::isspace(*c)) ++c;
-		if (*c == '\0') return 1;
 
 		if (!std::strcmp(command, "module"))
 		{
@@ -521,7 +613,7 @@ int main(int argc, const char* argv[])
 		}
 		else if (!std::strcmp(command, "usercall"))
 		{
-			if (*c != '\0') return 1;
+			if (*(c - 1) != '\0') return 1;
 
 			std::string signature;
 			std::string line;
@@ -532,6 +624,7 @@ int main(int argc, const char* argv[])
 			}
 
 			signature += line.substr(0, line.find('{'));
+			line = line.substr(line.find('{') + 1);
 
 			++out_line_number;
 			out << "#line " << out_line_number + 1 << " \"" << argv[2] << "\"" << "\n";
@@ -540,7 +633,38 @@ int main(int argc, const char* argv[])
 			if (!function_signature.valid) return 1;
 
 			++out_line_number;
+			out << function_signature.return_type << " " << (function_signature.is_usercall ? "__stdcall" : "__cdecl") << function_signature.function_name << "(";
+			bool first = true;
+			for (auto parameter : function_signature.parameters)
+			{
+				if (parameter.parameter_register.empty())
+				{
+					if (!first)
+					{
+						out << ", ";
+					}
+					else
+					{
+						first = false;
+					}
+
+					out << parameter.parameter_type << " " << parameter.parameter_name;
+				}
+			}
+			out << "){";
+
+			for (auto parameter : function_signature.parameters)
+			{
+				if (!parameter.parameter_register.empty())
+				{
+					out << parameter.parameter_type << " " << parameter.parameter_name << "; __asm {mov " << parameter.parameter_name << ", " << parameter.parameter_register << "};";
+				}
+			}
+			out << "\n";
+
+			++out_line_number;
 			out << "#line " << in_line_number + 1 << " \"" << argv[1] << "\"" << "\n";
+			out << line << "\n";
 		}
 		else if (!std::strcmp(command, "emit"))
 		{
