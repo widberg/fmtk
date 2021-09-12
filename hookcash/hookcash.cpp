@@ -633,7 +633,7 @@ int main(int argc, const char* argv[])
 			if (!function_signature.valid) return 1;
 
 			++out_line_number;
-			out << function_signature.return_type << " " << (function_signature.is_usercall ? "__stdcall" : "__cdecl") << function_signature.function_name << "(";
+			out << function_signature.return_type << " " << (function_signature.is_usercall ? "__stdcall" : "__cdecl") << " " << function_signature.function_name << "(";
 			bool first = true;
 			for (auto parameter : function_signature.parameters)
 			{
