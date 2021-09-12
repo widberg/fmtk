@@ -49,6 +49,9 @@ int main(int argc, const char* argv[])
 	std::size_t in_line_number = 0;
 	std::size_t out_line_number = 0;
 
+	++out_line_number;
+	out << "#line " << 1 << " \"" << argv[1] << "\"" << "\n";
+
 	std::string line;
 	while (std::getline(in, line))
 	{
@@ -443,22 +446,22 @@ int main(int argc, const char* argv[])
 			if (!std::strcmp(emit_section, "attach"))
 			{
 				++out_line_number;
-				out << "#line " << out_line_number << " \"" << argv[2] << "\"" << "\n";
+				out << "#line " << out_line_number + 1 << " \"" << argv[2] << "\"" << "\n";
 
 
 
 				++out_line_number;
-				out << "#line " << in_line_number << " \"" << argv[1] << "\"" << "\n";
+				out << "#line " << in_line_number + 1 << " \"" << argv[1] << "\"" << "\n";
 			}
 			else if (!std::strcmp(emit_section, "detach"))
 			{
 				++out_line_number;
-				out << "#line " << out_line_number << " \"" << argv[2] << "\"" << "\n";
+				out << "#line " << out_line_number + 1 << " \"" << argv[2] << "\"" << "\n";
 
 
 
 				++out_line_number;
-				out << "#line " << in_line_number << " \"" << argv[1] << "\"" << "\n";
+				out << "#line " << in_line_number + 1 << " \"" << argv[1] << "\"" << "\n";
 			}
 			else
 			{
