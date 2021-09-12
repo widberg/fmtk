@@ -21,6 +21,7 @@ struct Module
 {
 	std::string value;
 	std::string export_prefix;
+	std::string emit_prefix;
 	std::string base_address;
 	std::unordered_map<std::string, std::string> hashes;
 	std::unordered_map<std::string, Symbol> symbols;
@@ -135,6 +136,10 @@ int main(int argc, const char* argv[])
 				if (!std::strcmp(variable_name, "export_prefix"))
 				{
 					modules[module_name].export_prefix = variable_value;
+				}
+				else if (!std::strcmp(variable_name, "emit_prefix"))
+				{
+					modules[module_name].emit_prefix = variable_value;
 				}
 				else if (!std::strcmp(variable_name, "base_address"))
 				{
@@ -436,6 +441,13 @@ int main(int argc, const char* argv[])
 		{
 			const char* emit_section = c;
 			while (*c != '\0' && !std::isspace(*c)) ++c;
+			if (*c == '\0') return 1;
+			*c++ = '\0';
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return 1;
+
+			const char* emit_macro_name = c;
+			while (*c != '\0' && !std::isspace(*c)) ++c;
 			if (*c != '\0')
 			{
 				*c++ = '\0';
@@ -448,7 +460,15 @@ int main(int argc, const char* argv[])
 				++out_line_number;
 				out << "#line " << out_line_number + 1 << " \"" << argv[2] << "\"" << "\n";
 
+				for (auto it = modules.begin(); it != modules.end(); ++it)
+				{
+					std::string emit_prefix = it->second.emit_prefix;
 
+					for (auto jt = it->second.symbols.begin(); jt != it->second.symbols.end(); ++jt)
+					{
+						out << emit_prefix << emit_macro_name << "(" << jt->first << ");" << "\n";
+					}
+				}
 
 				++out_line_number;
 				out << "#line " << in_line_number + 1 << " \"" << argv[1] << "\"" << "\n";
@@ -458,7 +478,15 @@ int main(int argc, const char* argv[])
 				++out_line_number;
 				out << "#line " << out_line_number + 1 << " \"" << argv[2] << "\"" << "\n";
 
+				for (auto it = modules.begin(); it != modules.end(); ++it)
+				{
+					std::string emit_prefix = it->second.emit_prefix;
 
+					for (auto jt = it->second.symbols.begin(); jt != it->second.symbols.end(); ++jt)
+					{
+						out << emit_prefix << emit_macro_name << "(" << jt->first << ");" << "\n";
+					}
+				}
 
 				++out_line_number;
 				out << "#line " << in_line_number + 1 << " \"" << argv[1] << "\"" << "\n";
