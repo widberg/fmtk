@@ -89,6 +89,7 @@ using p_float_t = float*;
 #include "gadgets/createwindowexw.hpp"
 #include "gadgets/getplayerposition.hpp"
 #include "gadgets/readfile.hpp"
+#include "gadgets/createdialogparama.hpp"
 //#include "gadgets/idirectsoundbufferplay.hpp"
 
 bool patchXLive = false;
@@ -149,6 +150,7 @@ LONG AttachDetours()
 	ATTACH(RegisterCommand);
 	ATTACH(ScriptManagerInit);
 	ATTACH(ReadFile);
+	ATTACH(CreateDialogParamA);
 
 	//HINSTANCE hiDSOUND = GetModuleHandleA("dsound.dll");
 
@@ -182,6 +184,7 @@ LONG DetachDetours()
 	DETACH(RegisterCommand);
 	DETACH(ScriptManagerInit);
 	DETACH(ReadFile);
+	DETACH(CreateDialogParamA);
 
 	//DETACHDSOUND(IDirectSoundBuffer_Play);
 	//DETACHDSOUND(IDirectSoundBuffer_SetVolume);

@@ -1,5 +1,7 @@
 FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+	while (1);
+
 	LOG(trace, FMTK, "Entry Point");
 
 	AttachDetoursXLive();
