@@ -16,3 +16,6 @@
 [submodule "dependencies/usercall.hpp"]
 	path = dependencies/usercall.hpp
 	url = https://github.com/widberg/usercall.hpp.git
+[submodule "dependencies/hashlibpp"]
+	path = dependencies/hashlibpp
+	url = https://github.com/pkcakeout/hashlibpp.git

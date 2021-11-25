@@ -2,51 +2,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
-
-struct PaternRead
-{
-	std::string read_offset_value;
-	std::vector<std::uint16_t> pattern;
-};
-
-struct Symbol
-{
-	bool required;
-	std::unordered_map<std::string, std::string> addresses;
-	std::vector<std::vector<std::uint16_t>> patterns;
-	std::vector<PaternRead> pattern_reads;
-};
-
-struct Module
-{
-	std::string value;
-	std::string export_prefix;
-	std::string emit_prefix;
-	std::string base_address;
-	std::unordered_map<std::string, std::string> hashes;
-	std::unordered_map<std::string, Symbol> symbols;
-
-	bool set(const std::string& variable_name, const std::string& variable_value)
-	{
-		if (variable_name == "export_prefix")
-		{
-			export_prefix = variable_value;
-		}
-		else if (variable_name == "emit_prefix")
-		{
-			emit_prefix = variable_value;
-		}
-		else if (variable_name == "base_address")
-		{
-			base_address = variable_value;
-		}
-		else
-		{
-			return false;
-		}
-		return true;
-	}
-};
+#include <algorithm>
 
 struct FunctionParameter
 {
@@ -57,6 +13,7 @@ struct FunctionParameter
 
 struct FunctionSignature
 {
+	FunctionSignature() {}
 	FunctionSignature(const std::string& data)
 	{
 		const char* c = data.c_str();
@@ -65,33 +22,60 @@ struct FunctionSignature
 		if (*c == '\0') return;
 
 		const char* return_type_begin = c;
-		while (*c != '\0' && !std::isspace(*c)) ++c;
+		while (*c != '\0' && *c != '(' && !std::isspace(*c)) ++c;
 		if (*c == '\0') return;
 		return_type = std::string(return_type_begin, c - return_type_begin);
 		while (std::isspace(*c)) ++c;
 		if (*c == '\0') return;
 
+		if (*c == '(')
+		{
+			function_pointer = true;
+			++c;
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+		}
+
 		const char* calling_convention_begin = c;
 		while (*c != '\0' && !std::isspace(*c)) ++c;
 		if (*c == '\0') return;
-		std::string calling_convention(calling_convention_begin, c - calling_convention_begin);
-		if (calling_convention == "__usercall" || calling_convention == "__userpurge")
+		calling_convention = std::string(calling_convention_begin, c - calling_convention_begin);
+		if (calling_convention == "__usercall")
 		{
-			is_usercall = calling_convention == "__usercall";
+			calling_convention == "__stdcall";
 		}
-		else
+		else if (calling_convention == "__userpurge")
 		{
-			return;
+			calling_convention == "__cdecl";
 		}
 		while (std::isspace(*c)) ++c;
 		if (*c == '\0') return;
 
+		if (function_pointer)
+		{
+			if (*c != '*') return;
+			++c;
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+		}
+
 		const char* function_name_begin = c;
-		while (*c != '\0' && !std::isspace(*c)) ++c;
-		if (*c == '\0') return;
-		function_name = std::string(function_name_begin, c - function_name_begin);
-		while (std::isspace(*c)) ++c;
-		if (*c == '\0') return;
+
+		if (function_pointer)
+		{
+			if (*c != ')') return;
+			++c;
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+		}
+		else
+		{
+			while (*c != '\0' && !std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+			function_name = std::string(function_name_begin, c - function_name_begin);
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return;
+		}
 
 		if (*c == '@')
 		{
@@ -114,6 +98,8 @@ struct FunctionSignature
 
 		while (*c != '\0')
 		{
+			if (*c == ')') break;
+
 			FunctionParameter parameter;
 
 			const char* parameter_type = c;
@@ -161,12 +147,59 @@ struct FunctionSignature
 		valid = true;
 	}
 
+	bool function_pointer = false;
 	bool valid = false;
 	std::string return_type;
-	bool is_usercall = false;
+	std::string calling_convention;
 	std::string function_name;
 	std::string return_register;
 	std::vector<FunctionParameter> parameters;
+};
+
+struct PaternRead
+{
+	std::string read_offset_value;
+	std::vector<std::uint16_t> pattern;
+};
+
+struct Symbol
+{
+	bool required;
+	std::string type;
+	std::unordered_map<std::string, std::string> addresses;
+	std::vector<std::vector<std::uint16_t>> patterns;
+	std::vector<PaternRead> pattern_reads;
+};
+
+struct Module
+{
+	std::string value;
+	std::string export_prefix;
+	std::string emit_prefix;
+	std::string base_address;
+	std::unordered_map<std::string, std::string> hashes;
+	std::unordered_map<std::string, Symbol> symbols;
+
+	bool set(const std::string& variable_name, const std::string& variable_value)
+	{
+		if (variable_name == "export_prefix")
+		{
+			export_prefix = variable_value;
+		}
+		else if (variable_name == "emit_prefix")
+		{
+			emit_prefix = variable_value;
+		}
+		else if (variable_name == "base_address")
+		{
+			base_address = variable_value;
+		}
+		else
+		{
+			return false;
+		}
+		return true;
+	}
 };
 
 int main(int argc, const char* argv[])
@@ -188,6 +221,8 @@ int main(int argc, const char* argv[])
 	}
 
 	std::unordered_map<std::string, Module> modules;
+	std::size_t usercall_function_depth = 0;
+	FunctionSignature usercall_function_signature;
 
 	std::size_t in_line_number = 0;
 	std::size_t out_line_number = 0;
@@ -199,18 +234,62 @@ int main(int argc, const char* argv[])
 	while (std::getline(in, line))
 	{
 		++in_line_number;
-		++out_line_number;
 
-		out << line << "\n";
-
-		line.push_back('\0');
 		char* c = line.data();
 		while (std::isspace(*c)) ++c;
 
 		if (c[0] != '/' || c[1] != '/' || c[2] != '$')
 		{
+			if (usercall_function_depth)
+			{
+				usercall_function_depth = usercall_function_depth + std::count(line.begin(), line.end(), '{') - std::count(line.begin(), line.end(), '}');
+
+				if (line.find("return") != std::string::npos)
+				{
+					++out_line_number;
+					while (true)
+					{
+						std::size_t pos = line.find("return");
+						if (pos == std::string::npos) break;
+						if ((pos == 0 || std::isspace(line[pos - 1])) && (pos == line.length() - 6 || (std::isspace(line[pos + 6]) || line[pos + 6] == ';')))
+						{
+							out << line.substr(0, pos);
+							line = line.substr(pos);
+							std::size_t semicolon_pos = line.find(';');
+							if (semicolon_pos == std::string::npos) return 1;
+							std::string return_statement = line.substr(6, semicolon_pos - 6);
+
+							out << "__asm { pop esi };__asm { pop edi };__asm { pop edx };__asm { pop ecx };__asm { pop ebx };__asm { pop eax };";
+							if (!return_statement.empty() && !std::all_of(return_statement.begin(), return_statement.end(), std::isspace))
+							{
+								out << usercall_function_signature.return_type << " _usercall_internal_return = " << return_statement << ";__asm {mov " << usercall_function_signature.return_register << ", _usercall_internal_return};";
+							}
+
+							out << "return;";
+
+							line = line.substr(semicolon_pos + 1);
+						}
+					}
+					out << line << "\n";
+				}
+				else
+				{
+					++out_line_number;
+					out << line << "\n";
+				}
+			}
+			else
+			{
+				++out_line_number;
+				out << line << "\n";
+			}
+
 			continue;
 		}
+
+		++out_line_number;
+		out << line << "\n";
+		line.push_back('\0');
 
 		c += 3;
 		while (std::isspace(*c)) ++c;
@@ -360,18 +439,18 @@ int main(int argc, const char* argv[])
 
 			const char* required_value = c;
 			while (*c != '\0' && !std::isspace(*c)) ++c;
-			if (*c != '\0')
-			{
-				*c++ = '\0';
-				while (std::isspace(*c)) ++c;
-				if (*c != '\0') return 1;
-			}
+			if (*c == '\0') return 1;
+			*c++ = '\0';
+			while (std::isspace(*c)) ++c;
+			if (*c == '\0') return 1;
+
+			const char* type_value = c;
 
 			if (modules.count(module_name))
 			{
 				if (!modules[module_name].symbols.count(symbol_name))
 				{
-					modules[module_name].symbols[symbol_name] = Symbol { !strcmp(required_value, "required") };
+					modules[module_name].symbols[symbol_name] = Symbol { !strcmp(required_value, "required"), type_value };
 				}
 				else
 				{
@@ -617,10 +696,11 @@ int main(int argc, const char* argv[])
 
 			std::string signature;
 			std::string line;
+			++in_line_number;
 			while (std::getline(in, line) && line.find('{') == std::string::npos)
 			{
 				++in_line_number;
-				signature += line;
+				signature += " " + line;
 			}
 
 			signature += line.substr(0, line.find('{'));
@@ -630,10 +710,10 @@ int main(int argc, const char* argv[])
 			out << "#line " << out_line_number + 1 << " \"" << argv[2] << "\"" << "\n";
 
 			FunctionSignature function_signature(signature);
-			if (!function_signature.valid) return 1;
+			if (!function_signature.valid || function_signature.function_pointer) return 1;
 
 			++out_line_number;
-			out << function_signature.return_type << " " << (function_signature.is_usercall ? "__stdcall" : "__cdecl") << " " << function_signature.function_name << "(";
+			out << function_signature.return_type << " " << function_signature.calling_convention << " " << function_signature.function_name << "(";
 			bool first = true;
 			for (auto parameter : function_signature.parameters)
 			{
@@ -651,7 +731,7 @@ int main(int argc, const char* argv[])
 					out << parameter.parameter_type << " " << parameter.parameter_name;
 				}
 			}
-			out << "){";
+			out << "){__asm { push eax };__asm { push ebx };__asm { push ecx };__asm { push edx };__asm { push edi };__asm { push esi };";
 
 			for (auto parameter : function_signature.parameters)
 			{
@@ -664,7 +744,10 @@ int main(int argc, const char* argv[])
 
 			++out_line_number;
 			out << "#line " << in_line_number + 1 << " \"" << argv[1] << "\"" << "\n";
-			out << line << "\n";
+			in.seekg(-line.length(), std::ios::cur);
+
+			usercall_function_depth = 1;
+			usercall_function_signature = function_signature;
 		}
 		else if (!std::strcmp(command, "emit"))
 		{
@@ -704,7 +787,7 @@ int main(int argc, const char* argv[])
 					out << "HINSTANCE hiModule = GetModuleHandleA(" << it->second.value << ");" \
 						"CHAR lpPath[MAX_PATH + 1];" \
 						"GetModuleFileNameW(" << it->second.value << ", lpPath, MAX_PATH + 1);" \
-						"std::string module_hash = md5sum(lpPath);" \
+						"std::string module_hash = MD5(lpPath);" \
 						"std::string version_name = hashes.count(module_hash) ? hashes[module_hash] : \"\";" << "\n";
 
 					std::string export_prefix = it->second.export_prefix;
@@ -712,10 +795,10 @@ int main(int argc, const char* argv[])
 					for (auto jt = it->second.symbols.begin(); jt != it->second.symbols.end(); ++jt)
 					{
 						++out_line_number;
-						out << "std::unordered_map<std::string, std::string> addresses = { ";
+						out << "std::unordered_map<std::string, " << jt->second.type << "> addresses = { ";
 						for (auto kt = jt->second.addresses.begin(); kt != jt->second.addresses.end(); ++kt)
 						{
-							out << "{ \"" << kt->first << "\", " << kt->second << " }, ";
+							out << "{ \"" << kt->first << "\", static_cast<" << jt->second.type << ">(" << kt->second << ") }, ";
 						}
 						out << "};\n";
 
@@ -726,27 +809,27 @@ int main(int argc, const char* argv[])
 							out << "{ ";
 							for (std::uint16_t x : kt)
 							{
-								out << x << ", ";
+								out << "0x" << std::hex << x << ", ";
 							}
 							out << " }, ";
 						}
 						out << "};\n";
 
 						++out_line_number;
-						out << "void* " << export_prefix << jt->first << " = nullptr; if (addresses.count(version_name)) { " << export_prefix << jt->first << " = addresses[version_name];";
+						out << "auto " << export_prefix << jt->first << " = static_cast<" << jt->second.type << ">(nullptr); if (addresses.count(version_name)) { " << export_prefix << jt->first << " = addresses[version_name];";
 						if (!it->second.base_address.empty())
 						{
 							out << export_prefix << jt->first << " = " << export_prefix << jt->first << " - " << it->second.base_address << " + hiModule;";
 						}
-						out << "} else { for (auto pattern : patterns) { if (" << export_prefix << jt->first << " = find_pattern(hiModule, pattern)) { break; } } if (!" << export_prefix << jt->first << ") { do {";
+						out << "} else { for (auto pattern : patterns) { if (" << export_prefix << jt->first << " = FIND_PATTERN(hiModule, pattern)) { break; } } if (!" << export_prefix << jt->first << ") { do {";
 						for (auto kt : jt->second.pattern_reads)
 						{
-							out << "if (" << export_prefix << jt->first << " = find_pattern({ ";
+							out << "if (" << export_prefix << jt->first << " = static_cast<" << jt->second.type << ">(FIND_PATTERN({ ";
 							for (std::uint16_t x : kt.pattern)
 							{
-								out << x << ", ";
+								out << "0x" << std::hex << x << ", ";
 							}
-							out << " }) { " << export_prefix << jt->first << " = *(void**)(" << export_prefix << jt->first << kt.read_offset_value << "); break; }";
+							out << " }))) { " << export_prefix << jt->first << " = *(void**)(" << export_prefix << jt->first << kt.read_offset_value << "); break; }";
 						}
 						out << "} while(false); } if (!" << export_prefix << jt->first << " && " << jt->second.required << ") { assert(false); }}\n";
 

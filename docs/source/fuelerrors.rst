@@ -33,6 +33,22 @@ Solutions:
 
 * Check the output log for the error message and report it to the mod author.
 
+Save failed!
+------------------------------------
+
+``Save failed! Would you like to try again?``
+
+.. image:: img/Save_failed.png
+   :width: 800
+   
+Causes:
+
+* The game failed to write the save state to disk.
+
+Solutions:
+
+* Select ``No`` and hope it works the next time.
+
 3D Objects Don't Render
 ------------------------------------
 

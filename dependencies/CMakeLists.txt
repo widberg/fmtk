@@ -4,6 +4,9 @@ add_subdirectory(d3d9)
 # Detours
 add_subdirectory(detours)
 
+# hashlibpp
+add_subdirectory(hashlibpp)
+
 # LuaJIT
 add_subdirectory(luajit)
 
