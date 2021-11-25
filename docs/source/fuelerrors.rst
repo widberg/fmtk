@@ -84,7 +84,7 @@ Solutions:
 Please wait
 ---------------------------------------------------------------
 
-``Games For Windows Sign In LIVE Please wait``
+``Games For Windows LIVE Sign In Please wait``
 
 .. image:: img/Please_wait.png
    :width: 300
