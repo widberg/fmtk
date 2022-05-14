@@ -1,14 +1,14 @@
 add_custom_target(package
 	COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/mods" "$<TARGET_FILE_DIR:fmtk>/mods"
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtklua>" "$<TARGET_FILE_DIR:fmtk>/mods/native/fmtklua.dll"
+	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:lua51>" "$<TARGET_FILE_DIR:fmtk>/mods/path/lua5.1.dll"
+	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtkdll>" "$<TARGET_FILE_DIR:fmtk>/mods/fmtk/fmtkdll.dll"
+	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:secudll>" "$<TARGET_FILE_DIR:fmtk>/mods/fmtk/secudll.dll"
 	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/README.md" "$<TARGET_FILE_DIR:fmtk>/README.md"
 	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/package/uninstall_fmtk.bat" "$<TARGET_FILE_DIR:fmtk>/uninstall_fmtk.bat"
 	COMMAND
 		${CMAKE_COMMAND} -E tar "cf" "${CMAKE_BINARY_DIR}/fmtk.zip" --format=zip
 		"$<TARGET_FILE:fmtk>"
-		"$<TARGET_FILE:fmtkdll>"
-		"$<TARGET_FILE:secudll>"
-		"$<TARGET_FILE:lua51>"
 		"$<TARGET_FILE_DIR:fmtk>/mods"
 		"$<TARGET_FILE_DIR:fmtk>/README.md"
 		"$<TARGET_FILE_DIR:fmtk>/uninstall_fmtk.bat"

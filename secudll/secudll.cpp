@@ -10,7 +10,7 @@
 #include <sstream>
 #include <vector>
 
-constexpr const char* FMTK_TOML_PATH = "fmtk.toml";
+constexpr const char* FMTK_TOML_PATH = "mods/fmtk/fmtk.toml";
 
 #define ATTACH(x)       DetourAttach(&(PVOID&)Real_##x, FMTK_##x)
 #define DETACH(x)       DetourDetach(&(PVOID&)Real_##x, FMTK_##x)
@@ -67,7 +67,7 @@ BOOL WINAPI FMTK_CreateProcessW(
         lpCurrentDirectory,
         lpStartupInfo,
         lpProcessInformation,
-        "fmtkdll.dll",
+        "mods/fmtk/fmtkdll.dll",
         Real_CreateProcessW);
     
     return rv;

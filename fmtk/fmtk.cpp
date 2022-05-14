@@ -16,7 +16,7 @@
 #include "debug.hpp"
 #include "logging.hpp"
 
-constexpr const char* FMTK_TOML_PATH = "fmtk.toml";
+constexpr const char* FMTK_TOML_PATH = "mods/fmtk/fmtk.toml";
 
 void LogLastError();
 bool FirstTimeSetup();
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 
     if (!DetourCreateProcessWithDllExW(NULL, buf.data(),
         NULL, NULL, TRUE, dwFlags, NULL,
-        NULL, &si, &pi, "secudll.dll", NULL))
+        NULL, &si, &pi, "mods/fmtk/secudll.dll", NULL))
     {
         LOG(error, FMTK, "DetourCreateProcessWithDllEx failed: %ld\n", GetLastError());
         LogLastError();

@@ -18,7 +18,7 @@
 	{                                                                                             \
 		std::vector<spdlog::sink_ptr> sinks;                                                      \
 		sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());                 \
-		sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("fmtk.log", true));   \
+		sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("mods/fmtk/fmtk.log", true)); \
 		auto logger = std::make_shared<spdlog::logger>("logger", begin(sinks), end(sinks));       \
 		spdlog::set_default_logger(logger);                                                       \
 		spdlog::set_pattern("[%^%L%$] %v");                                                       \
