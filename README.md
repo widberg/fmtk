@@ -87,9 +87,22 @@ git submodule update --init --recursive
 
 ### Build
 
+Use the `x86 Native Tools Command Prompt for VS 2022` environment while generating and building the project.
+
+#### Visual Studio Generator
+
 ```sh
 mkdir build
 cd build
-cmake -A Win32 ..
+cmake -G "Visual Studio 17 2022" -A Win32 ..
+cmake --build .
+```
+
+#### Ninja
+
+```sh
+mkdir build
+cd build
+cmake -GNinja ..
 cmake --build .
 ```
