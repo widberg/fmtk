@@ -22,11 +22,11 @@ add_executable(minilua ${LUAJIT_DIR}/host/minilua.c)
 
 # buildvm_arch_generator
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/LuaJIT/src/host/)
-add_custom_target(buildvm_arch_generator
+add_custom_command(
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/LuaJIT/src/host/buildvm_arch.h
 	COMMAND minilua ${LUAJIT_DIR}/../dynasm/dynasm.lua -D WIN -D FPU -D HFABI -o ${CMAKE_CURRENT_BINARY_DIR}/LuaJIT/src/host/buildvm_arch.h ${LUAJIT_DIR}/vm_x86.dasc
-	DEPENDS minilua
-	BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/LuaJIT/src/host/buildvm_arch.h
 	WORKING_DIRECTORY ${LUAJIT_DIR}/../dynasm
+	DEPENDS minilua ${LUAJIT_DIR}/../dynasm/dynasm.lua
 )
 
 # buildvm
@@ -36,12 +36,14 @@ add_executable(buildvm
 	${LUAJIT_DIR}/host/buildvm_fold.c
 	${LUAJIT_DIR}/host/buildvm_lib.c
 	${LUAJIT_DIR}/host/buildvm_peobj.c
+
+	${CMAKE_CURRENT_BINARY_DIR}/LuaJIT/src/host/buildvm_arch.h
 )
 target_include_directories(buildvm PRIVATE ${LUAJIT_DIR} ${CMAKE_CURRENT_BINARY_DIR}/LuaJIT/src/host)
-add_dependencies(buildvm buildvm_arch_generator)
 
 macro(add_buildvm_target _target _mode)
-	add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}
+	add_custom_command(
+		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}
 		COMMAND buildvm ARGS -m ${_mode} -o ${CMAKE_CURRENT_BINARY_DIR}/${_target} ${ARGN}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		DEPENDS buildvm ${ARGN}

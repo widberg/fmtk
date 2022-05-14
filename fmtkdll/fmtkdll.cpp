@@ -226,6 +226,8 @@ BOOL ProcessAttach(HMODULE hDll)
 
     fmtkModsDirectoryPath = (std::filesystem::absolute(modsDirectoryPath.value()) / "").string();
 
+    SetDllDirectory((modsDirectoryPath.value() + L"\\path").c_str());
+
     loadModsDirectory(modsDirectoryPath.value() + L"\\native");
 
     return TRUE;
