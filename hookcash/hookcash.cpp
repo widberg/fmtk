@@ -65,10 +65,21 @@ const char* consumeIdentifier(const char* c, std::string& identifier)
 {
 	c = consumeWhitespace(c);
 
-	const char* start = c;
-	while (std::isalnum(*c) || *c == '_') ++c;
+	if (*c == '\"')
+	{
+		++c;
+		const char* start = c;
+		while (*c != '\0' && *c != '\"') ++c;
+		identifier = std::string(start, c - start);
+		++c;
+	}
+	else
+	{
+		const char* start = c;
+		while (*c != '\0' && !std::isspace(*c)) ++c;
 
-	identifier = std::string(start, c - start);
+		identifier = std::string(start, c - start);
+	}
 
 	return c;
 }
@@ -80,9 +91,8 @@ bool commandModule(const std::vector<std::string>& argv, Context& context)
 		std::cout << "commandModule Wrong number of arguments " << argv.size() << std::endl;
 		return false;
 	}
-	std::cout << "module " << argv[0] << " " << argv[1] << "\n";
 
-	if (context.modules.count(argv[0]))
+	if (context.modules.count(argv[0]) || argv[0] == "*")
 	{
 		std::cout << "module " << argv[0] << " already exists\n";
 		return false;
@@ -101,16 +111,30 @@ bool commandSet(const std::vector<std::string>& argv, Context& context)
 		return false;
 	}
 
-	if (!context.modules.count(argv[0]))
+	if (!context.modules.count(argv[0]) && argv[0] != "*")
 	{
 		std::cout << "module " << argv[0] << " does not exists\n";
 		return false;
 	}
 
-	if (!context.modules[argv[0]].set(argv[1], argv[2]))
+	if (argv[0] == "*")
 	{
-		std::cout << "variable does not exist" << std::endl;
-		return false;
+		for (auto it = context.modules.begin(); it != context.modules.end(); ++it)
+		{
+			if (!it->second.set(argv[1], argv[2]))
+			{
+				std::cout << "variable does not exist" << std::endl;
+				return false;
+			}
+		}
+	}
+	else
+	{
+		if (!context.modules[argv[0]].set(argv[1], argv[2]))
+		{
+			std::cout << "variable does not exist" << std::endl;
+			return false;
+		}
 	}
 
 	return true;
@@ -235,13 +259,11 @@ bool parseLine(const std::string& line, Context& context)
 		return false;
 	}
 
-	std::cout << "c " << (int) * c << "\n";
 	std::vector<std::string> argv;
 	while (*c != '\0')
 	{
 		std::string arg;
 		c = consumeIdentifier(c, arg);
-		std::cout << "ident " << arg << "\n";
 		argv.push_back(arg);
 	}
 
@@ -251,6 +273,33 @@ bool parseLine(const std::string& line, Context& context)
 	}
 
 	return true;
+}
+
+void dumpContext(const Context& context)
+{
+	for (auto it = context.modules.begin(); it != context.modules.end(); ++it)
+	{
+		std::cout << it->first << " (" << it->second.value << "):\n";
+		std::cout << " hashes:\n";
+		for (auto jt = it->second.hashes.begin(); jt != it->second.hashes.end(); ++jt)
+		{
+			std::cout << "  " << jt->first << " = " << jt->second << "\n";
+		}
+
+		std::cout << " symbols:\n";
+		for (auto jt = it->second.symbols.begin(); jt != it->second.symbols.end(); ++jt)
+		{
+			std::cout << "  " << jt->first << " (" <<
+				(jt->second.required ? "required" : "optional") <<
+				") (" << jt->second.type << "):\n";
+			
+			std::cout << "   addresses:\n";
+			for (auto kt = jt->second.addresses.begin(); kt != jt->second.addresses.end(); ++kt)
+			{
+				std::cout << "    " << kt->first << " = " << kt->second << "\n";
+			}
+		}
+	}
 }
 
 int main(int argc, const char* argv[])
@@ -286,6 +335,8 @@ int main(int argc, const char* argv[])
 			return 1;
 		}
 	}
+
+	dumpContext(context);
 
 	return 0;
 }

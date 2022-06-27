@@ -40,5 +40,8 @@
 # woke
 .wokeignore
 
-#docs
+# docs
 docs/build
+
+# idea
+.idea/
