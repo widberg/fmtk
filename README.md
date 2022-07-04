@@ -22,7 +22,7 @@ FUEL Modding Toolkit
 * File aliasing (like a programmatic REFUELED)
 * Seamless mod compatibility so everyone plays nice
 * Configurable launcher and mods
-* Cool "Blue FUEL" launcher logo :)
+* Cool "Blue FUEL" launcher logo [:)](https://github.com/widberg/fmtk/wiki/Logo-Lore)
 * Easy to install for inexperienced users
 
 ## Compatibility
@@ -34,10 +34,10 @@ FMTK is fully compatible with legally obtained retail and Steam release copies o
 1. Verify that your FUEL installation is stock and all of the executable files have their original names.
   - If you have renamed `FUEL.exe`, `GameSetup.exe`, or `SecuLauncher.exe`, now would be the time to revert them to their original names. If you have a Steam copy, this can be done with the "Verify integrity of game files..." button in the "Local Files" tab of FUEL's Steam "Properties..." menu.
   - This requirement will be removed in future releases once fingerprinting is implemented.
-2. Download the latest release from the [releases page](https://github.com/widberg/fmtk/releases). This will be the asset with a name matching the pattern `fmtk-*.zip`. Your web browser will probably warn you that the file is not commonly downloaded because this is a small project without many users; I encourage you to scan the file with virustotal or windows defender if you want to confirm its safety. Alternatively you can [build the project from the source code](https://github.com/widberg/fmtk#getting-started-for-fmtk-developers).
+2. Download the latest release from the [releases page](https://github.com/widberg/fmtk/releases). This will be the asset with a name matching the pattern `fmtk-*.zip`.
 3. Unzip the release into the root FUEL directory (the directory containing `FUEL.exe`)
 4. Verify that `fmtk.exe`, `mods`, and your `FUEL.exe` are all in the same directory.
-5. Run `fmtk.exe`. Windows smart screen will probably warn you that the executable is not from a trusted vendor because I have not paid for a CA to sign the executable; once again I encourage you to scan the files with virustotal or windows defender if you want to confirm their safety. Alternatively you can [build the project from the source code](https://github.com/widberg/fmtk#getting-started-for-fmtk-developers).
+5. Run `fmtk.exe`.
 
 In the event of a crash or other game state locking event, i.e. "Error: Shaders processing has failed."  or "The Game Disc could not be read.", please check the `fmtk.log` file in the `mods/fmtk` directory. If you cannot resolve the reported error yourself then please open an issue or contact an FMTK developer directly.
 
@@ -45,7 +45,7 @@ In the event of a crash or other game state locking event, i.e. "Error: Shaders 
 
 ## Discord
 
-Join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FUEL discussion and FMTK support. join the [TotemTech Underground Discord](https://discord.gg/CQgMNbYeUR) for general Asobo Studio modding beyond and including FUEL. If you plan on joining to ask a specific question, please read the [FMTK FAQ](https://github.com/widberg/fmtk/wiki/FAQ) first to see if it has already been answered.
+Join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FUEL discussion and FMTK support. Join the [TotemTech Underground Discord](https://discord.gg/CQgMNbYeUR) for general Asobo Studio modding beyond and including FUEL. If you plan on joining to ask a specific question, please read the [FMTK FAQ](https://github.com/widberg/fmtk/wiki/FAQ) first to see if it has already been answered.
 
 ## Documentation
 
