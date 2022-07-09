@@ -8,6 +8,7 @@ Welcome to FMTK's documentation!
 
    fueldevelopermenus
    fuelcommands
+   fueltotemscript
    fuelcommandlineoptions
    fuelerrors
    fuelcontrolcodes
