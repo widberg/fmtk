@@ -2186,7 +2186,9 @@ x is east/west, y is north/south, and z is up/down
 
 .. code-block:: c
 
-   TransText
+   TransText id string
+
+The ID is used to reference this text in later commands. IDs can be between 0 and 16383, inclusive. While the range may seem weird at first, it begins to make sense when you realize that the size of the buffer is 16384 which is 0x4000 in hexadecimal. The string can use control codes and sometimes printf format specifiers. See the :ref:`Control Codes documentation entry<fuelcontrolcodes>` for more information.
 
 .. code-block:: c
 
