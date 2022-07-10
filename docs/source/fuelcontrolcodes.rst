@@ -12,7 +12,7 @@ General Control Codes
 
    ~
 
-Newline.
+Newline. Multiple of this escape sequence in a row must be separated by spaces. For example ``~ ~`` should be used instead of ``~~`` if you wan't two newlines.
 
 .. code-block:: c
 
