@@ -8,7 +8,7 @@ Command arguments have two types. The first type is a numeric argument. Numeric 
 Commands
 --------
 
- :ref:`Commands documentation entry<Commands>` for a list of commands available in FUEL.
+ See the :ref:`Commands documentation entry<Commands>` for a list of commands available in FUEL.
 
 Directives
 ----------
@@ -39,7 +39,7 @@ Unsets a variable.
 
 If the expression evaluates as true then this block is executed. Otherwise, it is skipped.
 
-An expression is a sequence of one or more variable names separated by the conditional operators ``||`` (Binary OR) and ``&&`` (Binary AND). If a variable name is set then it evaluates as true. Otherwise, it evaluates as false. Note that the expression is not escaped or quoted in any way. For example, ``#if	CD_MAKE_BF || CD_VERSION`` will be satisfied when either ``CD_MAKE_BF``, ``CD_VERSION``, or both are set.
+An expression is a sequence of one or more variable names separated by the conditional operators ``||`` (Binary OR) and ``&&`` (Binary AND). If a variable name is set then it evaluates as true. Otherwise, it evaluates as false. Note that the expression is not escaped or quoted in any way. For example, ``#if CD_MAKE_BF || CD_VERSION`` will be satisfied when either ``CD_MAKE_BF``, ``CD_VERSION``, or both are set. But it will not be satisfied if neither are set.
 
 Rather than having operator prescience, the expression is evaluated left to right with no operator prescience. For example, while you might expect the expression ``name1 || name2 && name3 || name4`` to be evaluated as ``((name1 || name2) && (name3 || name4))`` it is actually evaluated as ``(((name1 || name2) && name3) || name4)``. Note that parentheses are not supported in expressions, they are only used here to illustrate the order of operations. Also, the conditional expressions do not have short circuit evaluation, not that this matters since there are no side effects.
 
