@@ -8,7 +8,7 @@ Notes
 
 The in-game console can be accessed by pressing the ``y`` key in the game world. The game is paused while the console is open so you have to close it for your commands to take effect. Use the ``wasd`` keys to navigate the console keyboard. Use ``r`` to insert a space character and ``x`` to delete the last character. Pressing ``y`` while the console is open will close the console. Be careful not to confuse the letter ``O`` in the first row with the digit ``0`` in the second and third rows.
 
-See the :ref:`Totem Script documentation entry<fueltotemscript>` for more information about how commands work.
+See the :ref:`Totem Script documentation entry<Totem Script>` for more information about how commands work.
 
 Due to the excessive number of commands, I will add details to the commands as I see fit. If there is a command that you would like me to add details to, open an issue with the command name and I will get to it when I have a chance.
 
@@ -2190,7 +2190,7 @@ x is east/west, y is north/south, and z is up/down
 
    TransText id string
 
-The ID is used to reference this text in later commands. IDs can be between 0 and 16383, inclusive. While the range may seem weird at first, it begins to make sense when you realize that the size of the buffer is 16384 which is 0x4000 in hexadecimal. The string can use control codes and sometimes printf format specifiers. See the :ref:`Control Codes documentation entry<fuelcontrolcodes>` for more information.
+The ID is used to reference this text in later commands. IDs can be between 0 and 16383, inclusive. While the range may seem weird at first, it begins to make sense when you realize that the size of the buffer is 16384 which is 0x4000 in hexadecimal. The string can use control codes and sometimes printf format specifiers. See the :ref:`Control Codes documentation entry<Control Codes>` for more information.
 
 .. code-block:: c
 
