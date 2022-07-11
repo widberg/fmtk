@@ -8,7 +8,9 @@ Command arguments have two types. The first type is a numeric argument. Numeric 
 Commands
 --------
 
- See the :ref:`Commands documentation entry<Commands>` for a list of commands available in FUEL.
+All command names are case insensitive. Only the first ``15`` capital letters and numbers in each command name are required, this is called the "short form command name" and it is also case insensitive. However, I recommend using the full command name in scripts for readability.
+
+See the :ref:`Commands documentation entry<Commands>` for a list of commands available in FUEL.
 
 Directives
 ----------
@@ -147,6 +149,6 @@ When a script file is invoked with the ``BSource`` command, tokens of the form `
 Limitations
 -----------
 
-The number of usable characters in a buffer is ``1`` less than the length of the buffer to leave room for the null terminator. The buffer length for each line is 2048 characters. The buffer length for the command name is 1024 characters. The buffer length for each argument is 1024 characters. The buffer length for variable names is 32 characters. A command can have at most 32 arguments including the name. Since integer and float arguments are backed by 32-bit floating point values they are subject to the limitations imposed the underlying data type.
+The number of usable characters in a buffer is ``1`` less than the length of the buffer to leave room for the null terminator. The buffer length for each line is 2048 characters. The buffer length for the command name is 1024 characters. The buffer length for the short form command name is 16 characters. Registered commands are stored in a linked list and thus there is no limitation on the number of registered commands. The buffer length for each argument is 1024 characters. The buffer length for variable names is 32 characters. There can be at most 32 variables set at any one time. A command can have at most 32 arguments including the name. Since integer and float arguments are backed by 32-bit floating point values they are subject to the limitations imposed the underlying data type.
 
 Additionally, an eagle eyed reader will have noticed that Totem Script only supports sequential and conditional execution, and not iterative execution. This means that there are no loops, so if you want to run a command multiple times then you need to copy and paste it that many times or fall back to a higher level environment and execute the commands from there. You will almost never need to do this so it is an excusable omission from the language.
