@@ -78,7 +78,7 @@ Close the matching ``#if``, ``#ifdef``, ``#ifnot``, ``#ifndef``, or ``#else`` bl
 Constants
 ---------
 
-All constants are case insensitive.
+All constants are case insensitive. While these constants change the numeric value, the string value will remain unchanged. Some commands will check for string values of "OFF" or "ON" independently of the command evaluator. In this case the argument must match exactly since the string value is being checked and not the numeric value.
 
 .. code-block:: c
 
