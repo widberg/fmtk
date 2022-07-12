@@ -1,7 +1,7 @@
 Totem Script
 ============
 
-Totem Script is a shell-like scripting language used in FUEL. Most of the textual game files are Totem Script scripts. Two of the extensions used for Totem Script are ``.tsc`` (Totem Script) and ``.pc`` in the ``trtext`` directory. In addition to being used in game files, the language is used in the in-game console and programmatically throughout the game executable. Each line a Totem Script file is executed sequentially. If a line fails to execute then it is ignored and execution continues with the next line. Whitespace is ignored.
+Totem Script is a shell-like scripting language used in FUEL. Most of the textual game files are Totem Script scripts. Two of the extensions used for Totem Script are ``.tsc`` (Totem Script) and ``.pc`` in the ``trtext`` directory. In addition to being used in game files, the language is used in the in-game console and programmatically throughout the game executable. Each line of a Totem Script file is executed sequentially. If a line fails to execute then it is ignored and execution continues with the next line. Whitespace is ignored.
 
 Command arguments have two types. The first type is a numeric argument. Numeric arguments are backed by a float value but in practice they are used as integers, booleans, and floats. The second type is a string argument. String arguments are unsurprisingly backed by a C-string value.
 
