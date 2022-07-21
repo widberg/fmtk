@@ -65,6 +65,7 @@ These are projects that are related to researching FUEL but not directly part of
 * ~~[fmt_fuel](https://github.com/widberg/fmt_fuel) - Noesis scripts for object formats~~ replaced with blender_fuel
 * [blender_fuel](https://github.com/widberg/blender_fuel) - Blender scripts for object formats
 * [atk](https://github.com/widberg/atk) - Frida agent for asobo games
+* [fuel-save-editor](https://github.com/widberg/fuel-save-editor) - Save editor for Asobo's FUEL
 
 ## Support
 
