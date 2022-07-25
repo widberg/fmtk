@@ -8,6 +8,9 @@ Notes
 
 The in-game console can be accessed by pressing the ``y`` key in the game world. The game is paused while the console is open so you have to close it for your commands to take effect. Use the ``wasd`` keys to navigate the console keyboard. Use ``r`` to insert a space character and ``x`` to delete the last character. Pressing ``y`` while the console is open will close the console. Be careful not to confuse the letter ``O`` in the first row with the digit ``0`` in the second and third rows.
 
+.. image:: img/CommandPalette.png
+   :width: 800
+
 See the :ref:`Totem Script documentation entry<Totem Script>` for more information about how commands work.
 
 Due to the excessive number of commands, I will add details to the commands as I see fit. If there is a command that you would like me to add details to, open an issue with the command name and I will get to it when I have a chance.
@@ -571,6 +574,9 @@ Stop recording. See ``MakeAVI``.
 
    DebugDraw3DElements
 
+.. image:: img/DebugDraw3DElements.png
+   :width: 800
+
 .. code-block:: c
 
    DebugDynamicInfo
@@ -591,6 +597,9 @@ Stop recording. See ``MakeAVI``.
 
    DebugGenWorldTerrain
 
+.. image:: img/DebugGenWorldTerrain.png
+   :width: 800
+
 .. code-block:: c
 
    DeBuGGPS
@@ -602,6 +611,9 @@ Stop recording. See ``MakeAVI``.
 .. code-block:: c
 
    DeBugInfos
+
+.. image:: img/DeBugInfos.png
+   :width: 800
 
 .. code-block:: c
 
@@ -695,9 +707,13 @@ Stop recording. See ``MakeAVI``.
 
    DisableMouseForCamera
 
+Makes it so the mouse cannot be used to move the camera.
+
 .. code-block:: c
 
    DisableMOvie
+
+Skips all movies.
 
 .. code-block:: c
 
@@ -711,9 +727,14 @@ Stop recording. See ``MakeAVI``.
 
    DisableShaderCompile
 
+Skips the "Processing Shaders" step when loading the game.
+
 .. code-block:: c
 
    DisplayDebugOnline
+
+.. image:: img/DisplayDebugOnline.png
+   :width: 800
 
 .. code-block:: c
 
@@ -722,6 +743,9 @@ Stop recording. See ``MakeAVI``.
 .. code-block:: c
 
    DisplayFPS
+
+.. image:: img/DisplayFPS.png
+   :width: 800
 
 .. code-block:: c
 
@@ -742,6 +766,9 @@ Stop recording. See ``MakeAVI``.
 .. code-block:: c
 
    DisplaySoundInfo
+
+.. image:: img/DisplaySoundInfo.png
+   :width: 800
 
 .. code-block:: c
 
@@ -1510,6 +1537,9 @@ both arguments default to 30 if not present. They may be overwritten individuall
 
    PersoSPEED
 
+.. image:: img/PersoSPEED.png
+   :width: 800
+
 .. code-block:: c
 
    PlayDIalog
@@ -1797,6 +1827,13 @@ both arguments default to 30 if not present. They may be overwritten individuall
 .. code-block:: c
 
    SetDebugSDMode
+
+``SetDebugSDMode [PS3|X360|PC|MAC]``
+
+If the argument is missing or not one of the given strings, then the "Platform Dependent" SD is used.
+
+.. image:: img/SetDebugSDMode.png
+   :width: 800
 
 .. code-block:: c
 
