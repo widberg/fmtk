@@ -14,7 +14,7 @@ The ``Param/pp001.tsc`` file can be hot reloaded by editing and saving ``Param/p
 Values
 ------
 
-The value of a game parameter can be expressed in several ways. By default every parameter is ``0``.
+The value of a game parameter can be expressed in several ways. By default every parameter has an uninitialized garbage value.
 
 The first, and most common, way to express the value is with a numeric argument. If the argument is numeric, then the numeric representation of the argument is used as the value of the parameter.
 
