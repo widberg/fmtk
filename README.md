@@ -7,6 +7,7 @@ FUEL Modding Toolkit
 [![Build Status](https://github.com/widberg/fmtk/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/widberg/fmtk/actions/workflows/build.yml)
 [![Documentation Status](https://readthedocs.org/projects/fmtk/badge/?version=latest)](https://fmtk.readthedocs.io/en/latest/?badge=latest)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/widberg/fmtk)](https://github.com/widberg/fmtk/releases)
+[![Join the chat at https://discord.gg/CQgMNbYeUR](https://img.shields.io/badge/chat-on_discord-7389D8.svg?logo=discord&logoColor=ffffff&labelColor=6A7EC2)](https://discord.gg/CQgMNbYeUR)
 
 ## Features
 
@@ -44,7 +45,7 @@ In the event of a crash or other game state locking event, i.e. "Error: Shaders 
 
 ## Discord
 
-Join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FUEL discussion and FMTK support. Join the [TotemTech Underground Discord](https://discord.gg/CQgMNbYeUR) for general Asobo Studio modding beyond and including FUEL. If you plan on joining to ask a specific question, please read the [FMTK FAQ](https://github.com/widberg/fmtk/wiki/FAQ) first to see if it has already been answered.
+Join the [TotemTech Underground Discord](https://discord.gg/CQgMNbYeUR) for general Asobo Studio modding, beyond and including FUEL. Or, join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FUEL discussion and FMTK support; please do not join the Unofficial FUEL Discord server to ask about games that are not FUEL. If you plan on joining to ask a specific question, please read the [FMTK FAQ](https://github.com/widberg/fmtk/wiki/FAQ) first to see if it has already been answered.
 
 ## Documentation
 
