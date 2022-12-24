@@ -3,10 +3,13 @@ AutoMesh
 
 `ADDMESH: <mesh name> [<property> ...]`
 
-Max 512 + 1 chars for token. max 17 tokens, 1 ADDMESH:, 1 mesh name, 15 properties.
-
 Properties
 ----------
+
+
+
+Boolean
+-------
 
 OnATVPark
 
@@ -45,56 +48,6 @@ NoMountain
 NoOcclusion
 
 ShortCut
-
-MaxDistToRoad<int>
-
-MinDistToRoad<int>
-
-SideDist<int>
-
-ExteriorCurveMinCurve<int>
-
-ExteriorCurveMaxCurve<int>
-
-InteriorCurveMinCurve<int>
-
-InteriorCurveMaxCurve<int>
-
-MiddleDist<int>
-
-Probability<int>
-
-// * 0.0099999998
-
-CrossingDist<int>
-
-Frequency<int> // max(int, 5)
-
-Phase<int>
-
-GroundMaxPente<int>
-
-// * 0.0099999998
-
-GroundMaxTrou<int>
-
-// * 0.0099999998
-
-HumidityMin<int>
-
-// * 0.0099999998
-
-HumidityMax<int>
-
-// * 0.0099999998
-
-RoughnessMin<int>
-
-// * 0.0099999998
-
-RoughnessMax<int>
-
-// * 0.0099999998
 
 LinePosition
 
@@ -160,22 +113,6 @@ OnTerra
 
 TakeStoneColor
 
-OnTerraMiddle<int>
-
-// same as OnTerraMiddleMax<int>
-
-OnTerraMiddleMax<int>
-
-// if int <= 0.0099999998, then int = v20
-// OnTerra = 1;
-// v25 = 2;
-
-OnTerraMiddleMin<int>
-
-// if int <= 0.0099999998, then int = v20
-// OnTerra = 1;
-// v25 = 2;
-
 CloseToRoad
 
 OnRockyArea
@@ -204,4 +141,79 @@ CountryPopulation
 
 RandomRot
 
+// For all properties
 // if v25 == a4, do stuff
+
+Integer
+-------
+
+MaxDistToRoad
+
+MinDistToRoad
+
+SideDist
+
+ExteriorCurveMinCurve
+
+ExteriorCurveMaxCurve
+
+InteriorCurveMinCurve
+
+InteriorCurveMaxCurve
+
+MiddleDist
+
+Probability
+
+// * 0.0099999998
+
+CrossingDist
+
+Frequency // max(int, 5)
+
+Phase
+
+GroundMaxPente
+
+// * 0.0099999998
+
+GroundMaxTrou
+
+// * 0.0099999998
+
+HumidityMin
+
+// * 0.0099999998
+
+HumidityMax
+
+// * 0.0099999998
+
+RoughnessMin
+
+// * 0.0099999998
+
+RoughnessMax
+
+// * 0.0099999998
+
+OnTerraMiddle
+
+// same as OnTerraMiddleMax
+
+OnTerraMiddleMax
+
+// if int <= 0.0099999998, then int = v20
+// OnTerra = 1;
+// v25 = 2;
+
+OnTerraMiddleMin
+
+// if int <= 0.0099999998, then int = v20
+// OnTerra = 1;
+// v25 = 2;
+
+Limits
+------
+
+Max 512 + 1 chars for token. max 17 tokens, 1 ADDMESH:, 1 mesh name, 15 properties.
