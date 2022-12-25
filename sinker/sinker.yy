@@ -61,6 +61,8 @@ static struct
 
 %left '+' '-'
 %left '*'
+%right INDIRECTION '@' '?' '!'
+%left '['
 
 %start slist
 
@@ -91,6 +93,34 @@ expression
     | expression '*' expression
     {
         $$ = (Expression*)new MultiplicationExpression($1, $3);
+    }
+    | '*' expression %prec INDIRECTION
+    {
+        $$ = (Expression*)new IndirectionExpression($2);
+    }
+    | '@' expression
+    {
+        $$ = (Expression*)new RelocateExpression($2);
+    }
+    | '?' expression
+    {
+        $$ = (Expression*)new NullCheckExpression($2);
+    }
+    | expression '[' expression ']'
+    {
+        $$ = (Expression*)new ArraySubscriptExpression($1, $3);
+    }
+    | '!' IDENTIFIER "::" IDENTIFIER
+    {
+        $$ = (Expression*)new GetProcAddressExpression($2, $4);
+    }
+    | IDENTIFIER
+    {
+        $$ = (Expression*)new ModuleExpression($1);
+    }
+    | IDENTIFIER "::" IDENTIFIER
+    {
+        $$ = (Expression*)new SymbolExpression($1, $3);
     }
     ;
 

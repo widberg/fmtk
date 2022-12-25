@@ -19,7 +19,7 @@ set_target_properties(sinker PROPERTIES
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sinker.cpp.re ${CMAKE_CURRENT_SOURCE_DIR}/sinker.cpp
-	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/sinker.yy -o ${CMAKE_CURRENT_BINARY_DIR}/sinker.cpp.re
+	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/sinker.yy -o ${CMAKE_CURRENT_BINARY_DIR}/sinker.cpp.re -Wcounterexamples
 	COMMAND re2c ${CMAKE_CURRENT_BINARY_DIR}/sinker.cpp.re -o ${CMAKE_CURRENT_SOURCE_DIR}/sinker.cpp --no-debug-info
 	DEPENDS sinker.yy
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

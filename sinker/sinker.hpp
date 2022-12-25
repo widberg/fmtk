@@ -89,6 +89,86 @@ private:
     Expression *rhs;
 };
 
+class IndirectionExpression final : Expression {
+public:
+    IndirectionExpression(Expression *expression)
+        : expression(expression) {}
+    virtual unsigned long long calculate() const override {
+        return (unsigned long long)*(void**)(expression->calculate());
+    }
+private:
+    Expression *expression;
+};
+
+class RelocateExpression final : Expression {
+public:
+    RelocateExpression(Expression *expression)
+        : expression(expression) {}
+    virtual unsigned long long calculate() const override {
+        return expression->calculate();
+    }
+private:
+    Expression *expression;
+};
+
+class NullCheckExpression final : Expression {
+public:
+    NullCheckExpression(Expression *expression)
+        : expression(expression) {}
+    virtual unsigned long long calculate() const override {
+        return expression->calculate();
+    }
+private:
+    Expression *expression;
+};
+
+class ArraySubscriptExpression final : Expression {
+public:
+    ArraySubscriptExpression(Expression *origin, Expression *offset)
+        : origin(origin), offset(offset) {}
+    virtual unsigned long long calculate() const override {
+        return (unsigned long long)*(void**)(origin->calculate() + offset->calculate() * sizeof(void*));
+    }
+private:
+    Expression *origin;
+    Expression *offset;
+};
+
+class GetProcAddressExpression final : Expression {
+public:
+    GetProcAddressExpression(std::string const& module, std::string const& lpProcName)
+        : module(module), lpProcName(lpProcName) {}
+    virtual unsigned long long calculate() const override {
+        return 0;
+    }
+private:
+    std::string module;
+    std::string lpProcName;
+};
+
+class ModuleExpression final : Expression {
+public:
+    ModuleExpression(std::string const& module)
+        : module(module) {}
+    virtual unsigned long long calculate() const override {
+        return 0;
+    }
+private:
+    std::string module;
+};
+
+class SymbolExpression final : Expression {
+public:
+    SymbolExpression(std::string const& module, std::string const& symbol)
+        : module(module), symbol(symbol) {}
+    virtual unsigned long long calculate() const override {
+        return 0;
+    }
+private:
+    std::string module;
+    std::string symbol;
+};
+
 // class Attributable {
 // public:
 //     template<typename T>
