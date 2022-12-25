@@ -233,6 +233,7 @@ yy::parser::symbol_type yy::yylex()
         // Literal
         '0b' @s [0-1]+ @e       { return parse_integer(std::string(s, e - s).c_str(), 2); }
         '0x' @s [0-9a-fA-F]+ @e { return parse_integer(std::string(s, e - s).c_str(), 16); }
+        '0' @s [0-9a-fA-F]+ @e { return parse_integer(std::string(s, e - s).c_str(), 8); }
         @s [0-9]+ @e            { return parse_integer(std::string(s, e - s).c_str(), 10); }
 
         // Whitespace
