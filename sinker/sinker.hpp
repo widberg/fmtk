@@ -37,6 +37,58 @@ struct std::formatter<attribute_value_t> {
     }
 };
 
+class Expression {
+public:
+    virtual unsigned long long calculate() const = 0;
+};
+
+class IntegerExpression final : Expression {
+public:
+    IntegerExpression(unsigned long long value)
+        : value(value) {}
+    virtual unsigned long long calculate() const override {
+        return 0;
+    }
+private:
+    unsigned long long value;
+};
+
+class AdditionExpression final : Expression {
+public:
+    AdditionExpression(Expression *lhs, Expression *rhs)
+        : lhs(lhs), rhs(rhs) {}
+    virtual unsigned long long calculate() const override {
+        return lhs->calculate() + rhs->calculate();
+    }
+private:
+    Expression *lhs;
+    Expression *rhs;
+};
+
+class SubtractionExpression final : Expression {
+public:
+    SubtractionExpression(Expression *lhs, Expression *rhs)
+        : lhs(lhs), rhs(rhs) {}
+    virtual unsigned long long calculate() const override {
+        return lhs->calculate() - rhs->calculate();
+    }
+private:
+    Expression *lhs;
+    Expression *rhs;
+};
+
+class MultiplicationExpression final : Expression {
+public:
+    MultiplicationExpression(Expression *lhs, Expression *rhs)
+        : lhs(lhs), rhs(rhs) {}
+    virtual unsigned long long calculate() const override {
+        return lhs->calculate() * rhs->calculate();
+    }
+private:
+    Expression *lhs;
+    Expression *rhs;
+};
+
 // class Attributable {
 // public:
 //     template<typename T>

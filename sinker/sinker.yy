@@ -46,14 +46,21 @@ static struct
 %token END_OF_FILE 0
 
 %token IDENTIFIER INTEGER STRING BOOL
-%token MODULE SET VARIANT SYMBOL ADDRESS
-%token ';' ',' '(' ')'
+%token MODULE "module"
+%token VARIANT "variant"
+%token SYMBOL "symbol"
+%token ADDRESS "address"
+%token SET "set"
 %token DOUBLE_COLON "::"
 
 %type<std::string> IDENTIFIER STRING
-%type<unsigned long long> INTEGER expression
+%type<unsigned long long> INTEGER
+%type<Expression*> expression
 %type<bool> BOOL
 %type<attribute_value_t> attribute_value
+
+%left '+' '-'
+%left '*'
 
 %start slist
 
@@ -66,7 +73,25 @@ slist
 
 expression
     : INTEGER
-
+    {
+        $$ = (Expression*)new IntegerExpression($1);
+    }
+    | '(' expression ')'
+    {
+        $$ = $2;
+    }
+    | expression '+' expression
+    {
+        $$ = (Expression*)new AdditionExpression($1, $3);
+    }
+    | expression '-' expression
+    {
+        $$ = (Expression*)new SubtractionExpression($1, $3);
+    }
+    | expression '*' expression
+    {
+        $$ = (Expression*)new MultiplicationExpression($1, $3);
+    }
     ;
 
 attribute_value
@@ -85,35 +110,35 @@ attribute_value
     ;
 
 stmt
-    : MODULE IDENTIFIER ',' STRING ',' INTEGER ';'
+    : "module" IDENTIFIER ',' STRING ',' INTEGER ';'
     {
         std::cout << std::format("module {}, {}, {}\n", $2, $4, $6);
     }
-    | MODULE IDENTIFIER ',' INTEGER ';'
+    | "module" IDENTIFIER ',' INTEGER ';'
     {
         std::cout << std::format("module {}, {}\n", $2, $4);
     }
-    | VARIANT IDENTIFIER ',' IDENTIFIER ',' STRING ';'
+    | "variant" IDENTIFIER ',' IDENTIFIER ',' STRING ';'
     {
         std::cout << std::format("variant {}, {}, {}\n", $2, $4, $6);
     }
-    | SYMBOL IDENTIFIER "::" IDENTIFIER ',' STRING ';'
+    | "symbol" IDENTIFIER "::" IDENTIFIER ',' STRING ';'
     {
         std::cout << std::format("symbol {}::{}, {}\n", $2, $4, $6);
     }
-    | ADDRESS IDENTIFIER "::" IDENTIFIER ',' expression ';'
+    | "address" IDENTIFIER "::" IDENTIFIER ',' expression ';'
     {
-        std::cout << std::format("address {}::{}, {}\n", $2, $4, $6);
+        std::cout << std::format("address {}::{}, expr\n", $2, $4);
     }
-    | ADDRESS IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' expression ';'
+    | "address" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' expression ';'
     {
         std::cout << std::format("address {}::{}, {}, {}\n", $2, $4, $6, 8);
     }
-    | SET IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
+    | "set" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
         std::cout << std::format("set {}, {}, {}\n", $2, $4, $6);
     }
-    | SET IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
+    | "set" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
         std::cout << std::format("set {}::{}, {}, {}\n", $2, $4, $6, $8);
     }
