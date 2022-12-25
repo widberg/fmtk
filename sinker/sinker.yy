@@ -19,8 +19,9 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+#include <format>
 
-#include "hookcash.hpp"
+#include "sinker.hpp"
 }//%code requires
 
 %code
@@ -30,29 +31,29 @@ static yy::location loc;
 
 #define TOKEN(name) do { return yy::parser::make_##name(loc); } while(0)
 #define TOKENV(name, ...) do { return yy::parser::make_##name(__VA_ARGS__, loc); } while(0)
-#define HC_ASSERT(cond, loc, msg) do { if (!cond) { yy::parser::error(loc, msg); YYERROR; } } while(0)
+#define SINKER_ASSERT(cond, loc, msg) do { if (!cond) { yy::parser::error(loc, msg); YYERROR; } } while(0)
 
 static struct
 {
     char *cur;
     char *mar;
     char *lim;
-    Language mode = Language::HOOKCASH;
+    Language mode = Language::SINKER;
 } in;
 
-Context ctx;
 }//%code
 
 %token END_OF_FILE 0
 
-%token IDENTIFIER LITERAL STRING REQUIRED_BOOL VARIABLE_TYPE
+%token IDENTIFIER INTEGER STRING BOOL
 %token MODULE SET VARIANT SYMBOL ADDRESS
-%token SEMICOLON
+%token ';' ',' '(' ')'
+%token DOUBLE_COLON "::"
 
 %type<std::string> IDENTIFIER STRING
-%type<unsigned long long> LITERAL
-%type<bool> REQUIRED_BOOL
-%type<VariableType> VARIABLE_TYPE
+%type<unsigned long long> INTEGER expression
+%type<bool> BOOL
+%type<attribute_value_t> attribute_value
 
 %start slist
 
@@ -63,36 +64,58 @@ slist
     | %empty
     ;
 
+expression
+    : INTEGER
+
+    ;
+
+attribute_value
+    : INTEGER
+    {
+        $$ = attribute_value_t {$1};
+    }
+    | STRING
+    {
+        $$ = attribute_value_t {$1};
+    }
+    | BOOL
+    {
+        $$ = attribute_value_t {$1};
+    }
+    ;
+
 stmt
-    : MODULE IDENTIFIER STRING SEMICOLON
+    : MODULE IDENTIFIER ',' STRING ',' INTEGER ';'
     {
-        HC_ASSERT(!ctx.modules.count($2), @1, "module \"" + $2 + "\" already exists.");
-        ctx.modules[$2] = Module { $3 };
+        std::cout << std::format("module {}, {}, {}\n", $2, $4, $6);
     }
-    | SET IDENTIFIER VARIABLE_TYPE STRING SEMICOLON
+    | MODULE IDENTIFIER ',' INTEGER ';'
     {
-        HC_ASSERT(ctx.modules.count($2), @1, "module \"" + $2 + "\" does not exist.");
-        ctx.modules[$2].set($3, $4);
+        std::cout << std::format("module {}, {}\n", $2, $4);
     }
-    | VARIANT IDENTIFIER IDENTIFIER STRING SEMICOLON
+    | VARIANT IDENTIFIER ',' IDENTIFIER ',' STRING ';'
     {
-        HC_ASSERT(ctx.modules.count($2), @1, "module \"" + $2 + "\" does not exist.");
-        HC_ASSERT(!ctx.modules[$2].variants.count($3), @1, "module \"" + $2 + "\" already has variant \"" + $3 + "\".");
-        ctx.modules[$2].variants[$3] = $4;
+        std::cout << std::format("variant {}, {}, {}\n", $2, $4, $6);
     }
-    | SYMBOL IDENTIFIER IDENTIFIER REQUIRED_BOOL STRING SEMICOLON
+    | SYMBOL IDENTIFIER "::" IDENTIFIER ',' STRING ';'
     {
-        HC_ASSERT(ctx.modules.count($2), @1, "module \"" + $2 + "\" does not exist.");
-        HC_ASSERT(!ctx.modules[$2].symbols.count($3), @1, "module \"" + $2 + "\" already has symbol \"" + $3 + "\".");
-        ctx.modules[$2].symbols[$3] = Symbol { $4, $5 };
+        std::cout << std::format("symbol {}::{}, {}\n", $2, $4, $6);
     }
-    | ADDRESS IDENTIFIER IDENTIFIER IDENTIFIER STRING SEMICOLON
+    | ADDRESS IDENTIFIER "::" IDENTIFIER ',' expression ';'
     {
-        HC_ASSERT(ctx.modules.count($2), @1, "module \"" + $2 + "\" does not exist.");
-        HC_ASSERT(ctx.modules[$2].symbols.count($3), @1, "module \"" + $2 + "\" does not have symbol \"" + $3 + "\".");
-        HC_ASSERT(ctx.modules[$2].variants.count($4), @1, "module \"" + $2 + "\" does not have variant \"" + $3 + "\".");
-        HC_ASSERT(!ctx.modules[$2].symbols[$3].addresses.count($4), @1, "module \"" + $2 + "\" already has address for symbol \"" + $3 + "\" for variant \"" + $4 + "\".");
-        ctx.modules[$2].symbols[$3].addresses[$4] = $5;
+        std::cout << std::format("address {}::{}, {}\n", $2, $4, $6);
+    }
+    | ADDRESS IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' expression ';'
+    {
+        std::cout << std::format("address {}::{}, {}, {}\n", $2, $4, $6, 8);
+    }
+    | SET IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
+    {
+        std::cout << std::format("set {}, {}, {}\n", $2, $4, $6);
+    }
+    | SET IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
+    {
+        std::cout << std::format("set {}::{}, {}, {}\n", $2, $4, $6, $8);
     }
     ;
 
@@ -103,12 +126,12 @@ void yy::parser::error(const location_type& l, const std::string& message)
     std::cerr << l.begin.filename->c_str() << ':' << l.begin.line << ':' << l.begin.column << '-' << l.end.column << ": " << message << '\n';
 }
 
-yy::parser::symbol_type parse_literal(const std::string& str, int base)
+yy::parser::symbol_type parse_integer(const std::string& str, int base)
 {
     char *p;
     unsigned long long n = strtoull(str.c_str(), &p, base);
     if (*p != 0) TOKEN(YYerror);
-    TOKENV(LITERAL, n);
+    TOKENV(INTEGER, n);
 }
 
 static bool first_loop = true;
@@ -139,12 +162,11 @@ yy::parser::symbol_type yy::yylex()
         'symbol'       { TOKEN(SYMBOL); }
         'address'      { TOKEN(ADDRESS); }
 
-        'required'     { TOKENV(REQUIRED_BOOL, true); }
-        'optional'     { TOKENV(REQUIRED_BOOL, false); }
+        'true'         { TOKENV(BOOL, true); }
+        'false'        { TOKENV(BOOL, false); }
 
-        'base_address' { TOKENV(VARIABLE_TYPE, VariableType::base_address); }
-
-        ';'            { TOKEN(SEMICOLON); }
+        '::'           { TOKEN(DOUBLE_COLON); }
+        @s [;,()]            { return yy::parser::symbol_type (*s, loc); }
 
         // Identifier
         @s [a-zA-Z_][a-zA-Z_0-9]* @e { TOKENV(IDENTIFIER, std::string(s, e - s)); }
@@ -154,9 +176,9 @@ yy::parser::symbol_type yy::yylex()
         [\x22] @s [^\x22]* @e [\x22] { TOKENV(STRING, std::string(s, e - s)); }
 
         // Literal
-        '0b' @s [0-1]+ @e       { return parse_literal(std::string(s, e - s).c_str(), 2); }
-        '0x' @s [0-9a-fA-F]+ @e { return parse_literal(std::string(s, e - s).c_str(), 16); }
-        @s [0-9]+ @e            { return parse_literal(std::string(s, e - s).c_str(), 10); }
+        '0b' @s [0-1]+ @e       { return parse_integer(std::string(s, e - s).c_str(), 2); }
+        '0x' @s [0-9a-fA-F]+ @e { return parse_integer(std::string(s, e - s).c_str(), 16); }
+        @s [0-9]+ @e            { return parse_integer(std::string(s, e - s).c_str(), 10); }
 
         // Whitespace
         $              { TOKEN(END_OF_FILE); }
@@ -184,15 +206,6 @@ yy::parser::symbol_type yy::yylex()
     }
 }
 
-std::unordered_map<std::string, Language> const EXTENSIONS = {
-    { ".hc", Language::HOOKCASH },
-    { ".c", Language::SOURCE_CODE },
-    { ".cpp", Language::SOURCE_CODE },
-    { ".h", Language::SOURCE_CODE },
-    { ".hpp", Language::SOURCE_CODE },
-    { ".hb", Language::BINARY },
-};
-
 int main(int argc, char const* argv[]) {
     if (argc < 2) return 1;
 
@@ -216,18 +229,12 @@ int main(int argc, char const* argv[]) {
         std::filesystem::path file_path(argv[i]);
         std::string file_extension(file_path.extension().string());
 
-        if (!EXTENSIONS.count(file_extension))
-        {
-            std::cerr << "Unable to determine file type of \"" << argv[i] << "\"\n";
-            return 4;
-        }
-        in.mode = EXTENSIONS.at(file_extension);
+        in.mode = file_extension == ".skr" ? Language::SINKER : Language::SOURCE_CODE;
 
         first_loop = true;
         yy::parser parser;
 //    parser.set_debug_level(1);
         if (parser.parse()) return 3;
     }
-    ctx.dump();
     return 0;
 }

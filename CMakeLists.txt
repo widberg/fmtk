@@ -20,7 +20,7 @@ project(fmtk VERSION 0.0.7.0 LANGUAGES CXX)
 
 option(FMTK_DOCS        "Build only the documentation." OFF)
 
-set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "")
+set(CMAKE_CXX_STANDARD 20 CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE INTERNAL "")
 add_definitions(-DUNICODE -D_UNICODE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" CACHE INTERNAL "")
@@ -29,7 +29,7 @@ set_property(GLOBAL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug
 find_package(FUEL)
 add_subdirectory(dependencies)
 
-add_subdirectory(hookcash)
+add_subdirectory(sinker)
 add_subdirectory(fmtksdk)
 add_subdirectory(common)
 add_subdirectory(fmtklua)
