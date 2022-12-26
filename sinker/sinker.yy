@@ -22,6 +22,12 @@
 #include <format>
 
 #include "sinker.hpp"
+
+// Bison generates weird switch statements
+#ifdef _MSC_VER
+#pragma warning( disable : 4065 )
+#endif
+
 }//%code requires
 
 %code
@@ -145,28 +151,32 @@ stmt
     : "module" IDENTIFIER ',' STRING ',' INTEGER ';'
     {
         std::cout << std::format("module {}, {}, {}\n", $2, $4, $6);
-        ctx.add_module(Module($2, std::make_optional($4), $6));
+        ctx.emplace_module($2, std::make_optional($4), $6);
     }
     | "module" IDENTIFIER ',' INTEGER ';'
     {
         std::cout << std::format("module {}, {}\n", $2, $4);
-        ctx.add_module(Module($2, {}, $4));
+        ctx.emplace_module($2, {}, $4);
     }
     | "variant" IDENTIFIER ',' IDENTIFIER ',' STRING ';'
     {
         std::cout << std::format("variant {}, {}, {}\n", $2, $4, $6);
+        ctx.get_module($2)->add_variant($4, $6);
     }
     | "symbol" IDENTIFIER "::" IDENTIFIER ',' STRING ';'
     {
         std::cout << std::format("symbol {}::{}, {}\n", $2, $4, $6);
+        ctx.get_module($2)->emplace_symbol($4, $6);
     }
     | "address" IDENTIFIER "::" IDENTIFIER ',' expression ';'
     {
         std::cout << std::format("address {}::{}, expr\n", $2, $4);
+        ctx.get_module($2)->get_symbol($4)->add_address({}, $6);
     }
     | "address" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' expression ';'
     {
-        std::cout << std::format("address {}::{}, {}, {}\n", $2, $4, $6, 8);
+        std::cout << std::format("address {}::{}, {}, expr\n", $2, $4, $6);
+        ctx.get_module($2)->get_symbol($4)->add_address($6, $8);
     }
     | "set" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
@@ -176,6 +186,7 @@ stmt
     | "set" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
         std::cout << std::format("set {}::{}, {}, {}\n", $2, $4, $6, $8);
+        ctx.get_module($2)->get_symbol($4)->set_attribute($6, $8);
     }
     ;
 
@@ -275,7 +286,7 @@ int main(int argc, char const* argv[]) {
         std::streamsize size = file.tellg();
         file.seekg(0, std::ios::beg);
 
-        std::vector<char> buffer(size);
+        std::vector<char> buffer((unsigned int)size);
         if (!file.read(buffer.data(), size)) return 2;
         buffer.push_back('\0');
 

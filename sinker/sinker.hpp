@@ -3,6 +3,7 @@
 
 #include <format>
 #include <map>
+#include <set>
 #include <variant>
 #include <string>
 #include <string_view>
@@ -95,7 +96,7 @@ public:
     IndirectionExpression(Expression *expression)
         : expression(expression) {}
     virtual std::optional<expression_value_t> calculate() const override {
-        return std::make_optional((expression_value_t)*(void**)(expression->calculate().value()));
+        return (expression_value_t)*(void**)(expression->calculate().value());
     }
 private:
     Expression *expression;
@@ -128,7 +129,7 @@ public:
     ArraySubscriptExpression(Expression *origin, Expression *offset)
         : origin(origin), offset(offset) {}
     virtual std::optional<expression_value_t> calculate() const override {
-        return std::make_optional((expression_value_t)*(void**)(origin->calculate().value() + offset->calculate().value() * sizeof(void*)));
+        return (expression_value_t)*(void**)(origin->calculate().value() + offset->calculate().value() * sizeof(void*));
     }
 private:
     Expression *origin;
@@ -181,7 +182,7 @@ public:
         attribute_value_t const& attr = attributes.at(attribute_name);
 
         if (T const* value = std::get_if<T>(&attr)) {
-            return std::make_optional(*value);
+            return *value;
         }
 
         return {};
@@ -208,13 +209,52 @@ public:
     }
     Module* get_module(std::string_view module_name);
 
-    void add_module(Module&& module);
+    void emplace_module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address);
 private:
     std::vector<Module> modules;
 };
 
+class Symbol : public Attributable {
+    friend class Module;
+public:
+    Symbol (const Symbol&) = delete;
+    Symbol& operator= (const Symbol&) = delete;
+    Symbol(Symbol&&) = default;
+    Symbol& operator=(Symbol&& mE) = default;
+    std::string const& get_name() const {
+        return name;
+    }
+    template<typename T>
+    std::optional<T> calculate_address();
+
+    template<typename T>
+    std::optional<T> get_cached_calculated_address() const {
+        if (!cached_calculated_address) {
+            return {};
+        }
+
+        return static_cast<T>(cached_calculated_address.value());
+    }
+
+    Module *get_module() const {
+        return module;
+    }
+
+    void add_address(std::optional<std::string> const& variant, Expression *expression) {
+        variants.push_back({variant, expression});
+    }
+private:
+    Symbol(std::string const& name, std::string const& type, Module *module)
+        : name(name), type(type), module(module) {}
+    std::optional<expression_value_t> cached_calculated_address;
+    std::string name;
+    std::string type;
+    Module *module;
+    std::vector<std::pair<std::optional<std::string>, Expression*>> variants;
+};
 
 class Module : public Attributable {
+    friend class Context;
 public:
     Module (const Module&) = delete;
     Module& operator= (const Module&) = delete;
@@ -223,13 +263,50 @@ public:
     std::string const& get_name() const {
         return name;
     }
-    Module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address)
-        : name(name), lpModuleName(lpModuleName), prefered_base_address(prefered_base_address) {};
+    std::string const& get_real_variant() const {
+        return real_variant;
+    }
+    Symbol *get_symbol(std::string_view symbol_name) {
+    for (Symbol& symbol : symbols) {
+        if (symbol_name == symbol.get_name()) {
+            return &symbol;
+        }
+    }
+
+    return nullptr;
+    }
+    void emplace_symbol(std::string const& name, std::string const& type) {
+        symbols.push_back(std::move(Symbol(name, type, this)));
+    }
+    void add_variant(std::string const& name, std::string const& hash) {
+        variants.insert({name, hash});
+    }
 private:
+    Module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address, Context *context)
+        : name(name), lpModuleName(lpModuleName), prefered_base_address(prefered_base_address), context(context) {};
+    Context *context;
     std::string name;
     std::optional<std::string> lpModuleName;
     expression_value_t prefered_base_address;
+    expression_value_t relocated_base_address;
+    std::vector<Symbol> symbols;
+    std::map<std::string, std::string, std::less<>> variants;
+    std::string real_variant;
 };
+
+template<typename T>
+std::optional<T> Symbol::calculate_address() {
+    for (auto variant : variants) {
+        if (!variant.first.has_value() || variant.first.value() == module->get_real_variant()) {
+            cached_calculated_address = variant.second->calculate();
+            if (cached_calculated_address) {
+                return cached_calculated_address;
+            }
+        }
+    }
+
+    return {};
+}
 
 Module* Context::get_module(std::string_view module_name) {
     for (Module& module : modules) {
@@ -241,21 +318,10 @@ Module* Context::get_module(std::string_view module_name) {
     return nullptr;
 }
 
-void Context::add_module(Module&& module) {
-    modules.push_back(std::move(module));
+void Context::emplace_module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address) {
+    modules.push_back(std::move(Module(name, lpModuleName, prefered_base_address, this)));
 }
 
-// class Module;
-
-// class Symbol : public Attributable {
-// public:
-//     std::string const& get_name() const;
-//     template<typename T>
-//     std::optional<T> calculate_address();
-//     template<typename T>
-//     std::optional<T> get_cached_calculated_address() const;
-//     Module const& get_module() const;
-// };
 
 
 
