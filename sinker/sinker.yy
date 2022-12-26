@@ -49,11 +49,13 @@ static struct
 
 Context ctx;
 
+static bool in_pattern_match_expression = false;
+
 }//%code
 
 %token END_OF_FILE 0
 
-%token IDENTIFIER INTEGER STRING BOOL
+%token IDENTIFIER INTEGER STRING BOOL PATTERN_BYTE
 %token MODULE "module"
 %token VARIANT "variant"
 %token SYMBOL "symbol"
@@ -62,15 +64,17 @@ Context ctx;
 %token DOUBLE_COLON "::"
 
 %type<std::string> IDENTIFIER STRING
-%type<unsigned long long> INTEGER
+%type<expression_value_t> INTEGER
+%type<pattern_byte> PATTERN_BYTE
 %type<Expression*> expression
 %type<bool> BOOL
 %type<attribute_value_t> attribute_value
+%type<std::vector<pattern_byte>> pattern_match_expression
 
 %left '+' '-'
 %left '*'
 %right INDIRECTION '@' '?' '!'
-%left '['
+%left '[' '{'
 
 %start slist
 
@@ -81,6 +85,18 @@ slist
     | %empty
     ;
 
+pattern_match_expression
+    : pattern_match_expression PATTERN_BYTE
+    {
+        $1.push_back($2);
+        $$ = $1;
+    }
+    | %empty
+    {
+        $$ = std::vector<pattern_byte>();
+    }
+    ;
+
 expression
     : INTEGER
     {
@@ -88,7 +104,7 @@ expression
     }
     | '(' expression ')'
     {
-        $$ = $2;
+        $$ = (Expression*) new ParenthesesExpression($2);
     }
     | expression '+' expression
     {
@@ -130,6 +146,10 @@ expression
     {
         $$ = (Expression*)new SymbolExpression($1, $3);
     }
+    | '{' {in_pattern_match_expression = true;} pattern_match_expression {in_pattern_match_expression = false;} '}'
+    {
+        $$ = (Expression*)new PatternMatchExpression($3);
+    }
     ;
 
 attribute_value
@@ -150,42 +170,42 @@ attribute_value
 stmt
     : "module" IDENTIFIER ',' STRING ',' INTEGER ';'
     {
-        std::cout << std::format("module {}, {}, {}\n", $2, $4, $6);
+        // std::cout << std::format("module {}, {}, {}\n", $2, $4, $6);
         ctx.emplace_module($2, std::make_optional($4), $6);
     }
     | "module" IDENTIFIER ',' INTEGER ';'
     {
-        std::cout << std::format("module {}, {}\n", $2, $4);
+        // std::cout << std::format("module {}, {}\n", $2, $4);
         ctx.emplace_module($2, {}, $4);
     }
     | "variant" IDENTIFIER ',' IDENTIFIER ',' STRING ';'
     {
-        std::cout << std::format("variant {}, {}, {}\n", $2, $4, $6);
+        // std::cout << std::format("variant {}, {}, {}\n", $2, $4, $6);
         ctx.get_module($2)->add_variant($4, $6);
     }
     | "symbol" IDENTIFIER "::" IDENTIFIER ',' STRING ';'
     {
-        std::cout << std::format("symbol {}::{}, {}\n", $2, $4, $6);
+        // std::cout << std::format("symbol {}::{}, {}\n", $2, $4, $6);
         ctx.get_module($2)->emplace_symbol($4, $6);
     }
     | "address" IDENTIFIER "::" IDENTIFIER ',' expression ';'
     {
-        std::cout << std::format("address {}::{}, expr\n", $2, $4);
+        // std::cout << std::format("address {}::{}, expr\n", $2, $4);
         ctx.get_module($2)->get_symbol($4)->add_address({}, $6);
     }
     | "address" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' expression ';'
     {
-        std::cout << std::format("address {}::{}, {}, expr\n", $2, $4, $6);
+        // std::cout << std::format("address {}::{}, {}, expr\n", $2, $4, $6);
         ctx.get_module($2)->get_symbol($4)->add_address($6, $8);
     }
     | "set" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
-        std::cout << std::format("set {}, {}, {}\n", $2, $4, $6);
+        // std::cout << std::format("set {}, {}, {}\n", $2, $4, $6);
         ctx.get_module($2)->set_attribute($4, $6);
     }
     | "set" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
-        std::cout << std::format("set {}::{}, {}, {}\n", $2, $4, $6, $8);
+        // std::cout << std::format("set {}::{}, {}, {}\n", $2, $4, $6, $8);
         ctx.get_module($2)->get_symbol($4)->set_attribute($6, $8);
     }
     ;
@@ -224,7 +244,8 @@ yy::parser::symbol_type yy::yylex()
         re2c:eof = 0;
         re2c:tags = 1;
         %}
-    hookcash:
+    sinker:
+        if (in_pattern_match_expression) goto pattern_match;
         %{
         // Keywords
         'module'       { TOKEN(MODULE); }
@@ -237,7 +258,7 @@ yy::parser::symbol_type yy::yylex()
         'false'        { TOKENV(BOOL, false); }
 
         '::'           { TOKEN(DOUBLE_COLON); }
-        @s [;,()?@*-+{}!] | "[" | "]"           { return yy::parser::symbol_type (*s, loc); }
+        @s [;,()?@*-+{}!] | "[" | "]" { return yy::parser::symbol_type (*s, loc); }
 
         // Identifier
         @s [a-zA-Z_][a-zA-Z_0-9]* @e { TOKENV(IDENTIFIER, std::string(s, e - s)); }
@@ -262,10 +283,31 @@ yy::parser::symbol_type yy::yylex()
 
         *              { std::cout << "bad character\n"; TOKEN(YYerror); }
         %}
+    pattern_match:
+        %{
+        '??' { TOKENV(PATTERN_BYTE, { 0, 0x00 }); }
+        @s [0-9a-fA-F][0-9a-fA-F] @e {
+            char *p;
+            unsigned long long n = strtoull(std::string(s, e - s).c_str(), &p, 16);
+            if (*p != 0) TOKEN(YYerror);
+            TOKENV(PATTERN_BYTE, { (std::uint8_t)n, 0xFF });
+        }
+        '}' { return yy::parser::symbol_type ('}', loc); }
+
+        // Whitespace
+        $              { TOKEN(END_OF_FILE); }
+        "\r\n"|[\r\n]  { loc.lines(); loc.step(); if (in.mode == Language::SOURCE_CODE) goto source; continue; }
+        [ \t\v\b\f]    { loc.columns(); continue; }
+
+        // Comment
+        "//"[^\r\n]*   { continue; }
+
+        *              { std::cout << "bad character\n"; TOKEN(YYerror); }
+        %}
     source:
         %{
         $                                  { TOKEN(END_OF_FILE); }
-        [ \t\v\b\f]* "//" [ \t\v\b\f]* "$" { goto hookcash; }
+        [ \t\v\b\f]* "//" [ \t\v\b\f]* "$" { goto sinker; }
         *                                  { loc.columns(); goto source_internal; }
         %}
     source_internal:
@@ -309,7 +351,7 @@ int main(int argc, char const* argv[]) {
         if (parser.parse()) return 3;
     }
 
-    std::cout << "--- ctx ---\n" << ctx;
+    std::cout << ctx;
 
     return 0;
 }

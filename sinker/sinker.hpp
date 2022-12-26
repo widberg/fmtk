@@ -10,6 +10,8 @@
 #include <cassert>
 #include <optional>
 #include <ostream>
+#include <iostream>
+#include <iomanip>
 
 enum class Language
 {
@@ -19,25 +21,9 @@ enum class Language
 
 typedef unsigned long long expression_value_t;
 typedef std::variant<expression_value_t, bool, std::string> attribute_value_t;
-
-template <>
-struct std::formatter<attribute_value_t> {
-    std::formatter<expression_value_t> ull_formatter;
-    std::formatter<bool> bool_formatter;
-    std::formatter<std::string> string_formatter;
-
-    constexpr auto parse(std::format_parse_context& ctx) {
-        return string_formatter.parse(ctx);
-    }
-
-    auto format(const attribute_value_t& attr, std::format_context& ctx) {
-        if (std::holds_alternative<expression_value_t>(attr)) {
-            return ull_formatter.format(std::get<expression_value_t>(attr), ctx);
-        } else if (std::holds_alternative<bool>(attr)) {
-            return bool_formatter.format(std::get<bool>(attr), ctx);
-        } 
-        return string_formatter.format('"' + std::get<std::string>(attr) + '"', ctx);
-    }
+struct pattern_byte {
+    std::uint8_t value;
+    std::uint8_t mask;
 };
 
 class Context;
@@ -202,7 +188,7 @@ public:
             } else if (std::holds_alternative<bool>(attribute.second)) {
                 out << (std::get<bool>(attribute.second) ? "true" : "false");
             } else {
-                out << std::get<std::string>(attribute.second);
+                out << "\"" << std::get<std::string>(attribute.second) << "\"";
             }
             out << ";\n";
         }
@@ -240,7 +226,7 @@ void Symbol::dump(std::ostream& out) const {
         } else if (std::holds_alternative<bool>(attribute.second)) {
                 out << (std::get<bool>(attribute.second) ? "true" : "false");
         } else {
-            out << std::get<std::string>(attribute.second);
+            out << "\"" << std::get<std::string>(attribute.second) << "\"";
         }
         out << ";\n";
     }
@@ -250,14 +236,13 @@ void Symbol::dump(std::ostream& out) const {
         if (address.first) {
             out << ", " << address.first.value();
         }
-        out << ", " << *address.second << "\n";
+        out << ", " << *address.second << ";\n";
     }
 }
 
 void Context::dump(std::ostream& out) const {
     for (Module const& module : modules) {
         module.dump(out);
-        out << "\n";
     }
 }
 
@@ -288,6 +273,23 @@ Module* Context::get_module(std::string_view module_name) {
 void Context::emplace_module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address) {
     modules.push_back(std::move(Module(name, lpModuleName, prefered_base_address, this)));
 }
+
+
+class ParenthesesExpression final : Expression {
+public:
+    ParenthesesExpression(Expression *expression)
+        : expression(expression) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return expression->calculate(context);
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << "(";
+        expression->dump(out);
+        out << ")";
+    }
+private:
+    Expression *expression;
+};
 
 
 class IntegerExpression final : Expression {
@@ -448,6 +450,31 @@ public:
 private:
     std::string module;
     std::string symbol;
+};
+
+class PatternMatchExpression final : Expression {
+public:
+    PatternMatchExpression(std::vector<pattern_byte> const& pattern)
+        : pattern(pattern) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return 0;
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << "{ ";
+        std::ios_base::fmtflags f( out.flags() );
+        for (pattern_byte pb : pattern) {
+            if (pb.mask == 0xFF) {
+                out << std::hex << std::setfill('0') << std::setw(2) << (int)pb.value;
+            } else {
+                out << "??";
+            }
+            out << " ";
+        }
+        out.flags( f );
+        out << "}";
+    }
+private:
+    std::vector<pattern_byte> pattern;
 };
 
 // class Installable {
