@@ -237,7 +237,7 @@ yy::parser::symbol_type yy::yylex()
         'false'        { TOKENV(BOOL, false); }
 
         '::'           { TOKEN(DOUBLE_COLON); }
-        @s [;,()]            { return yy::parser::symbol_type (*s, loc); }
+        @s [;,()?@*-+{}!] | "[" | "]"           { return yy::parser::symbol_type (*s, loc); }
 
         // Identifier
         @s [a-zA-Z_][a-zA-Z_0-9]* @e { TOKENV(IDENTIFIER, std::string(s, e - s)); }
@@ -260,7 +260,7 @@ yy::parser::symbol_type yy::yylex()
         // Comment
         "//"[^\r\n]*   { continue; }
 
-        *              { TOKEN(YYerror); }
+        *              { std::cout << "bad character\n"; TOKEN(YYerror); }
         %}
     source:
         %{
@@ -305,8 +305,11 @@ int main(int argc, char const* argv[]) {
 
         first_loop = true;
         yy::parser parser;
-//    parser.set_debug_level(1);
+        /* parser.set_debug_level(1); */
         if (parser.parse()) return 3;
     }
+
+    std::cout << "--- ctx ---\n" << ctx;
+
     return 0;
 }

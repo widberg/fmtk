@@ -77,6 +77,10 @@ public:
         attributes[attribute_name] = value;
     }
 
+    std::map<std::string, attribute_value_t, std::less<>> const& get_attributes() const {
+        return attributes;
+    }
+
 private:
     std::map<std::string, attribute_value_t, std::less<>> attributes;
 };
@@ -94,9 +98,17 @@ public:
     Module* get_module(std::string_view module_name);
 
     void emplace_module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address);
+    void dump(std::ostream& out) const;
 private:
     std::vector<Module> modules;
 };
+
+
+std::ostream& operator<<(std::ostream& os, Context const& context)
+{
+    context.dump(os);
+    return os;
+}
 
 class Symbol : public Attributable {
     friend class Module;
@@ -127,6 +139,7 @@ public:
     void add_address(std::optional<std::string> const& variant, Expression *expression) {
         variants.push_back({variant, expression});
     }
+    void dump(std::ostream& out) const;
 private:
     Symbol(std::string const& name, std::string const& type, Module *module)
         : name(name), type(type), module(module) {}
@@ -136,6 +149,13 @@ private:
     Module *module;
     std::vector<std::pair<std::optional<std::string>, Expression*>> variants;
 };
+
+
+std::ostream& operator<<(std::ostream& os, Symbol const& symbol)
+{
+    symbol.dump(os);
+    return os;
+}
 
 class Module : public Attributable {
     friend class Context;
@@ -168,6 +188,29 @@ public:
     std::optional<expression_value_t> get_relocated_base_address() const {
         return relocated_base_address;
     }
+    void dump(std::ostream& out) const {
+        out << "module " << name;
+        if (lpModuleName) {
+            out << ", " << lpModuleName.value();
+        }
+        out << ", " << prefered_base_address << ";\n";
+
+        for (auto const& attribute : get_attributes()) {
+            out << "set " << name << ", " << attribute.first << ", ";
+            if (std::holds_alternative<expression_value_t>(attribute.second)) {
+                out << std::get<expression_value_t>(attribute.second);
+            } else if (std::holds_alternative<bool>(attribute.second)) {
+                out << (std::get<bool>(attribute.second) ? "true" : "false");
+            } else {
+                out << std::get<std::string>(attribute.second);
+            }
+            out << ";\n";
+        }
+
+        for (Symbol const& symbol : symbols) {
+            symbol.dump(out);
+        }
+    }
 private:
     Module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address, Context *context)
         : name(name), lpModuleName(lpModuleName), prefered_base_address(prefered_base_address), context(context) {};
@@ -180,6 +223,43 @@ private:
     std::map<std::string, std::string, std::less<>> variants;
     std::string real_variant;
 };
+
+
+std::ostream& operator<<(std::ostream& os, Module const& module)
+{
+    module.dump(os);
+    return os;
+}
+void Symbol::dump(std::ostream& out) const {
+    out << "symbol " << module->get_name() << "::" << name << ", " << type << ";\n";
+
+    for (auto const& attribute : get_attributes()) {
+        out << "set " << name << ", " << attribute.first << ", ";
+        if (std::holds_alternative<expression_value_t>(attribute.second)) {
+            out << std::get<expression_value_t>(attribute.second);
+        } else if (std::holds_alternative<bool>(attribute.second)) {
+                out << (std::get<bool>(attribute.second) ? "true" : "false");
+        } else {
+            out << std::get<std::string>(attribute.second);
+        }
+        out << ";\n";
+    }
+
+    for (auto address : variants) {
+        out << "address " << module->get_name() << "::" << name;
+        if (address.first) {
+            out << ", " << address.first.value();
+        }
+        out << ", " << *address.second << "\n";
+    }
+}
+
+void Context::dump(std::ostream& out) const {
+    for (Module const& module : modules) {
+        module.dump(out);
+        out << "\n";
+    }
+}
 
 template<typename T>
 std::optional<T> Symbol::calculate_address() {
