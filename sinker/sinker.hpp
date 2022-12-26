@@ -86,6 +86,7 @@ public:
 
     void emplace_module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address);
     void dump(std::ostream& out) const;
+    void dump_def(std::ostream& out) const;
 private:
     std::vector<Module> modules;
 };
@@ -127,6 +128,9 @@ public:
         variants.push_back({variant, expression});
     }
     void dump(std::ostream& out) const;
+    
+    void dump_def(std::ostream& out) const;
+    
     ~Symbol() {
         for (auto variant : variants) {
             delete variant.second;
@@ -207,6 +211,18 @@ public:
             symbol.dump(out);
         }
     }
+    void dump_def(std::ostream& out) const {
+        out << "#ifndef SINKER_" << name << "_SYMBOLS\n";
+        out << "#define SINKER_" << name << "_SYMBOLS(symbol_name, symbol_type)\n";
+        out << "#endif\n";
+        out << "SINKER_MODULE(" << name << ")\n";
+
+        for (Symbol const& symbol : symbols) {
+            symbol.dump_def(out);
+        }
+
+        out << "#undef SINKER_" << name << "_SYMBOLS\n";
+    }
 private:
     Module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address, Context *context)
         : name(name), lpModuleName(lpModuleName), prefered_base_address(prefered_base_address), context(context) {};
@@ -250,10 +266,37 @@ void Symbol::dump(std::ostream& out) const {
     }
 }
 
+void Symbol::dump_def(std::ostream& out) const {
+    out << "SINKER_SYMBOL(" << module->get_name() << ", " << name << ", " << type << ")\n";
+    out << "SINKER_" << module->get_name() << "_SYMBOL(" << name << ", " << type << ")\n";
+}
+
 void Context::dump(std::ostream& out) const {
     for (Module const& module : modules) {
         module.dump(out);
     }
+}
+
+void Context::dump_def(std::ostream& out) const {
+    out <<
+R"%(#ifndef SINKER_MODULE
+#define SINKER_MODULE(module_name)
+#endif
+#ifndef SINKER_SYMBOL
+#define SINKER_SYMBOL(module_name, symbol_name, symbol_type)
+#endif
+
+)%";
+
+    for (Module const& module : modules) {
+        module.dump_def(out);
+        out << "\n";
+    }
+
+    out <<
+R"%(#undef SINKER_MODULE
+#undef SINKER_SYMBOL
+)%";
 }
 
 template<typename T>

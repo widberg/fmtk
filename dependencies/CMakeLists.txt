@@ -1,3 +1,6 @@
+# CLI11
+add_subdirectory(CLI11)
+
 # D3D9
 add_subdirectory(d3d9)
 

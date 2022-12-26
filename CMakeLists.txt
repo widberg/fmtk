@@ -36,7 +36,7 @@ add_subdirectory(fmtklua)
 add_subdirectory(secudll)
 add_subdirectory(fmtkdll)
 add_subdirectory(fmtk)
-add_subdirectory(package)
+add_subdirectory(package_fmtk)
 
 if(FMTK_DOCS)
 	add_subdirectory(docs)

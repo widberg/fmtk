@@ -19,3 +19,6 @@
 [submodule "dependencies/hashlibpp"]
 	path = dependencies/hashlibpp
 	url = https://github.com/pkcakeout/hashlibpp.git
+[submodule "dependencies/CLI11"]
+	path = dependencies/CLI11
+	url = https://github.com/CLIUtils/CLI11.git

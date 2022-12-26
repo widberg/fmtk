@@ -20,6 +20,8 @@
 #include <iostream>
 #include <filesystem>
 #include <format>
+#include <CLI/CLI.hpp>
+#include <istream>
 
 #include "sinker.hpp"
 
@@ -320,19 +322,16 @@ yy::parser::symbol_type yy::yylex()
     }
 }
 
-int main(int argc, char const* argv[]) {
-    if (argc < 2) return 1;
-
-    for (int i = 1; i < argc; ++i) {
-        std::ifstream file(argv[i], std::ios::binary | std::ios::ate);
-        std::streamsize size = file.tellg();
-        file.seekg(0, std::ios::beg);
+bool interpret(std::istream& input_stream, Language language, std::string input_filename) {
+        input_stream.seekg(0, std::ios::end);
+        std::streamsize size = input_stream.tellg();
+        input_stream.seekg(0, std::ios::beg);
 
         std::vector<char> buffer((unsigned int)size);
-        if (!file.read(buffer.data(), size)) return 2;
+        if (!input_stream.read(buffer.data(), size)) return false;
         buffer.push_back('\0');
 
-        yy::location::filename_type filename(argv[i]);
+        yy::location::filename_type filename(input_filename);
 
         loc = yy::location(&filename);
 
@@ -340,18 +339,44 @@ int main(int argc, char const* argv[]) {
         in.mar = buffer.data();
         in.lim = buffer.data() + size;
 
-        std::filesystem::path file_path(argv[i]);
-        std::string file_extension(file_path.extension().string());
-
-        in.mode = file_extension == ".skr" ? Language::SINKER : Language::SOURCE_CODE;
+        in.mode = language;
 
         first_loop = true;
+        in_pattern_match_expression = false;
         yy::parser parser;
         /* parser.set_debug_level(1); */
-        if (parser.parse()) return 3;
+        return !parser.parse();
+}
+
+int main(int argc, char const* argv[]) {
+    CLI::App app{"Sinker Compiler"};
+    std::string output_filename = "a.skr";
+    std::string def_filename;
+    std::vector<std::string> input_filenames;
+    app.add_option("-o,--output", output_filename, "Output file");
+    app.add_option("-d,--def", def_filename, "Definitions file");
+    app.add_option("input_files", input_filenames, "Input files");
+
+    CLI11_PARSE(app, argc, argv);
+    
+    for (std::string const& input_filename : input_filenames) {
+        std::ifstream file(input_filename, std::ios::binary);
+        
+        std::filesystem::path file_path(input_filename);
+        std::string file_extension(file_path.extension().string());
+
+        Language language = file_extension == ".skr" ? Language::SINKER : Language::SOURCE_CODE;
+
+        if (!interpret(file, language, input_filename)) return 1;
     }
 
-    std::cout << ctx;
+    std::ofstream output_stream(output_filename);
+    ctx.dump(output_stream);
+
+    if (!def_filename.empty()) {
+        std::ofstream def_stream(def_filename);
+        ctx.dump_def(def_stream);
+    }
 
     return 0;
 }

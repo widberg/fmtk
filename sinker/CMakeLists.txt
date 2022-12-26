@@ -5,7 +5,7 @@ add_executable(sinker
 		             # I know codegen'd files shouldn't get checked in but re2c and bison are a pain
 		             # to setup on windows.
 )
-target_link_libraries(sinker common)
+target_link_libraries(sinker common CLI11::CLI11)
 
 set_target_properties(sinker PROPERTIES
 	VS_DEBUGGER_WORKING_DIRECTORY "${FUEL_DIR}"
