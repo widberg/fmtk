@@ -41,6 +41,8 @@ static struct
     Language mode = Language::SINKER;
 } in;
 
+Context ctx;
+
 }//%code
 
 %token END_OF_FILE 0
@@ -143,10 +145,12 @@ stmt
     : "module" IDENTIFIER ',' STRING ',' INTEGER ';'
     {
         std::cout << std::format("module {}, {}, {}\n", $2, $4, $6);
+        ctx.add_module(Module($2, std::make_optional($4), $6));
     }
     | "module" IDENTIFIER ',' INTEGER ';'
     {
         std::cout << std::format("module {}, {}\n", $2, $4);
+        ctx.add_module(Module($2, {}, $4));
     }
     | "variant" IDENTIFIER ',' IDENTIFIER ',' STRING ';'
     {
@@ -167,6 +171,7 @@ stmt
     | "set" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
         std::cout << std::format("set {}, {}, {}\n", $2, $4, $6);
+        ctx.get_module($2)->set_attribute($4, $6);
     }
     | "set" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {

@@ -1,13 +1,13 @@
 #ifndef SINKER_HPP
 #define SINKER_HPP
 
-// #include <iostream>
-// #include <string>
-// #include <unordered_map>
+#include <format>
+#include <map>
 #include <variant>
 #include <string>
 #include <string_view>
 #include <cassert>
+#include <optional>
 
 enum class Language
 {
@@ -15,11 +15,12 @@ enum class Language
     SOURCE_CODE,
 };
 
-typedef std::variant<unsigned long long, bool, std::string> attribute_value_t;
+typedef unsigned long long expression_value_t;
+typedef std::variant<expression_value_t, bool, std::string> attribute_value_t;
 
 template <>
 struct std::formatter<attribute_value_t> {
-    std::formatter<unsigned long long> ull_formatter;
+    std::formatter<expression_value_t> ull_formatter;
     std::formatter<bool> bool_formatter;
     std::formatter<std::string> string_formatter;
 
@@ -28,8 +29,8 @@ struct std::formatter<attribute_value_t> {
     }
 
     auto format(const attribute_value_t& attr, std::format_context& ctx) {
-        if (std::holds_alternative<unsigned long long>(attr)) {
-            return ull_formatter.format(std::get<unsigned long long>(attr), ctx);
+        if (std::holds_alternative<expression_value_t>(attr)) {
+            return ull_formatter.format(std::get<expression_value_t>(attr), ctx);
         } else if (std::holds_alternative<bool>(attr)) {
             return bool_formatter.format(std::get<bool>(attr), ctx);
         } 
@@ -39,26 +40,26 @@ struct std::formatter<attribute_value_t> {
 
 class Expression {
 public:
-    virtual unsigned long long calculate() const = 0;
+    virtual std::optional<expression_value_t> calculate() const = 0;
 };
 
 class IntegerExpression final : Expression {
 public:
-    IntegerExpression(unsigned long long value)
+    IntegerExpression(expression_value_t value)
         : value(value) {}
-    virtual unsigned long long calculate() const override {
+    virtual std::optional<expression_value_t> calculate() const override {
         return 0;
     }
 private:
-    unsigned long long value;
+    expression_value_t value;
 };
 
 class AdditionExpression final : Expression {
 public:
     AdditionExpression(Expression *lhs, Expression *rhs)
         : lhs(lhs), rhs(rhs) {}
-    virtual unsigned long long calculate() const override {
-        return lhs->calculate() + rhs->calculate();
+    virtual std::optional<expression_value_t> calculate() const override {
+        return lhs->calculate().value() + rhs->calculate().value();
     }
 private:
     Expression *lhs;
@@ -69,8 +70,8 @@ class SubtractionExpression final : Expression {
 public:
     SubtractionExpression(Expression *lhs, Expression *rhs)
         : lhs(lhs), rhs(rhs) {}
-    virtual unsigned long long calculate() const override {
-        return lhs->calculate() - rhs->calculate();
+    virtual std::optional<expression_value_t> calculate() const override {
+        return lhs->calculate().value() - rhs->calculate().value();
     }
 private:
     Expression *lhs;
@@ -81,8 +82,8 @@ class MultiplicationExpression final : Expression {
 public:
     MultiplicationExpression(Expression *lhs, Expression *rhs)
         : lhs(lhs), rhs(rhs) {}
-    virtual unsigned long long calculate() const override {
-        return lhs->calculate() * rhs->calculate();
+    virtual std::optional<expression_value_t> calculate() const override {
+        return lhs->calculate().value() * rhs->calculate().value();
     }
 private:
     Expression *lhs;
@@ -93,8 +94,8 @@ class IndirectionExpression final : Expression {
 public:
     IndirectionExpression(Expression *expression)
         : expression(expression) {}
-    virtual unsigned long long calculate() const override {
-        return (unsigned long long)*(void**)(expression->calculate());
+    virtual std::optional<expression_value_t> calculate() const override {
+        return std::make_optional((expression_value_t)*(void**)(expression->calculate().value()));
     }
 private:
     Expression *expression;
@@ -104,7 +105,7 @@ class RelocateExpression final : Expression {
 public:
     RelocateExpression(Expression *expression)
         : expression(expression) {}
-    virtual unsigned long long calculate() const override {
+    virtual std::optional<expression_value_t> calculate() const override {
         return expression->calculate();
     }
 private:
@@ -115,7 +116,7 @@ class NullCheckExpression final : Expression {
 public:
     NullCheckExpression(Expression *expression)
         : expression(expression) {}
-    virtual unsigned long long calculate() const override {
+    virtual std::optional<expression_value_t> calculate() const override {
         return expression->calculate();
     }
 private:
@@ -126,8 +127,8 @@ class ArraySubscriptExpression final : Expression {
 public:
     ArraySubscriptExpression(Expression *origin, Expression *offset)
         : origin(origin), offset(offset) {}
-    virtual unsigned long long calculate() const override {
-        return (unsigned long long)*(void**)(origin->calculate() + offset->calculate() * sizeof(void*));
+    virtual std::optional<expression_value_t> calculate() const override {
+        return std::make_optional((expression_value_t)*(void**)(origin->calculate().value() + offset->calculate().value() * sizeof(void*)));
     }
 private:
     Expression *origin;
@@ -138,7 +139,7 @@ class GetProcAddressExpression final : Expression {
 public:
     GetProcAddressExpression(std::string const& module, std::string const& lpProcName)
         : module(module), lpProcName(lpProcName) {}
-    virtual unsigned long long calculate() const override {
+    virtual std::optional<expression_value_t> calculate() const override {
         return 0;
     }
 private:
@@ -150,7 +151,7 @@ class ModuleExpression final : Expression {
 public:
     ModuleExpression(std::string const& module)
         : module(module) {}
-    virtual unsigned long long calculate() const override {
+    virtual std::optional<expression_value_t> calculate() const override {
         return 0;
     }
 private:
@@ -161,7 +162,7 @@ class SymbolExpression final : Expression {
 public:
     SymbolExpression(std::string const& module, std::string const& symbol)
         : module(module), symbol(symbol) {}
-    virtual unsigned long long calculate() const override {
+    virtual std::optional<expression_value_t> calculate() const override {
         return 0;
     }
 private:
@@ -169,21 +170,84 @@ private:
     std::string symbol;
 };
 
-// class Attributable {
-// public:
-//     template<typename T>
-//     std::optional<T> get_attribute(std::string_view attribute_name) const;
+class Attributable {
+public:
+    template<typename T>
+    std::optional<T> get_attribute(std::string_view attribute_name) const {
+        if (!attributes.count(attribute_name)) {
+            return {};
+        }
 
-//     template<typename T>
-//     void set_attribute(std::string_view attribute_name, T value);
+        attribute_value_t const& attr = attributes.at(attribute_name);
 
-// private:
-//     std::unordered_map<std::string, std::variant<unsigned long long, bool, std::string>> attributes;
-// };
+        if (T const* value = std::get_if<T>(&attr)) {
+            return std::make_optional(*value);
+        }
+
+        return {};
+    }
+
+    template<typename T>
+    void set_attribute(std::string const& attribute_name, T value) {
+        attributes[attribute_name] = value;
+    }
+
+private:
+    std::map<std::string, attribute_value_t, std::less<>> attributes;
+};
+
+class Module;
+
+class Context {
+public:
+    Context() {}
+    Context (const Context&) = delete;
+    Context& operator= (const Context&) = delete;
+    std::vector<Module> const& get_modules() const {
+        return modules;
+    }
+    Module* get_module(std::string_view module_name);
+
+    void add_module(Module&& module);
+private:
+    std::vector<Module> modules;
+};
+
+
+class Module : public Attributable {
+public:
+    Module (const Module&) = delete;
+    Module& operator= (const Module&) = delete;
+    Module(Module&&) = default;
+    Module& operator=(Module&& mE) = default;
+    std::string const& get_name() const {
+        return name;
+    }
+    Module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address)
+        : name(name), lpModuleName(lpModuleName), prefered_base_address(prefered_base_address) {};
+private:
+    std::string name;
+    std::optional<std::string> lpModuleName;
+    expression_value_t prefered_base_address;
+};
+
+Module* Context::get_module(std::string_view module_name) {
+    for (Module& module : modules) {
+        if (module_name == module.get_name()) {
+            return &module;
+        }
+    }
+
+    return nullptr;
+}
+
+void Context::add_module(Module&& module) {
+    modules.push_back(std::move(module));
+}
 
 // class Module;
 
-// class Symbol : Attributable {
+// class Symbol : public Attributable {
 // public:
 //     std::string const& get_name() const;
 //     template<typename T>
@@ -193,21 +257,7 @@ private:
 //     Module const& get_module() const;
 // };
 
-// class Module : Attributable {
-// public:
-//     std::string const& get_name() const;
-//     std::vector<Symbol const> const& get_symbols() const;
-//     std::optional<Symbol const&> get_symbol(std::string_view symbol_name) const;
-// };
 
-// class Context {
-// public:
-//     Context();
-//     void interpret(std::istream& in);
-//     void dump(std::ostream& out) const;
-//     std::vector<Module const> const& get_modules() const;
-//     std::optional<Module const&> get_module(std::string_view module_name) const;
-// };
 
 // class Installable {
 // public:
