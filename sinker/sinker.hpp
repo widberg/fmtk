@@ -32,6 +32,7 @@ class Expression {
 public:
     virtual std::optional<expression_value_t> calculate(Context *context) const = 0;
     virtual void dump(std::ostream& out) const = 0;
+    virtual ~Expression() {}
 };
 
 std::ostream& operator<<(std::ostream& os, Expression const& expression)
@@ -126,6 +127,11 @@ public:
         variants.push_back({variant, expression});
     }
     void dump(std::ostream& out) const;
+    ~Symbol() {
+        for (auto variant : variants) {
+            delete variant.second;
+        }
+    }
 private:
     Symbol(std::string const& name, std::string const& type, Module *module)
         : name(name), type(type), module(module) {}
@@ -177,9 +183,13 @@ public:
     void dump(std::ostream& out) const {
         out << "module " << name;
         if (lpModuleName) {
-            out << ", " << lpModuleName.value();
+            out << ", \"" << lpModuleName.value() << "\"";
         }
         out << ", " << prefered_base_address << ";\n";
+
+        for (auto variant : variants) {
+            out << "variant " << name << ", " << variant.first << ", \"" << variant.second << "\";\n";
+        }
 
         for (auto const& attribute : get_attributes()) {
             out << "set " << name << ", " << attribute.first << ", ";
@@ -217,7 +227,7 @@ std::ostream& operator<<(std::ostream& os, Module const& module)
     return os;
 }
 void Symbol::dump(std::ostream& out) const {
-    out << "symbol " << module->get_name() << "::" << name << ", " << type << ";\n";
+    out << "symbol " << module->get_name() << "::" << name << ", \"" << type << "\";\n";
 
     for (auto const& attribute : get_attributes()) {
         out << "set " << name << ", " << attribute.first << ", ";
@@ -287,6 +297,9 @@ public:
         expression->dump(out);
         out << ")";
     }
+    virtual ~ParenthesesExpression() override {
+        delete expression;
+    }
 private:
     Expression *expression;
 };
@@ -302,6 +315,8 @@ public:
     virtual void dump(std::ostream& out) const override {
         out << value;
     }
+    virtual ~IntegerExpression() override {
+    }
 private:
     expression_value_t value;
 };
@@ -315,6 +330,10 @@ public:
     }
     virtual void dump(std::ostream& out) const override {
         out << *lhs << " + " << *rhs;
+    }
+    virtual ~AdditionExpression() override {
+        delete lhs;
+        delete rhs;
     }
 private:
     Expression *lhs;
@@ -331,6 +350,10 @@ public:
     virtual void dump(std::ostream& out) const override {
         out << *lhs << " - " << *rhs;
     }
+    virtual ~SubtractionExpression() override {
+        delete lhs;
+        delete rhs;
+    }
 private:
     Expression *lhs;
     Expression *rhs;
@@ -345,6 +368,10 @@ public:
     }
     virtual void dump(std::ostream& out) const override {
         out << *lhs << " * " << *rhs;
+    }
+    virtual ~MultiplicationExpression() override {
+        delete lhs;
+        delete rhs;
     }
 private:
     Expression *lhs;
@@ -361,6 +388,9 @@ public:
     virtual void dump(std::ostream& out) const override {
         out << "*" << *expression;
     }
+    virtual ~IndirectionExpression() override {
+        delete expression;
+    }
 private:
     Expression *expression;
 };
@@ -370,10 +400,17 @@ public:
     RelocateExpression(Expression *expression)
         : expression(expression) {}
     virtual std::optional<expression_value_t> calculate(Context *context) const override {
-        return expression->calculate(context);
+        auto result = expression->calculate(context);
+        if (!result) {
+            return {};
+        }
+        return result.value();
     }
     virtual void dump(std::ostream& out) const override {
         out << "@" << *expression;
+    }
+    virtual ~RelocateExpression() override {
+        delete expression;
     }
 private:
     Expression *expression;
@@ -384,10 +421,17 @@ public:
     NullCheckExpression(Expression *expression)
         : expression(expression) {}
     virtual std::optional<expression_value_t> calculate(Context *context) const override {
-        return expression->calculate(context);
+        auto result = expression->calculate(context);
+        if (!result || result.value() == 0) {
+            return {};
+        }
+        return result;
     }
     virtual void dump(std::ostream& out) const override {
         out << "?" << *expression;
+    }
+    virtual ~NullCheckExpression() override {
+        delete expression;
     }
 private:
     Expression *expression;
@@ -402,6 +446,10 @@ public:
     }
     virtual void dump(std::ostream& out) const override {
         out << *origin << "[" << *offset << "]";
+    }
+    virtual ~ArraySubscriptExpression() override {
+        delete origin;
+        delete offset;
     }
 private:
     Expression *origin;
@@ -418,6 +466,8 @@ public:
     virtual void dump(std::ostream& out) const override {
         out << "!" << module << "::" << lpProcName;
     }
+    virtual ~GetProcAddressExpression() override {
+    }
 private:
     std::string module;
     std::string lpProcName;
@@ -433,6 +483,8 @@ public:
     virtual void dump(std::ostream& out) const override {
         out << module;
     }
+    virtual ~ModuleExpression() override {
+    }
 private:
     std::string module;
 };
@@ -446,6 +498,8 @@ public:
     }
     virtual void dump(std::ostream& out) const override {
         out << module << "::" << symbol;
+    }
+    virtual ~SymbolExpression() override {
     }
 private:
     std::string module;
@@ -472,6 +526,8 @@ public:
         }
         out.flags( f );
         out << "}";
+    }
+    virtual ~PatternMatchExpression() override {
     }
 private:
     std::vector<pattern_byte> pattern;
