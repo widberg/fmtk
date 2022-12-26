@@ -9,6 +9,7 @@
 #include <string_view>
 #include <cassert>
 #include <optional>
+#include <ostream>
 
 enum class Language
 {
@@ -39,137 +40,20 @@ struct std::formatter<attribute_value_t> {
     }
 };
 
+class Context;
+
 class Expression {
 public:
-    virtual std::optional<expression_value_t> calculate() const = 0;
+    virtual std::optional<expression_value_t> calculate(Context *context) const = 0;
+    virtual void dump(std::ostream& out) const = 0;
 };
 
-class IntegerExpression final : Expression {
-public:
-    IntegerExpression(expression_value_t value)
-        : value(value) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return 0;
-    }
-private:
-    expression_value_t value;
-};
+std::ostream& operator<<(std::ostream& os, Expression const& expression)
+{
+    expression.dump(os);
+    return os;
+}
 
-class AdditionExpression final : Expression {
-public:
-    AdditionExpression(Expression *lhs, Expression *rhs)
-        : lhs(lhs), rhs(rhs) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return lhs->calculate().value() + rhs->calculate().value();
-    }
-private:
-    Expression *lhs;
-    Expression *rhs;
-};
-
-class SubtractionExpression final : Expression {
-public:
-    SubtractionExpression(Expression *lhs, Expression *rhs)
-        : lhs(lhs), rhs(rhs) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return lhs->calculate().value() - rhs->calculate().value();
-    }
-private:
-    Expression *lhs;
-    Expression *rhs;
-};
-
-class MultiplicationExpression final : Expression {
-public:
-    MultiplicationExpression(Expression *lhs, Expression *rhs)
-        : lhs(lhs), rhs(rhs) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return lhs->calculate().value() * rhs->calculate().value();
-    }
-private:
-    Expression *lhs;
-    Expression *rhs;
-};
-
-class IndirectionExpression final : Expression {
-public:
-    IndirectionExpression(Expression *expression)
-        : expression(expression) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return (expression_value_t)*(void**)(expression->calculate().value());
-    }
-private:
-    Expression *expression;
-};
-
-class RelocateExpression final : Expression {
-public:
-    RelocateExpression(Expression *expression)
-        : expression(expression) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return expression->calculate();
-    }
-private:
-    Expression *expression;
-};
-
-class NullCheckExpression final : Expression {
-public:
-    NullCheckExpression(Expression *expression)
-        : expression(expression) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return expression->calculate();
-    }
-private:
-    Expression *expression;
-};
-
-class ArraySubscriptExpression final : Expression {
-public:
-    ArraySubscriptExpression(Expression *origin, Expression *offset)
-        : origin(origin), offset(offset) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return (expression_value_t)*(void**)(origin->calculate().value() + offset->calculate().value() * sizeof(void*));
-    }
-private:
-    Expression *origin;
-    Expression *offset;
-};
-
-class GetProcAddressExpression final : Expression {
-public:
-    GetProcAddressExpression(std::string const& module, std::string const& lpProcName)
-        : module(module), lpProcName(lpProcName) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return 0;
-    }
-private:
-    std::string module;
-    std::string lpProcName;
-};
-
-class ModuleExpression final : Expression {
-public:
-    ModuleExpression(std::string const& module)
-        : module(module) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return 0;
-    }
-private:
-    std::string module;
-};
-
-class SymbolExpression final : Expression {
-public:
-    SymbolExpression(std::string const& module, std::string const& symbol)
-        : module(module), symbol(symbol) {}
-    virtual std::optional<expression_value_t> calculate() const override {
-        return 0;
-    }
-private:
-    std::string module;
-    std::string symbol;
-};
 
 class Attributable {
 public:
@@ -281,6 +165,9 @@ public:
     void add_variant(std::string const& name, std::string const& hash) {
         variants.insert({name, hash});
     }
+    std::optional<expression_value_t> get_relocated_base_address() const {
+        return relocated_base_address;
+    }
 private:
     Module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address, Context *context)
         : name(name), lpModuleName(lpModuleName), prefered_base_address(prefered_base_address), context(context) {};
@@ -288,7 +175,7 @@ private:
     std::string name;
     std::optional<std::string> lpModuleName;
     expression_value_t prefered_base_address;
-    expression_value_t relocated_base_address;
+    std::optional<expression_value_t> relocated_base_address;
     std::vector<Symbol> symbols;
     std::map<std::string, std::string, std::less<>> variants;
     std::string real_variant;
@@ -323,7 +210,165 @@ void Context::emplace_module(std::string_view name, std::optional<std::string> l
 }
 
 
+class IntegerExpression final : Expression {
+public:
+    IntegerExpression(expression_value_t value)
+        : value(value) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return value;
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << value;
+    }
+private:
+    expression_value_t value;
+};
 
+class AdditionExpression final : Expression {
+public:
+    AdditionExpression(Expression *lhs, Expression *rhs)
+        : lhs(lhs), rhs(rhs) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return lhs->calculate(context).value() + rhs->calculate(context).value();
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << *lhs << " + " << *rhs;
+    }
+private:
+    Expression *lhs;
+    Expression *rhs;
+};
+
+class SubtractionExpression final : Expression {
+public:
+    SubtractionExpression(Expression *lhs, Expression *rhs)
+        : lhs(lhs), rhs(rhs) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return lhs->calculate(context).value() - rhs->calculate(context).value();
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << *lhs << " - " << *rhs;
+    }
+private:
+    Expression *lhs;
+    Expression *rhs;
+};
+
+class MultiplicationExpression final : Expression {
+public:
+    MultiplicationExpression(Expression *lhs, Expression *rhs)
+        : lhs(lhs), rhs(rhs) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return lhs->calculate(context).value() * rhs->calculate(context).value();
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << *lhs << " * " << *rhs;
+    }
+private:
+    Expression *lhs;
+    Expression *rhs;
+};
+
+class IndirectionExpression final : Expression {
+public:
+    IndirectionExpression(Expression *expression)
+        : expression(expression) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return (expression_value_t)*(void**)(expression->calculate(context).value());
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << "*" << *expression;
+    }
+private:
+    Expression *expression;
+};
+
+class RelocateExpression final : Expression {
+public:
+    RelocateExpression(Expression *expression)
+        : expression(expression) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return expression->calculate(context);
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << "@" << *expression;
+    }
+private:
+    Expression *expression;
+};
+
+class NullCheckExpression final : Expression {
+public:
+    NullCheckExpression(Expression *expression)
+        : expression(expression) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return expression->calculate(context);
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << "?" << *expression;
+    }
+private:
+    Expression *expression;
+};
+
+class ArraySubscriptExpression final : Expression {
+public:
+    ArraySubscriptExpression(Expression *origin, Expression *offset)
+        : origin(origin), offset(offset) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return (expression_value_t)*(void**)(origin->calculate(context).value() + offset->calculate(context).value() * sizeof(void*));
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << *origin << "[" << *offset << "]";
+    }
+private:
+    Expression *origin;
+    Expression *offset;
+};
+
+class GetProcAddressExpression final : Expression {
+public:
+    GetProcAddressExpression(std::string const& module, std::string const& lpProcName)
+        : module(module), lpProcName(lpProcName) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return 0;
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << "!" << module << "::" << lpProcName;
+    }
+private:
+    std::string module;
+    std::string lpProcName;
+};
+
+class ModuleExpression final : Expression {
+public:
+    ModuleExpression(std::string const& module)
+        : module(module) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return context->get_module(module)->get_relocated_base_address();
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << module;
+    }
+private:
+    std::string module;
+};
+
+class SymbolExpression final : Expression {
+public:
+    SymbolExpression(std::string const& module, std::string const& symbol)
+        : module(module), symbol(symbol) {}
+    virtual std::optional<expression_value_t> calculate(Context *context) const override {
+        return context->get_module(module)->get_symbol(symbol)->get_cached_calculated_address<expression_value_t>();
+    }
+    virtual void dump(std::ostream& out) const override {
+        out << module << "::" << symbol;
+    }
+private:
+    std::string module;
+    std::string symbol;
+};
 
 // class Installable {
 // public:
