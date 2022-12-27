@@ -322,6 +322,8 @@ yy::parser::symbol_type yy::yylex()
     }
 }
 
+bool debug = false;
+
 bool interpret(std::istream& input_stream, Language language, std::string input_filename) {
         input_stream.seekg(0, std::ios::end);
         std::streamsize size = input_stream.tellg();
@@ -344,7 +346,9 @@ bool interpret(std::istream& input_stream, Language language, std::string input_
         first_loop = true;
         in_pattern_match_expression = false;
         yy::parser parser;
-        /* parser.set_debug_level(1); */
+        if (debug) {
+            parser.set_debug_level(1);
+        }
         return !parser.parse();
 }
 
@@ -356,6 +360,7 @@ int main(int argc, char const* argv[]) {
     app.add_option("-o,--output", output_filename, "Output file");
     app.add_option("-d,--def", def_filename, "Definitions file");
     app.add_option("input_files", input_filenames, "Input files");
+    app.add_flag("--debug,!--no-debug", debug, "Input files");
 
     CLI11_PARSE(app, argc, argv);
     
