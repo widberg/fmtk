@@ -322,7 +322,7 @@ yy::parser::symbol_type yy::yylex()
     }
 }
 
-bool debug = false;
+static bool debug = false;
 
 bool interpret(std::istream& input_stream, Language language, std::string input_filename) {
         input_stream.seekg(0, std::ios::end);
