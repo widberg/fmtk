@@ -181,6 +181,9 @@ public:
     void add_variant(std::string const& name, std::string const& hash) {
         variants.insert({name, hash});
     }
+    bool has_variant(std::string_view name) {
+        return variants.count(name);
+    }
     std::optional<expression_value_t> get_relocated_base_address() const {
         return relocated_base_address;
     }

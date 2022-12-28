@@ -93,59 +93,33 @@ pattern_match_expression
         $1.push_back($2);
         $$ = $1;
     }
-    | %empty
-    {
-        $$ = std::vector<pattern_byte>();
-    }
+    | %empty { $$ = std::vector<pattern_byte>(); }
     ;
 
 expression
-    : INTEGER
-    {
-        $$ = (Expression*)new IntegerExpression($1);
-    }
-    | '(' expression ')'
-    {
-        $$ = (Expression*) new ParenthesesExpression($2);
-    }
-    | expression '+' expression
-    {
-        $$ = (Expression*)new AdditionExpression($1, $3);
-    }
-    | expression '-' expression
-    {
-        $$ = (Expression*)new SubtractionExpression($1, $3);
-    }
-    | expression '*' expression
-    {
-        $$ = (Expression*)new MultiplicationExpression($1, $3);
-    }
-    | '*' expression %prec INDIRECTION
-    {
-        $$ = (Expression*)new IndirectionExpression($2);
-    }
-    | '@' expression
-    {
-        $$ = (Expression*)new RelocateExpression($2);
-    }
-    | '?' expression
-    {
-        $$ = (Expression*)new NullCheckExpression($2);
-    }
-    | expression '[' expression ']'
-    {
-        $$ = (Expression*)new ArraySubscriptExpression($1, $3);
-    }
+    : INTEGER                          { $$ = (Expression*)new IntegerExpression($1);            }
+    | '(' expression ')'               { $$ = (Expression*) new ParenthesesExpression($2);       }
+    | expression '+' expression        { $$ = (Expression*)new AdditionExpression($1, $3);       }
+    | expression '*' expression        { $$ = (Expression*)new MultiplicationExpression($1, $3); }
+    | expression '-' expression        { $$ = (Expression*)new SubtractionExpression($1, $3);    }
+    | '*' expression %prec INDIRECTION { $$ = (Expression*)new IndirectionExpression($2);        }
+    | '@' expression                   { $$ = (Expression*)new RelocateExpression($2);           }
+    | '?' expression                   { $$ = (Expression*)new NullCheckExpression($2);          }
+    | expression '[' expression ']'    { $$ = (Expression*)new ArraySubscriptExpression($1, $3); }
     | '!' IDENTIFIER "::" IDENTIFIER
     {
+        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
         $$ = (Expression*)new GetProcAddressExpression($2, $4);
     }
     | IDENTIFIER
     {
+        SINKER_ASSERT(ctx.get_module($1), @1, "Module does not exist");
         $$ = (Expression*)new ModuleExpression($1);
     }
     | IDENTIFIER "::" IDENTIFIER
     {
+        SINKER_ASSERT(ctx.get_module($1), @1, "Module does not exist");
+        SINKER_ASSERT(ctx.get_module($1)->get_symbol($3), @3, "Symbol does not exist");
         $$ = (Expression*)new SymbolExpression($1, $3);
     }
     | '{' {in_pattern_match_expression = true;} pattern_match_expression {in_pattern_match_expression = false;} '}'
@@ -155,59 +129,55 @@ expression
     ;
 
 attribute_value
-    : INTEGER
-    {
-        $$ = attribute_value_t {$1};
-    }
-    | STRING
-    {
-        $$ = attribute_value_t {$1};
-    }
-    | BOOL
-    {
-        $$ = attribute_value_t {$1};
-    }
+    : INTEGER { $$ = attribute_value_t {$1}; }
+    | STRING  { $$ = attribute_value_t {$1}; }
+    | BOOL    { $$ = attribute_value_t {$1}; }
     ;
 
 stmt
     : "module" IDENTIFIER ',' STRING ',' INTEGER ';'
     {
-        // std::cout << std::format("module {}, {}, {}\n", $2, $4, $6);
-        ctx.emplace_module($2, std::make_optional($4), $6);
+        SINKER_ASSERT(!ctx.get_module($2), @2, "Module exists");
+        ctx.emplace_module($2, $4, $6);
     }
     | "module" IDENTIFIER ',' INTEGER ';'
     {
-        // std::cout << std::format("module {}, {}\n", $2, $4);
+        SINKER_ASSERT(!ctx.get_module($2), @2, "Module exists");
         ctx.emplace_module($2, {}, $4);
     }
     | "variant" IDENTIFIER ',' IDENTIFIER ',' STRING ';'
     {
-        // std::cout << std::format("variant {}, {}, {}\n", $2, $4, $6);
+        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(!ctx.get_module($2)->has_variant($4), @4, "Variant exists");
         ctx.get_module($2)->add_variant($4, $6);
     }
     | "symbol" IDENTIFIER "::" IDENTIFIER ',' STRING ';'
     {
-        // std::cout << std::format("symbol {}::{}, {}\n", $2, $4, $6);
+        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(!ctx.get_module($2)->get_symbol($4), @4, "Symbol exists");
         ctx.get_module($2)->emplace_symbol($4, $6);
     }
     | "address" IDENTIFIER "::" IDENTIFIER ',' expression ';'
     {
-        // std::cout << std::format("address {}::{}, expr\n", $2, $4);
+        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(ctx.get_module($2)->get_symbol($4), @4, "Symbol does not exist");
         ctx.get_module($2)->get_symbol($4)->add_address({}, $6);
     }
     | "address" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' expression ';'
     {
-        // std::cout << std::format("address {}::{}, {}, expr\n", $2, $4, $6);
+        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(ctx.get_module($2)->get_symbol($4), @4, "Symbol does not exist");
         ctx.get_module($2)->get_symbol($4)->add_address($6, $8);
     }
     | "set" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
-        // std::cout << std::format("set {}, {}, {}\n", $2, $4, $6);
+        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
         ctx.get_module($2)->set_attribute($4, $6);
     }
     | "set" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
-        // std::cout << std::format("set {}::{}, {}, {}\n", $2, $4, $6, $8);
+        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(ctx.get_module($2)->get_symbol($4), @4, "Symbol does not exist");
         ctx.get_module($2)->get_symbol($4)->set_attribute($6, $8);
     }
     ;
@@ -216,7 +186,8 @@ stmt
 
 void yy::parser::error(const location_type& l, const std::string& message)
 {
-    std::cerr << l.begin.filename->c_str() << ':' << l.begin.line << ':' << l.begin.column << '-' << l.end.column << ": " << message << '\n';
+    std::cerr << l.begin.filename->c_str() << ':' << l.begin.line << ':' << l.begin.column << '-' <<
+                l.end.column << ": " << message << '\n';
 }
 
 yy::parser::symbol_type parse_integer(const std::string& str, int base)
