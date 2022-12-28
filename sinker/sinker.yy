@@ -49,7 +49,7 @@ static struct
     Language mode = Language::SINKER;
 } in;
 
-Context ctx;
+Context *ctx;
 
 static bool in_pattern_match_expression = false;
 
@@ -108,19 +108,19 @@ expression
     | expression '[' expression ']'    { $$ = (Expression*)new ArraySubscriptExpression($1, $3); }
     | '!' IDENTIFIER "::" IDENTIFIER
     {
-        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
-        $$ = (Expression*)new GetProcAddressExpression(ctx.get_module($2), $4);
+        SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
+        $$ = (Expression*)new GetProcAddressExpression(ctx->get_module($2), $4);
     }
     | IDENTIFIER
     {
-        SINKER_ASSERT(ctx.get_module($1), @1, "Module does not exist");
-        $$ = (Expression*)new ModuleExpression(ctx.get_module($1));
+        SINKER_ASSERT(ctx->get_module($1), @1, "Module does not exist");
+        $$ = (Expression*)new ModuleExpression(ctx->get_module($1));
     }
     | IDENTIFIER "::" IDENTIFIER
     {
-        SINKER_ASSERT(ctx.get_module($1), @1, "Module does not exist");
-        SINKER_ASSERT(ctx.get_module($1)->get_symbol($3), @3, "Symbol does not exist");
-        $$ = (Expression*)new SymbolExpression(ctx.get_module($1)->get_symbol($3));
+        SINKER_ASSERT(ctx->get_module($1), @1, "Module does not exist");
+        SINKER_ASSERT(ctx->get_module($1)->get_symbol($3), @3, "Symbol does not exist");
+        $$ = (Expression*)new SymbolExpression(ctx->get_module($1)->get_symbol($3));
     }
     | '{' {in_pattern_match_expression = true;} pattern_match_expression {in_pattern_match_expression = false;} '}'
     {
@@ -137,48 +137,48 @@ attribute_value
 stmt
     : "module" IDENTIFIER ',' STRING ',' INTEGER ';'
     {
-        SINKER_ASSERT(!ctx.get_module($2), @2, "Module exists");
-        ctx.emplace_module($2, $4, $6);
+        SINKER_ASSERT(!ctx->get_module($2), @2, "Module exists");
+        ctx->emplace_module($2, $4, $6);
     }
     | "module" IDENTIFIER ',' INTEGER ';'
     {
-        SINKER_ASSERT(!ctx.get_module($2), @2, "Module exists");
-        ctx.emplace_module($2, {}, $4);
+        SINKER_ASSERT(!ctx->get_module($2), @2, "Module exists");
+        ctx->emplace_module($2, {}, $4);
     }
     | "variant" IDENTIFIER ',' IDENTIFIER ',' STRING ';'
     {
-        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
-        SINKER_ASSERT(!ctx.get_module($2)->has_variant($4), @4, "Variant exists");
-        ctx.get_module($2)->add_variant($4, $6);
+        SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(!ctx->get_module($2)->has_variant($4), @4, "Variant exists");
+        ctx->get_module($2)->add_variant($4, $6);
     }
     | "symbol" IDENTIFIER "::" IDENTIFIER ',' STRING ';'
     {
-        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
-        SINKER_ASSERT(!ctx.get_module($2)->get_symbol($4), @4, "Symbol exists");
-        ctx.get_module($2)->emplace_symbol($4, $6);
+        SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(!ctx->get_module($2)->get_symbol($4), @4, "Symbol exists");
+        ctx->get_module($2)->emplace_symbol($4, $6);
     }
     | "address" IDENTIFIER "::" IDENTIFIER ',' expression ';'
     {
-        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
-        SINKER_ASSERT(ctx.get_module($2)->get_symbol($4), @4, "Symbol does not exist");
-        ctx.get_module($2)->get_symbol($4)->add_address({}, $6);
+        SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(ctx->get_module($2)->get_symbol($4), @4, "Symbol does not exist");
+        ctx->get_module($2)->get_symbol($4)->add_address({}, $6);
     }
     | "address" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' expression ';'
     {
-        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
-        SINKER_ASSERT(ctx.get_module($2)->get_symbol($4), @4, "Symbol does not exist");
-        ctx.get_module($2)->get_symbol($4)->add_address($6, $8);
+        SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(ctx->get_module($2)->get_symbol($4), @4, "Symbol does not exist");
+        ctx->get_module($2)->get_symbol($4)->add_address($6, $8);
     }
     | "set" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
-        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
-        ctx.get_module($2)->set_attribute($4, $6);
+        SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
+        ctx->get_module($2)->set_attribute($4, $6);
     }
     | "set" IDENTIFIER "::" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
-        SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
-        SINKER_ASSERT(ctx.get_module($2)->get_symbol($4), @4, "Symbol does not exist");
-        ctx.get_module($2)->get_symbol($4)->set_attribute($6, $8);
+        SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(ctx->get_module($2)->get_symbol($4), @4, "Symbol does not exist");
+        ctx->get_module($2)->get_symbol($4)->set_attribute($6, $8);
     }
     ;
 
@@ -293,9 +293,8 @@ yy::parser::symbol_type yy::yylex()
     }
 }
 
-static bool debug = false;
-
-bool interpret(std::istream& input_stream, Language language, std::string input_filename) {
+bool Context::interpret(std::istream& input_stream, Language language, std::string input_filename, bool debug) {
+        ctx = this;
         input_stream.seekg(0, std::ios::end);
         std::streamsize size = input_stream.tellg();
         input_stream.seekg(0, std::ios::beg);
@@ -323,36 +322,3 @@ bool interpret(std::istream& input_stream, Language language, std::string input_
         return !parser.parse();
 }
 
-int main(int argc, char const* argv[]) {
-    CLI::App app{"Sinker Compiler"};
-    std::string output_filename = "a.skr";
-    std::string def_filename;
-    std::vector<std::string> input_filenames;
-    app.add_option("-o,--output", output_filename, "Output file");
-    app.add_option("-d,--def", def_filename, "Definitions file");
-    app.add_option("input_files", input_filenames, "Input files");
-    app.add_flag("--debug,!--no-debug", debug, "Input files");
-
-    CLI11_PARSE(app, argc, argv);
-    
-    for (std::string const& input_filename : input_filenames) {
-        std::ifstream file(input_filename, std::ios::binary);
-        
-        std::filesystem::path file_path(input_filename);
-        std::string file_extension(file_path.extension().string());
-
-        Language language = file_extension == ".skr" ? Language::SINKER : Language::SOURCE_CODE;
-
-        if (!interpret(file, language, input_filename)) return 1;
-    }
-
-    std::ofstream output_stream(output_filename);
-    ctx.dump(output_stream);
-
-    if (!def_filename.empty()) {
-        std::ofstream def_stream(def_filename);
-        ctx.dump_def(def_stream);
-    }
-
-    return 0;
-}
