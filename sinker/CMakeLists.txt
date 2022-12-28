@@ -5,17 +5,7 @@ add_executable(sinker
 		             # I know codegen'd files shouldn't get checked in but re2c and bison are a pain
 		             # to setup on windows.
 )
-target_link_libraries(sinker common CLI11::CLI11)
-
-set_target_properties(sinker PROPERTIES
-	VS_DEBUGGER_WORKING_DIRECTORY "${FUEL_DIR}"
-)
-
-set_target_properties(sinker PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
+target_link_libraries(sinker CLI11::CLI11)
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sinker.cpp.re ${CMAKE_CURRENT_SOURCE_DIR}/sinker.cpp
@@ -27,4 +17,9 @@ add_custom_command(
 
 include(cmake/add_sinker_target.cmake)
 
-add_sinker_target(sink INPUT ${CMAKE_BINARY_DIR}/test.skr OUTPUT ${CMAKE_BINARY_DIR}/out.skr DEFINITIONS ${CMAKE_BINARY_DIR}/out.def WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_sinker_target(sink
+	INPUT ${CMAKE_BINARY_DIR}/test.skr
+	OUTPUT ${CMAKE_BINARY_DIR}/out.skr
+	DEFINITIONS ${CMAKE_BINARY_DIR}/out.def
+	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
