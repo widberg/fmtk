@@ -3,7 +3,6 @@
 #include <iostream>
 #include <filesystem>
 #include <format>
-#include <CLI/CLI.hpp>
 #include <istream>
 
 #include "sinker.hpp"
