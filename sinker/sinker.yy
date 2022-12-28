@@ -109,18 +109,18 @@ expression
     | '!' IDENTIFIER "::" IDENTIFIER
     {
         SINKER_ASSERT(ctx.get_module($2), @2, "Module does not exist");
-        $$ = (Expression*)new GetProcAddressExpression($2, $4);
+        $$ = (Expression*)new GetProcAddressExpression(ctx.get_module($2), $4);
     }
     | IDENTIFIER
     {
         SINKER_ASSERT(ctx.get_module($1), @1, "Module does not exist");
-        $$ = (Expression*)new ModuleExpression($1);
+        $$ = (Expression*)new ModuleExpression(ctx.get_module($1));
     }
     | IDENTIFIER "::" IDENTIFIER
     {
         SINKER_ASSERT(ctx.get_module($1), @1, "Module does not exist");
         SINKER_ASSERT(ctx.get_module($1)->get_symbol($3), @3, "Symbol does not exist");
-        $$ = (Expression*)new SymbolExpression($1, $3);
+        $$ = (Expression*)new SymbolExpression(ctx.get_module($1)->get_symbol($3));
     }
     | '{' {in_pattern_match_expression = true;} pattern_match_expression {in_pattern_match_expression = false;} '}'
     {
