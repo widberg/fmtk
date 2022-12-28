@@ -12,6 +12,7 @@
 #include <ostream>
 #include <iostream>
 #include <iomanip>
+#include <Windows.h>
 
 enum class Language
 {
@@ -230,6 +231,9 @@ public:
     std::optional<expression_value_t> get_relocated_base_address() const {
         return relocated_base_address;
     }
+    HMODULE get_hModule() const {
+        return hModule;
+    }
 private:
     Module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t preferred_base_address, Context *context)
         : name(name), lpModuleName(lpModuleName), preferred_base_address(preferred_base_address), context(context) {};
@@ -241,6 +245,7 @@ private:
     std::vector<Symbol> symbols;
     std::map<std::string, std::string, std::less<>> variants;
     std::string real_variant;
+    HMODULE hModule = 0;
 };
 
 
@@ -532,8 +537,18 @@ public:
     GetProcAddressExpression(Module *module, std::string const& lpProcName)
         : module(module), lpProcName(lpProcName) {}
     virtual std::optional<expression_value_t> calculate(Symbol *symbol) const override {
-        // TODO: actually do the lookup
-        return 0;
+        HMODULE hModule = module->get_hModule();
+        if (!hModule) {
+            return {};
+        }
+
+        FARPROC addr = GetProcAddress(hModule, lpProcName.c_str());
+
+        if (addr) {
+            return (expression_value_t)addr;
+        }
+
+        return {};
     }
     virtual void dump(std::ostream& out) const override {
         out << "!" << module->get_name() << "::" << lpProcName;
