@@ -327,6 +327,7 @@ void Context::emplace_module(std::string_view name, std::optional<std::string> l
     modules.push_back(std::move(Module(name, lpModuleName, prefered_base_address, this)));
 }
 
+#define PROPAGATE_UNRESOLVED(x) do { if (!x) return {}; } while(0)
 
 class ParenthesesExpression final : Expression {
 public:
@@ -369,7 +370,11 @@ public:
     AdditionExpression(Expression *lhs, Expression *rhs)
         : lhs(lhs), rhs(rhs) {}
     virtual std::optional<expression_value_t> calculate(Context *context) const override {
-        return lhs->calculate(context).value() + rhs->calculate(context).value();
+        auto lhs_result = lhs->calculate(context);
+        auto rhs_result = rhs->calculate(context);
+        PROPAGATE_UNRESOLVED(lhs_result);
+        PROPAGATE_UNRESOLVED(rhs_result);
+        return lhs_result.value() + rhs_result.value();
     }
     virtual void dump(std::ostream& out) const override {
         out << *lhs << " + " << *rhs;
@@ -388,7 +393,11 @@ public:
     SubtractionExpression(Expression *lhs, Expression *rhs)
         : lhs(lhs), rhs(rhs) {}
     virtual std::optional<expression_value_t> calculate(Context *context) const override {
-        return lhs->calculate(context).value() - rhs->calculate(context).value();
+        auto lhs_result = lhs->calculate(context);
+        auto rhs_result = rhs->calculate(context);
+        PROPAGATE_UNRESOLVED(lhs_result);
+        PROPAGATE_UNRESOLVED(rhs_result);
+        return lhs_result.value() - rhs_result.value();
     }
     virtual void dump(std::ostream& out) const override {
         out << *lhs << " - " << *rhs;
@@ -407,7 +416,11 @@ public:
     MultiplicationExpression(Expression *lhs, Expression *rhs)
         : lhs(lhs), rhs(rhs) {}
     virtual std::optional<expression_value_t> calculate(Context *context) const override {
-        return lhs->calculate(context).value() * rhs->calculate(context).value();
+        auto lhs_result = lhs->calculate(context);
+        auto rhs_result = rhs->calculate(context);
+        PROPAGATE_UNRESOLVED(lhs_result);
+        PROPAGATE_UNRESOLVED(rhs_result);
+        return lhs_result.value() * rhs_result.value();
     }
     virtual void dump(std::ostream& out) const override {
         out << *lhs << " * " << *rhs;
@@ -426,7 +439,9 @@ public:
     IndirectionExpression(Expression *expression)
         : expression(expression) {}
     virtual std::optional<expression_value_t> calculate(Context *context) const override {
-        return (expression_value_t)*(void**)(expression->calculate(context).value());
+        auto expression_result = expression->calculate(context);
+        PROPAGATE_UNRESOLVED(expression_result);
+        return (expression_value_t)*(void**)(expression_result.value());
     }
     virtual void dump(std::ostream& out) const override {
         out << "*" << *expression;
@@ -443,11 +458,9 @@ public:
     RelocateExpression(Expression *expression)
         : expression(expression) {}
     virtual std::optional<expression_value_t> calculate(Context *context) const override {
-        auto result = expression->calculate(context);
-        if (!result) {
-            return {};
-        }
-        return result.value();
+        auto expression_result = expression->calculate(context);
+        PROPAGATE_UNRESOLVED(expression_result);
+        return expression_result.value();
     }
     virtual void dump(std::ostream& out) const override {
         out << "@" << *expression;
@@ -464,11 +477,13 @@ public:
     NullCheckExpression(Expression *expression)
         : expression(expression) {}
     virtual std::optional<expression_value_t> calculate(Context *context) const override {
-        auto result = expression->calculate(context);
-        if (!result || result.value() == 0) {
-            return {};
+        auto expression_result = expression->calculate(context);
+        PROPAGATE_UNRESOLVED(expression_result);
+        expression_value_t expression_value = expression_result.value();
+        if (expression_value) {
+            return expression_value;
         }
-        return result;
+        return {};
     }
     virtual void dump(std::ostream& out) const override {
         out << "?" << *expression;
@@ -485,7 +500,11 @@ public:
     ArraySubscriptExpression(Expression *origin, Expression *offset)
         : origin(origin), offset(offset) {}
     virtual std::optional<expression_value_t> calculate(Context *context) const override {
-        return (expression_value_t)*(void**)(origin->calculate(context).value() + offset->calculate(context).value() * sizeof(void*));
+        auto origin_result = origin->calculate(context);
+        auto offset_result = offset->calculate(context);
+        PROPAGATE_UNRESOLVED(origin_result);
+        PROPAGATE_UNRESOLVED(offset_result);
+        return (expression_value_t)*(void**)(origin_result.value() + offset_result.value() * sizeof(void*));
     }
     virtual void dump(std::ostream& out) const override {
         out << *origin << "[" << *offset << "]";
