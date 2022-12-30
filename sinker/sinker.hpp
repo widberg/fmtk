@@ -45,28 +45,12 @@ std::ostream& operator<<(std::ostream& os, Expression const& expression);
 class Attributable {
 public:
     template<typename T>
-    std::optional<T> get_attribute(std::string_view attribute_name) const {
-        if (!attributes.count(attribute_name)) {
-            return {};
-        }
-
-        attribute_value_t const& attr = attributes.at(attribute_name);
-
-        if (T const* value = std::get_if<T>(&attr)) {
-            return *value;
-        }
-
-        return {};
-    }
+    std::optional<T> get_attribute(std::string_view attribute_name) const;
 
     template<typename T>
-    void set_attribute(std::string const& attribute_name, T value) {
-        attributes[attribute_name] = value;
-    }
+    void set_attribute(std::string const& attribute_name, T value);
 
-    std::map<std::string, attribute_value_t, std::less<>> const& get_attributes() const {
-        return attributes;
-    }
+    std::map<std::string, attribute_value_t, std::less<>> const& get_attributes() const;
 
 private:
     std::map<std::string, attribute_value_t, std::less<>> attributes;
@@ -109,30 +93,16 @@ public:
     std::optional<T> calculate_address();
 
     template<typename T>
-    std::optional<T> get_cached_calculated_address() const {
-        if (!cached_calculated_address) {
-            return {};
-        }
+    std::optional<T> get_cached_calculated_address() const;
 
-        return static_cast<T>(cached_calculated_address.value());
-    }
+    Module *get_module() const;
 
-    Module *get_module() const {
-        return module;
-    }
-
-    void add_address(std::optional<std::string> const& variant, Expression *expression) {
-        variants.push_back({variant, expression});
-    }
+    void add_address(std::optional<std::string> const& variant, Expression *expression);
     void dump(std::ostream& out) const;
     
     void dump_def(std::ostream& out) const;
     
-    ~Symbol() {
-        for (auto variant : variants) {
-            delete variant.second;
-        }
-    }
+    ~Symbol();
 private:
     Symbol(std::string const& name, std::string const& type, Module *module)
         : name(name), type(type), module(module) {}
@@ -153,78 +123,18 @@ public:
     Module& operator= (const Module&) = delete;
     Module(Module&&) = default;
     Module& operator=(Module&& mE) = default;
-    std::string const& get_name() const {
-        return name;
-    }
-    std::string const& get_real_variant() const {
-        return real_variant;
-    }
-    Symbol *get_symbol(std::string_view symbol_name) {
-    for (Symbol& symbol : symbols) {
-        if (symbol_name == symbol.get_name()) {
-            return &symbol;
-        }
-    }
+    std::string const& get_name() const;
+    std::string const& get_real_variant() const;
+    Symbol *get_symbol(std::string_view symbol_name);
 
-    return nullptr;
-    }
-    void emplace_symbol(std::string const& name, std::string const& type) {
-        symbols.push_back(std::move(Symbol(name, type, this)));
-    }
-    void add_variant(std::string const& name, std::string const& hash) {
-        variants.insert({name, hash});
-    }
-    bool has_variant(std::string_view name) {
-        return variants.count(name);
-    }
-    void dump(std::ostream& out) const {
-        out << "module " << name;
-        if (lpModuleName) {
-            out << ", \"" << lpModuleName.value() << "\"";
-        }
-        out << ", " << preferred_base_address << ";\n";
-
-        for (auto const& attribute : get_attributes()) {
-            out << "set " << name << ", " << attribute.first << ", ";
-            if (std::holds_alternative<expression_value_t>(attribute.second)) {
-                out << std::get<expression_value_t>(attribute.second);
-            } else if (std::holds_alternative<bool>(attribute.second)) {
-                out << (std::get<bool>(attribute.second) ? "true" : "false");
-            } else {
-                out << "\"" << std::get<std::string>(attribute.second) << "\"";
-            }
-            out << ";\n";
-        }
-
-        for (auto variant : variants) {
-            out << "variant " << name << ", " << variant.first << ", \"" << variant.second << "\";\n";
-        }
-
-        for (Symbol const& symbol : symbols) {
-            symbol.dump(out);
-        }
-    }
-    void dump_def(std::ostream& out) const {
-        out << "#ifndef SINKER_" << name << "_SYMBOLS\n";
-        out << "#define SINKER_" << name << "_SYMBOLS(symbol_name, symbol_type)\n";
-        out << "#endif\n";
-        out << "SINKER_MODULE(" << name << ")\n";
-
-        for (Symbol const& symbol : symbols) {
-            symbol.dump_def(out);
-        }
-
-        out << "#undef SINKER_" << name << "_SYMBOLS\n";
-    }
-    expression_value_t get_preferred_base_address() const {
-        return preferred_base_address;
-    }
-    std::optional<expression_value_t> get_relocated_base_address() const {
-        return relocated_base_address;
-    }
-    HMODULE get_hModule() const {
-        return hModule;
-    }
+    void emplace_symbol(std::string const& name, std::string const& type);
+    void add_variant(std::string const& name, std::string const& hash);
+    bool has_variant(std::string_view name) const;
+    void dump(std::ostream& out) const;
+    void dump_def(std::ostream& out) const;
+    expression_value_t get_preferred_base_address() const;
+    std::optional<expression_value_t> get_relocated_base_address() const;
+    HMODULE get_hModule() const;
 private:
     Module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t preferred_base_address, Context *context)
         : name(name), lpModuleName(lpModuleName), preferred_base_address(preferred_base_address), context(context) {};
@@ -242,19 +152,6 @@ private:
 
 std::ostream& operator<<(std::ostream& os, Module const& module);
 
-template<typename T>
-std::optional<T> Symbol::calculate_address() {
-    for (auto variant : variants) {
-        if (!variant.first.has_value() || variant.first.value() == module->get_real_variant()) {
-            cached_calculated_address = variant.second->calculate();
-            if (cached_calculated_address) {
-                return cached_calculated_address;
-            }
-        }
-    }
-
-    return {};
-}
 
 #define PROPAGATE_UNRESOLVED(x) do { if (!x) return {}; } while(0)
 
