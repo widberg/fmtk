@@ -69,6 +69,12 @@ static struct
 
 }//%code
 
+%initial-action
+{
+lexer_state->first_loop = true;
+lexer_state->in_pattern_match_expression = false;
+}//%initial-action
+
 %token END_OF_FILE 0
 
 %token IDENTIFIER INTEGER STRING BOOL PATTERN_BYTE
