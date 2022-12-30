@@ -81,7 +81,7 @@ namespace sinker
         void dump(std::ostream &out) const;
         void dump_def(std::ostream &out) const;
         bool interpret(std::istream &input_stream, Language language, std::string input_filename, bool debug = false);
-
+        bool interpret(char *input, unsigned int size, Language language, std::string input_filename, bool debug = false);
     private:
         std::vector<Module> modules;
     };

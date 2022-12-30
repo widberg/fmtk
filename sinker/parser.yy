@@ -308,6 +308,25 @@ sinker::Parser::symbol_type sinker::yylex(LexerState *lexer_state)
     }
 }
 
+bool Context::interpret(char *input, unsigned int size, Language language, std::string input_filename, bool debug) {
+        sinker::location::filename_type filename(input_filename);
+
+        loc = sinker::location(&filename);
+
+        in.cur = input;
+        in.mar = input;
+        in.lim = input + size;
+
+        in.mode = language;
+        LexerState lexer_state;
+        sinker::Parser parser(this, &lexer_state);
+        if (debug) {
+            parser.set_debug_level(1);
+        }
+        return !parser.parse();
+}
+
+
 bool Context::interpret(std::istream& input_stream, Language language, std::string input_filename, bool debug) {
         input_stream.seekg(0, std::ios::end);
         std::streamsize size = input_stream.tellg();
@@ -317,19 +336,5 @@ bool Context::interpret(std::istream& input_stream, Language language, std::stri
         if (!input_stream.read(buffer.data(), size)) return false;
         buffer.push_back('\0');
 
-        sinker::location::filename_type filename(input_filename);
-
-        loc = sinker::location(&filename);
-
-        in.cur = buffer.data();
-        in.mar = buffer.data();
-        in.lim = buffer.data() + size;
-
-        in.mode = language;
-        LexerState lexer_state;
-        sinker::Parser parser(this, &lexer_state);
-        if (debug) {
-            parser.set_debug_level(1);
-        }
-        return !parser.parse();
+        return interpret(buffer.data(), (unsigned int)size, language, input_filename, debug);
 }
