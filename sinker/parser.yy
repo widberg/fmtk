@@ -11,6 +11,8 @@
 %define parse.error verbose
 %define parse.trace
 
+%parse-param {Context *ctx}
+
 %locations
 
 %code requires
@@ -48,8 +50,6 @@ static struct
     char *lim;
     Language mode = Language::SINKER;
 } in;
-
-Context *ctx;
 
 static bool in_pattern_match_expression = false;
 
@@ -290,7 +290,6 @@ yy::parser::symbol_type yy::yylex()
 }
 
 bool Context::interpret(std::istream& input_stream, Language language, std::string input_filename, bool debug) {
-        ctx = this;
         input_stream.seekg(0, std::ios::end);
         std::streamsize size = input_stream.tellg();
         input_stream.seekg(0, std::ios::beg);
@@ -311,10 +310,9 @@ bool Context::interpret(std::istream& input_stream, Language language, std::stri
 
         first_loop = true;
         in_pattern_match_expression = false;
-        yy::parser parser;
+        yy::parser parser(this);
         if (debug) {
             parser.set_debug_level(1);
         }
         return !parser.parse();
 }
-
