@@ -9,8 +9,6 @@
 
 namespace sinker
 {
-
-
     std::ostream &operator<<(std::ostream &out, attribute_value_t const &attribute_value) {
             if (std::holds_alternative<expression_value_t>(attribute_value))
             {
