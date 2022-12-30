@@ -1,11 +1,11 @@
 add_library(sinker STATIC
-		parser.yy
-		sinker.hpp
-		parser.cpp # Let's check this into vc so that re2c and bison aren't required dependencies.
-		             # I know codegen'd files shouldn't get checked in but re2c and bison are a pain
-		             # to setup on windows.
-		sinker.cpp
-		sinker.tpp
+	sinker.cpp
+	sinker.hpp
+	sinker.tpp
+	parser.yy
+	parser.cpp  # Let's check this into vc so that re2c and bison aren't required dependencies.
+				# I know codegen'd files shouldn't get checked in but re2c and bison are a pain
+				# to setup on windows.
 )
 
 add_custom_command(

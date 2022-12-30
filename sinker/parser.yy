@@ -68,7 +68,7 @@ static bool in_pattern_match_expression = false;
 %type<std::string> IDENTIFIER STRING
 %type<expression_value_t> INTEGER
 %type<pattern_byte> PATTERN_BYTE
-%type<Expression*> expression
+%type<std::shared_ptr<Expression>> expression
 %type<bool> BOOL
 %type<attribute_value_t> attribute_value
 %type<std::vector<pattern_byte>> pattern_match_expression
@@ -97,34 +97,34 @@ pattern_match_expression
     ;
 
 expression
-    : INTEGER                          { $$ = (Expression*)new IntegerExpression($1);            }
-    | '(' expression ')'               { $$ = (Expression*) new ParenthesesExpression($2);       }
-    | expression '+' expression        { $$ = (Expression*)new AdditionExpression($1, $3);       }
-    | expression '*' expression        { $$ = (Expression*)new MultiplicationExpression($1, $3); }
-    | expression '-' expression        { $$ = (Expression*)new SubtractionExpression($1, $3);    }
-    | '*' expression %prec INDIRECTION { $$ = (Expression*)new IndirectionExpression($2);        }
-    | '@' expression                   { $$ = (Expression*)new RelocateExpression($2);           }
-    | '?' expression                   { $$ = (Expression*)new NullCheckExpression($2);          }
-    | expression '[' expression ']'    { $$ = (Expression*)new ArraySubscriptExpression($1, $3); }
+    : INTEGER                          { $$ = std::shared_ptr<Expression>((Expression*)new IntegerExpression($1));            }
+    | '(' expression ')'               { $$ = std::shared_ptr<Expression>((Expression*)new ParenthesesExpression($2));       }
+    | expression '+' expression        { $$ = std::shared_ptr<Expression>((Expression*)new AdditionExpression($1, $3));       }
+    | expression '*' expression        { $$ = std::shared_ptr<Expression>((Expression*)new MultiplicationExpression($1, $3)); }
+    | expression '-' expression        { $$ = std::shared_ptr<Expression>((Expression*)new SubtractionExpression($1, $3));    }
+    | '*' expression %prec INDIRECTION { $$ = std::shared_ptr<Expression>((Expression*)new IndirectionExpression($2));        }
+    | '@' expression                   { $$ = std::shared_ptr<Expression>((Expression*)new RelocateExpression($2));           }
+    | '?' expression                   { $$ = std::shared_ptr<Expression>((Expression*)new NullCheckExpression($2));          }
+    | expression '[' expression ']'    { $$ = std::shared_ptr<Expression>((Expression*)new ArraySubscriptExpression($1, $3)); }
     | '!' IDENTIFIER "::" IDENTIFIER
     {
         SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
-        $$ = (Expression*)new GetProcAddressExpression(ctx->get_module($2), $4);
+        $$ = std::shared_ptr<Expression>((Expression*)new GetProcAddressExpression(ctx->get_module($2), $4));
     }
     | IDENTIFIER
     {
         SINKER_ASSERT(ctx->get_module($1), @1, "Module does not exist");
-        $$ = (Expression*)new ModuleExpression(ctx->get_module($1));
+        $$ = std::shared_ptr<Expression>((Expression*)new ModuleExpression(ctx->get_module($1)));
     }
     | IDENTIFIER "::" IDENTIFIER
     {
         SINKER_ASSERT(ctx->get_module($1), @1, "Module does not exist");
         SINKER_ASSERT(ctx->get_module($1)->get_symbol($3), @3, "Symbol does not exist");
-        $$ = (Expression*)new SymbolExpression(ctx->get_module($1)->get_symbol($3));
+        $$ = std::shared_ptr<Expression>((Expression*)new SymbolExpression(ctx->get_module($1)->get_symbol($3)));
     }
     | '{' {in_pattern_match_expression = true;} pattern_match_expression {in_pattern_match_expression = false;} '}'
     {
-        $$ = (Expression*)new PatternMatchExpression($3);
+        $$ = std::shared_ptr<Expression>((Expression*)new PatternMatchExpression($3));
     }
     ;
 
