@@ -23,6 +23,7 @@
 #include <istream>
 
 #include "sinker.hpp"
+using namespace sinker;
 
 // Bison generates weird switch statements
 #ifdef _MSC_VER

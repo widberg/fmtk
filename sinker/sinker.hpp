@@ -14,6 +14,8 @@
 #include <iomanip>
 #include <Windows.h>
 
+namespace sinker {
+
 enum class Language
 {
     SINKER,
@@ -574,5 +576,9 @@ private:
 //     void execute();
 //     int wait();
 // };
+
+}
+
+#include "sinker.tpp"
 
 #endif // !SINKER_HPP
