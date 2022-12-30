@@ -7,11 +7,16 @@
 %define api.token.constructor
 %define api.value.type variant
 %define api.location.file none
-%define parse.assert
+%define parse.assert true
 %define parse.error verbose
-%define parse.trace
+%define parse.trace true
+/* %define api.value.automove true */
+
+%define api.namespace {sinker}
+%define api.parser.class {Parser}
 
 %parse-param {Context *ctx}
+%param {LexerState *lexer_state}
 
 %locations
 
@@ -34,14 +39,25 @@ using namespace sinker;
 
 }//%code requires
 
+
+%code top
+{
+    
+struct LexerState
+{
+    bool first_loop = true;
+    bool in_pattern_match_expression = false;
+};
+}
+
 %code
 {
-namespace yy { parser::symbol_type yylex(); }
-static yy::location loc;
+namespace sinker { Parser::symbol_type yylex(LexerState *lexer_state); }
+static sinker::location loc;
 
-#define TOKEN(name) do { return yy::parser::make_##name(loc); } while(0)
-#define TOKENV(name, ...) do { return yy::parser::make_##name(__VA_ARGS__, loc); } while(0)
-#define SINKER_ASSERT(cond, loc, msg) do { if (!cond) { yy::parser::error(loc, msg); YYERROR; } } while(0)
+#define TOKEN(name) do { return sinker::Parser::make_##name(loc); } while(0)
+#define TOKENV(name, ...) do { return sinker::Parser::make_##name(__VA_ARGS__, loc); } while(0)
+#define SINKER_ASSERT(cond, loc, msg) do { if (!cond) { sinker::Parser::error(loc, msg); YYERROR; } } while(0)
 
 static struct
 {
@@ -50,8 +66,6 @@ static struct
     char *lim;
     Language mode = Language::SINKER;
 } in;
-
-static bool in_pattern_match_expression = false;
 
 }//%code
 
@@ -121,7 +135,7 @@ expression
         SINKER_ASSERT(ctx->get_module($1)->get_symbol($4), @4, "Symbol does not exist");
         $$ = std::shared_ptr<Expression>((Expression*)new SymbolExpression(ctx->get_module($1)->get_symbol($4)));
     }
-    | '{' {in_pattern_match_expression = true;} pattern_match_expression {in_pattern_match_expression = false;} '}'
+    | '{' {lexer_state->in_pattern_match_expression = true;} pattern_match_expression {lexer_state->in_pattern_match_expression = false;} '}'
     {
         $$ = std::shared_ptr<Expression>((Expression*)new PatternMatchExpression($3));
     }
@@ -183,13 +197,13 @@ stmt
 
 %%
 
-void yy::parser::error(const location_type& l, const std::string& message)
+void sinker::Parser::error(const location_type& l, const std::string& message)
 {
     std::cerr << l.begin.filename->c_str() << ':' << l.begin.line << ':' << l.begin.column << '-' <<
                 l.end.column << ": " << message << '\n';
 }
 
-yy::parser::symbol_type parse_integer(const std::string& str, int base)
+sinker::Parser::symbol_type parse_integer(const std::string& str, int base)
 {
     char *p;
     unsigned long long n = strtoull(str.c_str(), &p, base);
@@ -197,10 +211,9 @@ yy::parser::symbol_type parse_integer(const std::string& str, int base)
     TOKENV(INTEGER, n);
 }
 
-static bool first_loop = true;
-yy::parser::symbol_type yy::yylex()
+sinker::Parser::symbol_type sinker::yylex(LexerState *lexer_state)
 {
-    if (first_loop && in.mode == Language::SOURCE_CODE) { first_loop = false; goto source; }
+    if (lexer_state->first_loop && in.mode == Language::SOURCE_CODE) { lexer_state->first_loop = false; goto source; }
     const char *s, *e;
     /*!stags:re2c format = 'const char *@@;\n'; */
     for (;;)
@@ -217,7 +230,7 @@ yy::parser::symbol_type yy::yylex()
         re2c:tags = 1;
         %}
     sinker:
-        if (in_pattern_match_expression) goto pattern_match;
+        if (lexer_state->in_pattern_match_expression) goto pattern_match;
         %{
         // Keywords
         'module'       { TOKEN(MODULE); }
@@ -250,7 +263,7 @@ yy::parser::symbol_type yy::yylex()
         // Comment
         "//"[^\r\n]*   { continue; }
 
-        *              { return yy::parser::symbol_type (in.cur[-1], loc); }
+        *              { return sinker::Parser::symbol_type (in.cur[-1], loc); }
         %}
     pattern_match:
         %{
@@ -261,7 +274,7 @@ yy::parser::symbol_type yy::yylex()
             if (*p != 0) TOKEN(YYerror);
             TOKENV(PATTERN_BYTE, { (std::uint8_t)n, 0xFF });
         }
-        '}' { return yy::parser::symbol_type ('}', loc); }
+        '}' { return sinker::Parser::symbol_type ('}', loc); }
 
         // Whitespace
         $              { TOKEN(END_OF_FILE); }
@@ -271,7 +284,7 @@ yy::parser::symbol_type yy::yylex()
         // Comment
         "//"[^\r\n]*   { continue; }
 
-        *              { return yy::parser::symbol_type (in.cur[-1], loc); }
+        *              { return sinker::Parser::symbol_type (in.cur[-1], loc); }
         %}
     source:
         %{
@@ -298,19 +311,17 @@ bool Context::interpret(std::istream& input_stream, Language language, std::stri
         if (!input_stream.read(buffer.data(), size)) return false;
         buffer.push_back('\0');
 
-        yy::location::filename_type filename(input_filename);
+        sinker::location::filename_type filename(input_filename);
 
-        loc = yy::location(&filename);
+        loc = sinker::location(&filename);
 
         in.cur = buffer.data();
         in.mar = buffer.data();
         in.lim = buffer.data() + size;
 
         in.mode = language;
-
-        first_loop = true;
-        in_pattern_match_expression = false;
-        yy::parser parser(this);
+        LexerState lexer_state;
+        sinker::Parser parser(this, &lexer_state);
         if (debug) {
             parser.set_debug_level(1);
         }
