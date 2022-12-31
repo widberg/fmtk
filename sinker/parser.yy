@@ -311,6 +311,7 @@ sinker::Parser::symbol_type sinker::yylex(LexerState *lexer_state)
 bool Context::interpret(char *input, unsigned int size, Language language, std::string input_filename, bool debug) {
         sinker::location::filename_type filename(input_filename);
 
+        // TODO: add this stuff to the lexer context
         loc = sinker::location(&filename);
 
         in.cur = input;
