@@ -30,8 +30,9 @@
 %token NAMESPACE "namespace"
 
 %type<std::string> IDENTIFIER
-%type<std::shared_ptr<pigeon::Type>> TYPE type
+%type<std::shared_ptr<Type>> TYPE type
 %type<std::vector<std::string>> enum_body
+%type<std::vector<StructMember>> struct_body
 
 %code requires
 {
@@ -53,6 +54,7 @@
     namespace pigeon {
         class Context;
         class Type;
+        struct StructMember;
     }
 }
 
@@ -174,6 +176,23 @@ namespace pigeon
         std::vector<std::string> values;
     };
 
+    struct StructMember
+    {
+        std::string name;
+        std::shared_ptr<Type> type;
+    };
+
+    
+    
+    class StructType : public Type
+    {
+    public:
+        StructType(std::vector<StructMember> const& members)
+            : members(members) {}
+    private:
+        std::vector<StructMember> members;
+    };
+
     class Context
     {
     public:
@@ -221,24 +240,24 @@ slist
     ;
 
 stmt
-    : "enum" IDENTIFIER docspec '{' enum_body '}' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new EnumType($5)));} ';'
-    | "struct" IDENTIFIER docspec '{' struct_body '}' ';'
-    | "use" type "as" IDENTIFIER docspec ';'
+    : "enum" IDENTIFIER docspec '{' enum_body '}' ';' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new EnumType($5)));}
+    | "struct" IDENTIFIER docspec '{' struct_body '}' ';' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new StructType($5)));}
+    | "use" type "as" IDENTIFIER docspec ';' {ctx->current_namespace->add_type($4, $2);}
     | "namespace" IDENTIFIER docspec { ctx->current_namespace = ctx->current_namespace->emplace_namespace($2); } '{' slist '}' { ctx->current_namespace = ctx->current_namespace->get_parent(); } ';'
     ;
 
 enum_body
-    : enum_body ',' IDENTIFIER docspec{ $1.push_back($3); $$ = $1; }
+    : enum_body ',' IDENTIFIER docspec { $1.push_back($3); $$ = $1; }
     | enum_body ',' { $$ = $1; }
     | IDENTIFIER docspec { $$ = std::vector<std::string>({$1}); }
     | %empty { $$ = std::vector<std::string>(); }
     ;
 
 struct_body
-    : struct_body ',' IDENTIFIER ':' type
-    | struct_body ','
-    | IDENTIFIER ':' type
-    | %empty
+    : struct_body ',' IDENTIFIER docspec ':' type { $1.push_back({$3, $6}); $$ = $1; }
+    | struct_body ',' { $$ = $1; }
+    | IDENTIFIER docspec ':' type { $$ = std::vector<StructMember>({{$1, $4}}); }
+    | %empty { $$ = std::vector<StructMember>(); }
     ;
 
 docspec
