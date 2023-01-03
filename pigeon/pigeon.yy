@@ -72,7 +72,7 @@ namespace pigeon
     class Namespace
     {
     public:
-        Namespace(std::string const& name, std::shared_ptr<Namespace> parent)
+        Namespace(std::string const& name, Namespace *parent)
             : name(name), parent(parent) {}
         Namespace(std::string const& name)
             : name(name), parent(nullptr) {}
@@ -85,9 +85,9 @@ namespace pigeon
                 }
             }
 
-            for (auto child : children)
+            if (parent)
             {
-                if (auto type = child->get_type(name))
+                if (auto type = parent->get_type(name))
                 {
                     return type;
                 }
@@ -101,23 +101,72 @@ namespace pigeon
             types.push_back({name, type});
         }
 
-        
-        std::shared_ptr<Namespace> emplace_namespace(std::string const& name)
+        void add_export(std::string const& name, std::shared_ptr<Type> type)
         {
-            children.emplace_back(std::make_shared<Namespace>(name), this);
+            exports.push_back({name, type});
+        }
+
+        
+        Namespace *emplace_namespace(std::string const& name)
+        {
+            children.emplace_back(new Namespace(name, this));
             return children.back();
         }
 
-        std::shared_ptr<Namespace> get_parent()
+        Namespace *get_parent()
         {
             return parent;
         }
 
+        std::string const& get_name()
+        {
+            return name;
+        }
+
+        void dump() const {
+            std::cout << name << "{\n";
+
+            for (auto type : types)
+            {
+                std::cout << type.first << '\n';
+            }
+            for (auto ekport : exports)
+            {
+                std::cout << ekport.first << '\n';
+            }
+
+            for (auto child : children)
+            {
+                child->dump();
+            }
+
+            std::cout << "}\n";
+        }
+
+        ~Namespace()
+        {
+            for (auto child : children)
+            {
+                delete child;
+            }
+        }
+
+        std::vector<Namespace*> const& get_children() const
+        {
+            return children;
+        }
+
+        std::vector<std::pair<std::string, std::shared_ptr<Type>>> const& get_types() const
+        {
+            return types;
+        }
+
     private:
         std::string name;
-        std::vector<std::shared_ptr<Namespace>> children;
-        std::shared_ptr<Namespace> parent;
+        std::vector<Namespace*> children;
+        Namespace *parent;
         std::vector<std::pair<std::string, std::shared_ptr<Type>>> types;
+        std::vector<std::pair<std::string, std::shared_ptr<Type>>> exports;
     };
 
     class Type
@@ -141,6 +190,7 @@ namespace pigeon
             F64,
             BOOL,
             HANDLE,
+            STRING,
         };
 
         PrimitiveType(Kind kind)
@@ -193,24 +243,35 @@ namespace pigeon
         std::vector<StructMember> members;
     };
 
+    class FunctionType : public Type
+    {
+    public:
+        FunctionType(std::vector<StructMember> const& parameters, std::vector<StructMember> const& returns)
+            : parameters(parameters), returns(returns) {}
+    private:
+        std::vector<StructMember> parameters;
+        std::vector<StructMember> returns;
+    };
+
     class Context
     {
     public:
         Context(std::string const& name)
-            : global(std::make_shared<Namespace>(name)), current_namespace(global)
+            : global(name), current_namespace(&global)
         {
-            global->add_type("u8", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::U8)));
-            global->add_type("u16", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::U16)));
-            global->add_type("u32", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::U32)));
-            global->add_type("u64", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::U64)));
-            global->add_type("i8", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::I8)));
-            global->add_type("i16", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::I16)));
-            global->add_type("i32", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::I32)));
-            global->add_type("i64", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::I64)));
-            global->add_type("f32", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::F32)));
-            global->add_type("f64", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::F64)));
-            global->add_type("bool", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::BOOL)));
-            global->add_type("handle", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::HANDLE)));
+            global.add_type("u8", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::U8)));
+            global.add_type("u16", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::U16)));
+            global.add_type("u32", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::U32)));
+            global.add_type("u64", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::U64)));
+            global.add_type("i8", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::I8)));
+            global.add_type("i16", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::I16)));
+            global.add_type("i32", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::I32)));
+            global.add_type("i64", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::I64)));
+            global.add_type("f32", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::F32)));
+            global.add_type("f64", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::F64)));
+            global.add_type("bool", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::BOOL)));
+            global.add_type("handle", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::HANDLE)));
+            global.add_type("string", std::shared_ptr<Type>((Type*)new PrimitiveType(PrimitiveType::Kind::STRING)));
         }
         bool interpret(char *input, unsigned int size, std::string input_filename, bool debug = false);
         bool interpret(std::istream& input_stream, std::string input_filename, bool debug);
@@ -218,8 +279,8 @@ namespace pigeon
         char *mar;
         char *lim;
         location loc;
-        std::shared_ptr<Namespace> global;
-        std::shared_ptr<Namespace> current_namespace;
+        Namespace global;
+        Namespace *current_namespace;
     };
 
 }
@@ -243,7 +304,8 @@ stmt
     : "enum" IDENTIFIER docspec '{' enum_body '}' ';' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new EnumType($5)));}
     | "struct" IDENTIFIER docspec '{' struct_body '}' ';' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new StructType($5)));}
     | "use" type "as" IDENTIFIER docspec ';' {ctx->current_namespace->add_type($4, $2);}
-    | "namespace" IDENTIFIER docspec { ctx->current_namespace = ctx->current_namespace->emplace_namespace($2); } '{' slist '}' { ctx->current_namespace = ctx->current_namespace->get_parent(); } ';'
+    | "namespace" IDENTIFIER docspec { ctx->current_namespace = ctx->current_namespace->emplace_namespace($2);} '{' slist '}' { ctx->current_namespace = ctx->current_namespace->get_parent();} ';'
+    | IDENTIFIER ':' type ';' {ctx->current_namespace->add_export($1, $3);}
     ;
 
 enum_body
@@ -254,9 +316,9 @@ enum_body
     ;
 
 struct_body
-    : struct_body ',' IDENTIFIER docspec ':' type { $1.push_back({$3, $6}); $$ = $1; }
+    : struct_body ',' IDENTIFIER ':' type docspec { $1.push_back({$3, $5}); $$ = $1; }
     | struct_body ',' { $$ = $1; }
-    | IDENTIFIER docspec ':' type { $$ = std::vector<StructMember>({{$1, $4}}); }
+    | IDENTIFIER ':' type docspec { $$ = std::vector<StructMember>({{$1, $3}}); }
     | %empty { $$ = std::vector<StructMember>(); }
     ;
 
@@ -268,9 +330,13 @@ docspec
 type
     : TYPE
     | '?' type
-    { $$ = std::shared_ptr<Type>((Type*)new pigeon::OptionalType($2)); }
+    { $$ = std::shared_ptr<Type>((Type*)new OptionalType($2)); }
     | type '[' ']'
-    { $$ = std::shared_ptr<Type>((Type*)new pigeon::ArrayType($1)); }
+    { $$ = std::shared_ptr<Type>((Type*)new ArrayType($1)); }
+    | '(' struct_body ')' '-' '>' '(' struct_body ')'
+    { $$ = std::shared_ptr<Type>((Type*)new FunctionType($2, $7)); }
+    | '(' type ')'
+    { $$ = $2; }
     ;
 
 %%
@@ -384,6 +450,8 @@ int main(int argc, char const *argv[])
     }
 
     std::cout << "Hello, World!\n";
+
+    context.global.dump();
 
     return 0;
 }
