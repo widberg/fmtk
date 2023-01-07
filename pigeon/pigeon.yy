@@ -32,7 +32,7 @@
 %type<std::string> IDENTIFIER
 %type<std::shared_ptr<Type>> TYPE type
 %type<std::vector<std::string>> enum_body
-%type<std::vector<StructMember>> struct_body
+%type<std::vector<Declaration>> declaration_list
 
 %code requires
 {
@@ -54,7 +54,7 @@
     namespace pigeon {
         class Context;
         class Type;
-        struct StructMember;
+        struct Declaration;
     }
 }
 
@@ -106,9 +106,25 @@ namespace pigeon
             exports.push_back({name, type});
         }
 
-        
-        Namespace *emplace_namespace(std::string const& name)
+        Namespace *get_child(std::string const& name)
         {
+            for (auto child : children)
+            {
+                if (name == child->get_name())
+                {
+                    return child;
+                }
+            }
+
+            return nullptr;
+        }
+
+        Namespace *get_or_add_namespace(std::string const& name)
+        {
+            if (auto child = get_child(name))
+            {
+                return child;
+            }
             children.emplace_back(new Namespace(name, this));
             return children.back();
         }
@@ -123,24 +139,27 @@ namespace pigeon
             return name;
         }
 
-        void dump() const {
-            std::cout << name << "{\n";
+        void dump(std::ostream& out) const {
+            std::string prefix;
+            for (Namespace *p = parent; p; p = p->get_parent())
+            {
+                prefix = p->get_name() + "_" + prefix;
+            }
 
             for (auto type : types)
             {
-                std::cout << type.first << '\n';
+                std::cout << prefix << type.first << '\n';
             }
+
             for (auto ekport : exports)
             {
-                std::cout << ekport.first << '\n';
+                std::cout << prefix << ekport.first << '\n';
             }
 
             for (auto child : children)
             {
-                child->dump();
+                child->dump(out);
             }
-
-            std::cout << "}\n";
         }
 
         ~Namespace()
@@ -169,8 +188,16 @@ namespace pigeon
         std::vector<std::pair<std::string, std::shared_ptr<Type>>> exports;
     };
 
-    class Type
+    class CType
     {
+    public:
+        virtual std::string declaration(std::string const& variable_name) = 0;
+    };
+
+    class Type : public CType
+    {
+    public:
+        virtual std::string declaration(std::string const& variable_name) override = 0;
     };
     
     class PrimitiveType : public Type
@@ -195,6 +222,55 @@ namespace pigeon
 
         PrimitiveType(Kind kind)
             : kind(kind) {}
+        
+        virtual std::string declaration(std::string const& variable_name) override
+        {
+            std::string declaration;
+            switch (kind)
+            {
+            case Kind::U8:
+                declaration = "uint8_t ";
+                break;
+            case Kind::U16:
+                declaration = "uint16_t ";
+                break;
+            case Kind::U32:
+                declaration = "uint32_t ";
+                break;
+            case Kind::U64:
+                declaration = "uint64_t ";
+                break;
+            case Kind::I8:
+                declaration = "int8_t ";
+                break;
+            case Kind::I16:
+                declaration = "int16_t ";
+                break;
+            case Kind::I32:
+                declaration = "int32_t ";
+                break;
+            case Kind::I64:
+                declaration = "int64_t ";
+                break;
+            case Kind::F32:
+                declaration = "float ";
+                break;
+            case Kind::F64:
+                declaration = "double ";
+                break;
+            case Kind::BOOL:
+                declaration = "bool ";
+                break;
+            case Kind::HANDLE:
+                declaration = "void *";
+                break;
+            case Kind::STRING:
+                declaration = "char const *";
+                break;
+            }
+
+            return declaration + variable_name;
+        }
     private:
         Kind kind;
     };
@@ -204,6 +280,11 @@ namespace pigeon
     public:
         OptionalType(std::shared_ptr<Type> type)
             : type(type) {}
+        
+        virtual std::string declaration(std::string const& variable_name) override
+        {
+            return type->declaration("*" + variable_name);
+        }
     private:
         std::shared_ptr<Type> type;
     };
@@ -213,6 +294,11 @@ namespace pigeon
     public:
         ArrayType(std::shared_ptr<Type> type)
             : type(type) {}
+        
+        virtual std::string declaration(std::string const& variable_name) override
+        {
+            return type->declaration(variable_name + "[]");
+        }
     private:
         std::shared_ptr<Type> type;
     };
@@ -220,13 +306,19 @@ namespace pigeon
     class EnumType : public Type
     {
     public:
-        EnumType(std::vector<std::string> const& values)
-            : values(values) {}
+        EnumType(std::string const& name, std::vector<std::string> const& values)
+            : name(name), values(values) {}
+        
+        virtual std::string declaration(std::string const& variable_name) override
+        {
+            return name + "_t " + variable_name;
+        }
     private:
+        std::string name;
         std::vector<std::string> values;
     };
 
-    struct StructMember
+    struct Declaration
     {
         std::string name;
         std::shared_ptr<Type> type;
@@ -237,20 +329,56 @@ namespace pigeon
     class StructType : public Type
     {
     public:
-        StructType(std::vector<StructMember> const& members)
-            : members(members) {}
+        StructType(std::string const& name, std::vector<Declaration> const& members)
+            : name(name), members(members) {}
+        
+        virtual std::string declaration(std::string const& variable_name) override
+        {
+            return name + "_t " + variable_name;
+        }
     private:
-        std::vector<StructMember> members;
+        std::string name;
+        std::vector<Declaration> members;
     };
 
     class FunctionType : public Type
     {
     public:
-        FunctionType(std::vector<StructMember> const& parameters, std::vector<StructMember> const& returns)
+        FunctionType(std::vector<Declaration> const& parameters, std::vector<Declaration> const& returns)
             : parameters(parameters), returns(returns) {}
+        
+        virtual std::string declaration(std::string const& variable_name) override
+        {
+            // TODO: Generate something that makes sense here in regards to multiple return values
+            std::string out;
+
+            if (returns.size() == 0)
+            {
+                out += "void ";
+            } else {
+                out += returns[0].type->declaration("");
+            }
+            out += "(*" + variable_name + ")(";
+            
+            if (parameters.size() == 0)
+            {
+                out += "void";
+            } else {
+                for (auto parameter : parameters)
+                {
+                    out += parameter.type->declaration(parameter.name) + ", ";
+                }
+                out.pop_back();
+                out.pop_back();
+            }
+            
+            out += ")";
+
+            return out;
+        }
     private:
-        std::vector<StructMember> parameters;
-        std::vector<StructMember> returns;
+        std::vector<Declaration> parameters;
+        std::vector<Declaration> returns;
     };
 
     class Context
@@ -281,15 +409,19 @@ namespace pigeon
         location loc;
         Namespace global;
         Namespace *current_namespace;
+
+        void dump(std::ostream& out) const
+        {
+            out << "#include <stdint.h>\n";
+
+            out << "\n";
+        }
     };
 
 }
 
 
 }
-
-%right '['
-%right '?'
 
 %start slist
 
@@ -301,10 +433,10 @@ slist
     ;
 
 stmt
-    : "enum" IDENTIFIER docspec '{' enum_body '}' ';' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new EnumType($5)));}
-    | "struct" IDENTIFIER docspec '{' struct_body '}' ';' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new StructType($5)));}
+    : "enum" IDENTIFIER docspec '{' enum_body '}' ';' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new EnumType($2, $5)));}
+    | "struct" IDENTIFIER docspec '{' declaration_list '}' ';' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new StructType($2, $5)));}
     | "use" type "as" IDENTIFIER docspec ';' {ctx->current_namespace->add_type($4, $2);}
-    | "namespace" IDENTIFIER docspec { ctx->current_namespace = ctx->current_namespace->emplace_namespace($2);} '{' slist '}' { ctx->current_namespace = ctx->current_namespace->get_parent();} ';'
+    | "namespace" IDENTIFIER docspec { ctx->current_namespace = ctx->current_namespace->get_or_add_namespace($2);} '{' slist '}' { ctx->current_namespace = ctx->current_namespace->get_parent();} ';'
     | IDENTIFIER ':' type ';' {ctx->current_namespace->add_export($1, $3);}
     ;
 
@@ -315,11 +447,11 @@ enum_body
     | %empty { $$ = std::vector<std::string>(); }
     ;
 
-struct_body
-    : struct_body ',' IDENTIFIER ':' type docspec { $1.push_back({$3, $5}); $$ = $1; }
-    | struct_body ',' { $$ = $1; }
-    | IDENTIFIER ':' type docspec { $$ = std::vector<StructMember>({{$1, $3}}); }
-    | %empty { $$ = std::vector<StructMember>(); }
+declaration_list
+    : declaration_list ',' IDENTIFIER ':' type docspec { $1.push_back({$3, $5}); $$ = $1; }
+    | declaration_list ',' { $$ = $1; }
+    | IDENTIFIER ':' type docspec { $$ = std::vector<Declaration>({{$1, $3}}); }
+    | %empty { $$ = std::vector<Declaration>(); }
     ;
 
 docspec
@@ -329,14 +461,12 @@ docspec
 
 type
     : TYPE
-    | '?' type
-    { $$ = std::shared_ptr<Type>((Type*)new OptionalType($2)); }
+    | type '?'
+    { $$ = std::shared_ptr<Type>((Type*)new OptionalType($1)); }
     | type '[' ']'
     { $$ = std::shared_ptr<Type>((Type*)new ArrayType($1)); }
-    | '(' struct_body ')' '-' '>' '(' struct_body ')'
+    | '(' declaration_list ')' '-' '>' '(' declaration_list ')'
     { $$ = std::shared_ptr<Type>((Type*)new FunctionType($2, $7)); }
-    | '(' type ')'
-    { $$ = $2; }
     ;
 
 %%
@@ -451,7 +581,7 @@ int main(int argc, char const *argv[])
 
     std::cout << "Hello, World!\n";
 
-    context.global.dump();
+    context.dump(std::cout);
 
     return 0;
 }
