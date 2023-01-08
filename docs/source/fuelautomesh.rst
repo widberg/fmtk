@@ -6,7 +6,7 @@ AutoMesh
 Properties
 ----------
 
-
+Properties can be either boolean or numeric. A boolean property is true if it is included and false if it is excluded. A numeric property has a value of the integer concatenated with it after the property name.
 
 Boolean
 -------
@@ -213,7 +213,7 @@ OnTerraMiddleMin
 // OnTerra = 1;
 // v25 = 2;
 
-Limits
-------
+Limitations
+-----------
 
-Max 512 + 1 chars for token. max 17 tokens, 1 ADDMESH:, 1 mesh name, 15 properties.
+Max 512 chars + 1 null terminator for token. Max 17 tokens, 1 ADDMESH:, 1 mesh name, 15 properties.

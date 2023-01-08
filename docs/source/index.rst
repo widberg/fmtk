@@ -14,6 +14,7 @@ Welcome to FMTK's documentation!
    fuelcontrolcodes
    fuelgameparam
    fuelvehicleparam
+   fuelautomesh
 
 .. toctree::
    :maxdepth: 2
