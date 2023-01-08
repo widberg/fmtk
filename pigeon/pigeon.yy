@@ -69,7 +69,369 @@ namespace pigeon
 {
     Parser::symbol_type yylex(Context *context);
 
-    class Namespace
+    class DumpC
+    {
+        virtual void dump_c(std::ostream& out) const = 0;
+    };
+
+    class CType
+    {
+    public:
+        virtual std::string declaration(std::string const& variable_name) const = 0;
+        virtual std::string type_definition(std::string const& type_name) const = 0;
+        virtual bool can_return() const = 0;
+        virtual bool by_reference() const = 0;
+
+    };
+
+    class Type : public CType
+    {
+    public:
+        virtual std::string declaration(std::string const& variable_name) const override = 0;
+        virtual std::string type_definition(std::string const& type_name) const = 0;
+        virtual bool can_return() const override = 0;
+        virtual bool by_reference() const override = 0;
+    };
+    
+    class PrimitiveType : public Type
+    {
+    public:
+        enum class Kind
+        {
+            U8,
+            U16,
+            U32,
+            U64,
+            I8,
+            I16,
+            I32,
+            I64,
+            F32,
+            F64,
+            BOOL,
+            HANDLE,
+            STRING,
+        };
+
+        PrimitiveType(Kind kind)
+            : kind(kind) {}
+        
+        virtual std::string declaration(std::string const& variable_name) const override
+        {
+            std::string declaration;
+            switch (kind)
+            {
+            case Kind::U8:
+                declaration = "uint8_t ";
+                break;
+            case Kind::U16:
+                declaration = "uint16_t ";
+                break;
+            case Kind::U32:
+                declaration = "uint32_t ";
+                break;
+            case Kind::U64:
+                declaration = "uint64_t ";
+                break;
+            case Kind::I8:
+                declaration = "int8_t ";
+                break;
+            case Kind::I16:
+                declaration = "int16_t ";
+                break;
+            case Kind::I32:
+                declaration = "int32_t ";
+                break;
+            case Kind::I64:
+                declaration = "int64_t ";
+                break;
+            case Kind::F32:
+                declaration = "float ";
+                break;
+            case Kind::F64:
+                declaration = "double ";
+                break;
+            case Kind::BOOL:
+                declaration = "bool ";
+                break;
+            case Kind::HANDLE:
+                declaration = "void *";
+                break;
+            case Kind::STRING:
+                declaration = "char const *";
+                break;
+            }
+
+            return declaration + variable_name;
+        }
+
+        std::string type_definition(std::string const& type_name) const
+        {
+            /* return "typedef " + declaration(type_name) + ";"; */
+            return "";
+        }
+
+        bool can_return() const override
+        {
+            return true;
+        }
+        bool by_reference() const override
+        {
+            return false;
+        }
+    private:
+        Kind kind;
+    };
+
+    class TypeDefType : public Type
+    {
+    public:
+        TypeDefType(std::shared_ptr<Type> type, std::string const& name)
+            : type(type), name(name) {}
+        
+        virtual std::string declaration(std::string const& variable_name) const override
+        {
+            return type->declaration(variable_name);
+        }
+
+        std::string type_definition(std::string const& type_name) const
+        {
+            return "typedef " + name + " " + type_name + ";\n";
+        }
+
+        bool can_return() const override
+        {
+            return type->can_return();
+        }
+        bool by_reference() const override
+        {
+            return type->by_reference();
+        }
+    private:
+        std::shared_ptr<Type> type;
+        std::string name;
+    };
+
+    class OptionalType : public Type
+    {
+    public:
+        OptionalType(std::shared_ptr<Type> type)
+            : type(type) {}
+        
+        virtual std::string declaration(std::string const& variable_name) const override
+        {
+            return type->declaration("*" + variable_name);
+        }
+
+        std::string type_definition(std::string const& type_name) const
+        {
+            return "typedef " + declaration(type_name) + ";\n";
+        }
+
+        bool can_return() const override
+        {
+            return false;
+        }
+        bool by_reference() const override
+        {
+            return type->by_reference();
+        }
+    private:
+        std::shared_ptr<Type> type;
+    };
+
+    class ArrayType : public Type
+    {
+    public:
+        ArrayType(std::shared_ptr<Type> type)
+            : type(type) {}
+        
+        virtual std::string declaration(std::string const& variable_name) const override
+        {
+            return type->declaration(variable_name + "[]");
+        }
+
+        std::string type_definition(std::string const& type_name) const override
+        {
+            return "typedef " + declaration(type_name) + ";\n";
+        }
+
+        bool can_return() const override
+        {
+            return false;
+        }
+        bool by_reference() const override
+        {
+            return true;
+        }
+    private:
+        std::shared_ptr<Type> type;
+    };
+    
+    class EnumType : public Type
+    {
+    public:
+        EnumType(std::string const& name, std::vector<std::string> const& values)
+            : name(name), values(values) {}
+        
+        virtual std::string declaration(std::string const& variable_name) const override
+        {
+            return name + "_t " + variable_name;
+        }
+
+        std::string type_definition(std::string const& type_name) const
+        {
+            std::string out;
+
+            out += "typedef enum " + type_name + "\n{\n";
+
+            for (std::string value : values)
+            {
+                out += value + ",\n";
+            }
+
+            out += "} " + type_name + "_t;\n";
+            return out;
+        }
+
+        bool can_return() const override
+        {
+            return true;
+        }
+        bool by_reference() const override
+        {
+            return false;
+        }
+    private:
+        std::string name;
+        std::vector<std::string> values;
+    };
+
+    struct Declaration
+    {
+        std::string name;
+        std::shared_ptr<Type> type;
+    };
+    
+    class StructType : public Type
+    {
+    public:
+        StructType(std::string const& name, std::vector<Declaration> const& members)
+            : name(name), members(members) {}
+        
+        virtual std::string declaration(std::string const& variable_name) const override
+        {
+            return name + "_t *" + variable_name;
+        }
+
+        std::string type_definition(std::string const& type_name) const
+        {
+            std::string out;
+
+            out += "typedef struct " + type_name + "\n{\n";
+
+            for (Declaration member : members)
+            {
+                out += member.type->declaration(member.name) + ";\n";
+            }
+
+            out += "} " + type_name + "_t;\n";
+            return out;
+        }
+
+        bool can_return() const override
+        {
+            return false;
+        }
+        bool by_reference() const override
+        {
+            return true;
+        }
+    private:
+        std::string name;
+        std::vector<Declaration> members;
+    };
+
+    class FunctionType : public Type
+    {
+    public:
+        FunctionType(std::vector<Declaration> const& parameters, std::vector<Declaration> const& returns)
+            : parameters(parameters), returns(returns) {}
+        
+        virtual std::string declaration(std::string const& variable_name) const override
+        {
+            // TODO: Generate something that makes sense here in regards to multiple return values
+            std::string out;
+
+            if (returns.size() == 0 || (!returns[0].type->can_return() && returns.size() == 1))
+            {
+                out += "void ";
+            } else {
+                out += returns[0].type->declaration("");
+            }
+            out += "(*" + variable_name + ")(";
+            
+            bool has_parameters = false;
+
+            for (auto parameter : parameters)
+            {
+                out += parameter.type->declaration(parameter.name) + ", ";
+
+                has_parameters = true;
+            }
+
+            if (returns.size() > 0 && (!returns[0].type->can_return() || returns.size() > 1))
+            {
+                for (std::size_t i = (int)returns[0].type->can_return(); i < returns.size(); ++i)
+                {
+                    if (!returns[i].type->by_reference())
+                    {
+                        out += returns[i].type->declaration("*" + returns[i].name) + ", ";
+                    }
+                    else
+                    {
+                        out += returns[i].type->declaration(returns[i].name) + ", ";
+                    }
+                }
+
+                has_parameters = true;
+            }
+
+            if (has_parameters)
+            {
+                out.pop_back();
+                out.pop_back();
+            }
+            else
+            {
+                out += "void";
+            }
+
+            out += ")";
+
+            return out;
+        }
+
+        std::string type_definition(std::string const& type_name) const
+        {
+            return "typedef " + declaration(type_name) + ";\n";
+        }
+
+        bool can_return() const override
+        {
+            return true;
+        }
+        bool by_reference() const override
+        {
+            return true;
+        }
+    private:
+        std::vector<Declaration> parameters;
+        std::vector<Declaration> returns;
+    };
+
+    
+    class Namespace : public DumpC
     {
     public:
         Namespace(std::string const& name, Namespace *parent)
@@ -134,7 +496,7 @@ namespace pigeon
             return parent;
         }
 
-        std::string const& get_name()
+        std::string const& get_name() const
         {
             return name;
         }
@@ -180,6 +542,44 @@ namespace pigeon
             return types;
         }
 
+        void dump_c(std::ostream& out) const
+        {
+            if (parent)
+            {
+                out << "struct" << "\n{\n";
+
+            }
+            else
+            {
+                out << "typedef struct " << name << "_api\n{\n";
+            }
+        
+            for (auto type : types)
+            {
+                out << type.second->type_definition(type.first);
+            }
+
+            for (auto eksport : exports)
+            {
+                out << eksport.second->declaration(eksport.first) << ";\n\n";
+            }
+
+            for (Namespace *child : children)
+            {
+                child->dump_c(out);
+                out << "\n";
+            }
+
+            if (parent)
+            {
+                out << "} *" << name << ";\n";
+            }
+            else
+            {
+                out << "} " << name << "_api_t;\n";
+            }
+        }
+
     private:
         std::string name;
         std::vector<Namespace*> children;
@@ -188,200 +588,7 @@ namespace pigeon
         std::vector<std::pair<std::string, std::shared_ptr<Type>>> exports;
     };
 
-    class CType
-    {
-    public:
-        virtual std::string declaration(std::string const& variable_name) = 0;
-    };
-
-    class Type : public CType
-    {
-    public:
-        virtual std::string declaration(std::string const& variable_name) override = 0;
-    };
-    
-    class PrimitiveType : public Type
-    {
-    public:
-        enum class Kind
-        {
-            U8,
-            U16,
-            U32,
-            U64,
-            I8,
-            I16,
-            I32,
-            I64,
-            F32,
-            F64,
-            BOOL,
-            HANDLE,
-            STRING,
-        };
-
-        PrimitiveType(Kind kind)
-            : kind(kind) {}
-        
-        virtual std::string declaration(std::string const& variable_name) override
-        {
-            std::string declaration;
-            switch (kind)
-            {
-            case Kind::U8:
-                declaration = "uint8_t ";
-                break;
-            case Kind::U16:
-                declaration = "uint16_t ";
-                break;
-            case Kind::U32:
-                declaration = "uint32_t ";
-                break;
-            case Kind::U64:
-                declaration = "uint64_t ";
-                break;
-            case Kind::I8:
-                declaration = "int8_t ";
-                break;
-            case Kind::I16:
-                declaration = "int16_t ";
-                break;
-            case Kind::I32:
-                declaration = "int32_t ";
-                break;
-            case Kind::I64:
-                declaration = "int64_t ";
-                break;
-            case Kind::F32:
-                declaration = "float ";
-                break;
-            case Kind::F64:
-                declaration = "double ";
-                break;
-            case Kind::BOOL:
-                declaration = "bool ";
-                break;
-            case Kind::HANDLE:
-                declaration = "void *";
-                break;
-            case Kind::STRING:
-                declaration = "char const *";
-                break;
-            }
-
-            return declaration + variable_name;
-        }
-    private:
-        Kind kind;
-    };
-
-    class OptionalType : public Type
-    {
-    public:
-        OptionalType(std::shared_ptr<Type> type)
-            : type(type) {}
-        
-        virtual std::string declaration(std::string const& variable_name) override
-        {
-            return type->declaration("*" + variable_name);
-        }
-    private:
-        std::shared_ptr<Type> type;
-    };
-
-    class ArrayType : public Type
-    {
-    public:
-        ArrayType(std::shared_ptr<Type> type)
-            : type(type) {}
-        
-        virtual std::string declaration(std::string const& variable_name) override
-        {
-            return type->declaration(variable_name + "[]");
-        }
-    private:
-        std::shared_ptr<Type> type;
-    };
-    
-    class EnumType : public Type
-    {
-    public:
-        EnumType(std::string const& name, std::vector<std::string> const& values)
-            : name(name), values(values) {}
-        
-        virtual std::string declaration(std::string const& variable_name) override
-        {
-            return name + "_t " + variable_name;
-        }
-    private:
-        std::string name;
-        std::vector<std::string> values;
-    };
-
-    struct Declaration
-    {
-        std::string name;
-        std::shared_ptr<Type> type;
-    };
-
-    
-    
-    class StructType : public Type
-    {
-    public:
-        StructType(std::string const& name, std::vector<Declaration> const& members)
-            : name(name), members(members) {}
-        
-        virtual std::string declaration(std::string const& variable_name) override
-        {
-            return name + "_t " + variable_name;
-        }
-    private:
-        std::string name;
-        std::vector<Declaration> members;
-    };
-
-    class FunctionType : public Type
-    {
-    public:
-        FunctionType(std::vector<Declaration> const& parameters, std::vector<Declaration> const& returns)
-            : parameters(parameters), returns(returns) {}
-        
-        virtual std::string declaration(std::string const& variable_name) override
-        {
-            // TODO: Generate something that makes sense here in regards to multiple return values
-            std::string out;
-
-            if (returns.size() == 0)
-            {
-                out += "void ";
-            } else {
-                out += returns[0].type->declaration("");
-            }
-            out += "(*" + variable_name + ")(";
-            
-            if (parameters.size() == 0)
-            {
-                out += "void";
-            } else {
-                for (auto parameter : parameters)
-                {
-                    out += parameter.type->declaration(parameter.name) + ", ";
-                }
-                out.pop_back();
-                out.pop_back();
-            }
-            
-            out += ")";
-
-            return out;
-        }
-    private:
-        std::vector<Declaration> parameters;
-        std::vector<Declaration> returns;
-    };
-
-    class Context
+    class Context : public DumpC
     {
     public:
         Context(std::string const& name)
@@ -410,11 +617,23 @@ namespace pigeon
         Namespace global;
         Namespace *current_namespace;
 
-        void dump(std::ostream& out) const
+        void dump_c(std::ostream& out) const
         {
-            out << "#include <stdint.h>\n";
+            out << "#ifndef " << global.get_name() << "_H\n";
+            out << "#define " << global.get_name() << "_H\n";
+            out << "#ifdef __cplusplus\n";
+            out << "extern \"C\"\n";
+            out << "{\n";
+            out << "#endif // __cplusplus\n\n";
+            out << "#include <stdint.h>\n\n";
+            out << "#define " << global.get_name() << "API extern \"C\" __declspec(dllexport) __declspec(noinline)\n\n";
 
-            out << "\n";
+            global.dump_c(out);
+
+            out << "\n#ifdef __cplusplus\n";
+            out << "}\n";
+            out << "#endif // __cplusplus\n";
+            out << "#endif // !" << global.get_name() << "_H\n";
         }
     };
 
@@ -435,7 +654,7 @@ slist
 stmt
     : "enum" IDENTIFIER docspec '{' enum_body '}' ';' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new EnumType($2, $5)));}
     | "struct" IDENTIFIER docspec '{' declaration_list '}' ';' { ctx->current_namespace->add_type($2, std::shared_ptr<Type>((Type*)new StructType($2, $5)));}
-    | "use" type "as" IDENTIFIER docspec ';' {ctx->current_namespace->add_type($4, $2);}
+    | "use" type "as" IDENTIFIER docspec ';' {ctx->current_namespace->add_type($4, std::shared_ptr<Type>((Type*)new TypeDefType($2, $4)));}
     | "namespace" IDENTIFIER docspec { ctx->current_namespace = ctx->current_namespace->get_or_add_namespace($2);} '{' slist '}' { ctx->current_namespace = ctx->current_namespace->get_parent();} ';'
     | IDENTIFIER ':' type ';' {ctx->current_namespace->add_export($1, $3);}
     ;
@@ -560,17 +779,19 @@ bool pigeon::Context::interpret(std::istream& input_stream, std::string input_fi
 int main(int argc, char const *argv[])
 {
     CLI::App app{"Pigeon"};
+    std::string global_namespace_name;
     std::string output_filename;
     std::vector<std::string> input_filenames;
     bool debug = false;
+    app.add_option("-g,--global", global_namespace_name, "Global namespace name")->required();
     app.add_option("-o,--output", output_filename, "Output file");
     app.add_option("input_files", input_filenames, "Input files");
-    app.add_flag("--debug,!--no-debug", debug, "Input files");
+    app.add_flag("--debug,!--no-debug", debug, "Debug");
 
 
     CLI11_PARSE(app, argc, argv);
 
-    pigeon::Context context("test");
+    pigeon::Context context(global_namespace_name);
 
     for (auto input_filename : input_filenames)
     {
@@ -579,9 +800,7 @@ int main(int argc, char const *argv[])
         if (!context.interpret(file, input_filename, debug)) return 1;
     }
 
-    std::cout << "Hello, World!\n";
-
-    context.dump(std::cout);
+    context.dump_c(std::cout);
 
     return 0;
 }

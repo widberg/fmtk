@@ -1,6 +1,3 @@
-
-
-
 add_executable(pigeon
 	pigeon.cpp
 	pigeon.yy
@@ -18,6 +15,7 @@ add_custom_command(
 include(cmake/add_pigeon_target.cmake)
 
 add_pigeon_target(pig
+	GLOBAL pig
 	INPUT ${CMAKE_BINARY_DIR}/test.api
 	OUTPUT ${CMAKE_BINARY_DIR}/out.h
 )
