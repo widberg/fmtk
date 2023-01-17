@@ -1,7 +1,6 @@
 #ifndef SINKER_HPP
 #define SINKER_HPP
 
-#include <format>
 #include <map>
 #include <set>
 #include <variant>

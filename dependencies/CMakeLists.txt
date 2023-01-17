@@ -13,6 +13,9 @@ add_subdirectory(hashlibpp)
 # LuaJIT
 add_subdirectory(luajit)
 
+# re2c
+add_subdirectory(re2c)
+
 # sol2
 add_subdirectory(sol2)
 
@@ -28,3 +31,6 @@ SET(USERCALL_HPP_CHECK_RETURN           ON CACHE BOOL "")
 SET(USERCALL_HPP_USE_HEXRAYS_DEFS       ON CACHE BOOL "")
 SET(USERCALL_HPP_USE_REALLY_SHORT_NAMES ON CACHE BOOL "")
 add_subdirectory(usercall.hpp)
+
+# winflexbison
+add_subdirectory(winflexbison)

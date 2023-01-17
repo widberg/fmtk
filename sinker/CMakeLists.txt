@@ -3,17 +3,16 @@ add_library(sinker STATIC
 	sinker.hpp
 	sinker.tpp
 	parser.yy
-	parser.cpp  # Let's check this into vc so that re2c and bison aren't required dependencies.
-				# I know codegen'd files shouldn't get checked in but re2c and bison are a pain
-				# to setup on windows.
+	${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
 )
+target_include_directories(sinker PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_dependencies(sinker win_bison re2c)
 
 add_custom_command(
-	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re ${CMAKE_CURRENT_SOURCE_DIR}/parser.cpp
-	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/parser.yy -o ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re -Wcounterexamples
-	COMMAND re2c ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re -o ${CMAKE_CURRENT_SOURCE_DIR}/parser.cpp --no-debug-info
-	DEPENDS parser.yy
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
+	COMMAND $<TARGET_FILE:win_bison> ${CMAKE_CURRENT_SOURCE_DIR}/parser.yy -o ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re -Wcounterexamples
+	COMMAND $<TARGET_FILE:re2c> ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re -o ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp --no-debug-info
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/parser.yy
 )
 
 add_executable(sinkerc

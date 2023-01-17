@@ -26,7 +26,6 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
-#include <format>
 #include <istream>
 
 #include "sinker.hpp"

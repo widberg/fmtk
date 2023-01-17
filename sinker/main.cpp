@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
-#include <format>
 #include <istream>
 #include <CLI/CLI.hpp>
 
