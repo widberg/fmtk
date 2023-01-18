@@ -16,14 +16,14 @@
 #include "debug.hpp"
 #include "logging.hpp"
 
-constexpr const char* FMTK_TOML_PATH = "mods/fmtk/fmtk.toml";
+constexpr const char* FMTK_TOML_PATH = "fmtk.toml";
 
 void LogLastError();
 bool FirstTimeSetup();
 
 int main(int argc, char** argv)
 {
-    LOG_INIT();
+    LOG_INIT("fmtk.log");
 
     if (!std::filesystem::exists(FMTK_TOML_PATH))
     {
@@ -44,41 +44,17 @@ int main(int argc, char** argv)
         return -2;
     }
 
-    std::optional<std::wstring> secuLauncherPath = tbl["fmtk"]["secu_launcher"].value<std::wstring>();
-    if (!secuLauncherPath.has_value())
-    {
-        LOG(error, FMTK, "No SecuLauncher path in toml");
-        return -3;
-    }
-
     std::wstring arguments;
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
     for (int i = 1; i < argc; ++i)
     {
-        arguments += L'\"' + conv.from_bytes(argv[1]) + L"\" ";
+        arguments += L'\"' + conv.from_bytes(argv[i]) + L"\" ";
     }
 
     std::optional<std::wstring> toml_args = tbl["fmtk"]["args"].value<std::wstring>();
     if (toml_args.has_value())
     {
         arguments += toml_args.value();
-    }
-
-    std::optional<std::string> modsPath = tbl["fmtk"]["mods_directory"].value<std::string>();
-    if (!modsPath.has_value())
-    {
-        LOG(error, FMTK, "No mods directory path in toml");
-        return -4;
-    }
-
-    try
-    {
-        std::filesystem::create_directories(modsPath.value());
-    }
-    catch (const std::exception& e)
-    {
-        LOG(error, FMTK, "{}", e.what());
-        return -5;
     }
 
     STARTUPINFOW si;
@@ -92,18 +68,20 @@ int main(int argc, char** argv)
 
     std::wstringstream ss;
 
-    ss << L'\"' << secuLauncherPath.value() << L"\" " << arguments;
+    ss << L"\"../../SecuLauncher.exe\" " << arguments;
 
     std::vector<wchar_t> buf;
     buf.resize(ss.str().size() + 1);
     ss.str().copy(buf.data(), ss.str().size());
     buf.back() = L'\0';
 
+    LOG(info, FMTK, "{}", std::filesystem::absolute("../..").string());
+
     if (!DetourCreateProcessWithDllExW(NULL, buf.data(),
         NULL, NULL, TRUE, dwFlags, NULL,
-        NULL, &si, &pi, "mods/fmtk/secudll.dll", NULL))
+        std::filesystem::absolute("../..").wstring().c_str(), &si, &pi, "mods/fmtk/secudll.dll", NULL))
     {
-        LOG(error, FMTK, "DetourCreateProcessWithDllEx failed: %ld\n", GetLastError());
+        LOG(error, FMTK, "DetourCreateProcessWithDllEx failed: {}\n", GetLastError());
         LogLastError();
         return 9009;
     }
@@ -150,46 +128,8 @@ bool FirstTimeSetup()
     LOG(info, FMTK, "Performing first time setup");
 
     bool success = true;
-
-    std::wstring fuelExecutablePath;
-    if (std::filesystem::exists("FUEL.exe"))
-    {
-        fuelExecutablePath = L"FUEL.exe";
-    }
-    else
-    {
-        LOG(error, FMTK, "Could not locate the FUEL executable. Please edit fmtk.toml.");
-        success = false;
-    }
-
-    std::wstring gameSetupExecutablePath;
-    if (std::filesystem::exists("GameSetup.exe"))
-    {
-        gameSetupExecutablePath = L"GameSetup.exe";
-    }
-    else
-    {
-        LOG(error, FMTK, "Could not locate the GameSetup executable. Please edit fmtk.toml.");
-        success = false;
-    }
-
-    std::wstring secuLauncherPath;
-    if (std::filesystem::exists("SecuLauncher.exe"))
-    {
-        secuLauncherPath = L"SecuLauncher.exe";
-    }
-    else
-    {
-        LOG(error, FMTK, "Could not locate the SecuLauncher executable. Please edit fmtk.toml.");
-        success = false;
-    }
-
     auto tbl = toml::table{{
        { "fmtk", toml::table{{
-               { "fuel", fuelExecutablePath },
-               { "game_setup", gameSetupExecutablePath },
-               { "secu_launcher", secuLauncherPath },
-               { "mods_directory", "mods" },
                { "args", toml::array{} },
            }}
        },

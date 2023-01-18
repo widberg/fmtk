@@ -195,7 +195,7 @@ BOOL ProcessAttach(HMODULE hDll)
         AllocConsole();
     }
 
-    LOG_INIT();
+    LOG_INIT("mods/fmtk/fmtk.log");
     LOG(trace, FMTK, "Attaching to FUEL");
 
     LONG error = AttachDetours();
@@ -217,18 +217,13 @@ BOOL ProcessAttach(HMODULE hDll)
         return -2;
     }
 
-    std::optional<std::wstring> modsDirectoryPath = tbl["fmtk"]["mods_directory"].value<std::wstring>();
-    if (!modsDirectoryPath.has_value())
-    {
-        LOG(error, FMTK, "No mods directory in toml");
-        return FALSE;
-    }
+    std::wstring modsDirectoryPath = L"mods";
 
-    fmtkModsDirectoryPath = (std::filesystem::absolute(modsDirectoryPath.value()) / "").string();
+    fmtkModsDirectoryPath = (std::filesystem::absolute(modsDirectoryPath) / "").string();
 
-    SetDllDirectory((modsDirectoryPath.value() + L"\\path").c_str());
+    SetDllDirectory((modsDirectoryPath + L"\\path").c_str());
 
-    loadModsDirectory(modsDirectoryPath.value() + L"\\native");
+    loadModsDirectory(modsDirectoryPath + L"\\native");
 
     return TRUE;
 }

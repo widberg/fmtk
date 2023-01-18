@@ -9,7 +9,7 @@ if (FUEL_FOUND)
 	add_custom_target(run
 		COMMAND ${CMAKE_COMMAND} -E copy_directory  "${CMAKE_BINARY_DIR}/mods" "${FUEL_DIR}/mods"
 		COMMAND $<TARGET_FILE:fmtk>
-		WORKING_DIRECTORY "${FUEL_DIR}"
+		WORKING_DIRECTORY "${FUEL_DIR}/mods/fmtk"
 		DEPENDS package_fmtk
 	)
 endif()
