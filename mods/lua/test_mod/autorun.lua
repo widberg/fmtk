@@ -16,7 +16,7 @@ end)
 
 local bbb = false;
 fmtk.hook(fmtk.event.TICK, "test_mod_tick", function()
-	if ~bbb then
+	if not bbb then
 		fmtk.run_command("DisableMOvie")
 		bbb = true
 	end

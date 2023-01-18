@@ -13,10 +13,19 @@ if (FUEL_FOUND)
 
 	add_custom_target(copy_mods
 		COMMAND ${CMAKE_COMMAND} -E copy_directory  "${CMAKE_SOURCE_DIR}/mods" "${FUEL_DIR}/mods"
+		COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:secudll>" "${FUEL_DIR}/mods/fmtk/secudll.dll"
+		COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtkdll>" "${FUEL_DIR}/mods/fmtk/fmtkdll.dll"
 		COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtklua>" "${FUEL_DIR}/mods/native/fmtklua.dll"
+		COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:lua51>" "${FUEL_DIR}/mods/path/lua5.1.dll"
 	)
-	add_dependencies(copy_mods fmtklua)
+	add_dependencies(copy_mods fmtklua lua51 fmtkdll secudll)
 	add_dependencies(fmtk copy_mods)
+	
+	add_custom_target(run
+		COMMAND $<TARGET_FILE:fmtk>
+		WORKING_DIRECTORY "${FUEL_DIR}"
+	)
+	add_dependencies(run fmtk)
 endif()
 
 set_target_properties(fmtk PROPERTIES
