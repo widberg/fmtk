@@ -23,7 +23,7 @@ bool FirstTimeSetup();
 
 int main(int argc, char** argv)
 {
-    LOG_INIT("fmtk.log");
+    LOG_INIT("fmtk_launcher.log");
 
     if (!std::filesystem::exists(FMTK_TOML_PATH))
     {
@@ -74,8 +74,6 @@ int main(int argc, char** argv)
     buf.resize(ss.str().size() + 1);
     ss.str().copy(buf.data(), ss.str().size());
     buf.back() = L'\0';
-
-    LOG(info, FMTK, "{}", std::filesystem::absolute("../..").string());
 
     if (!DetourCreateProcessWithDllExW(NULL, buf.data(),
         NULL, NULL, TRUE, dwFlags, NULL,
