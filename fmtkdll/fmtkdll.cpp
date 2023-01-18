@@ -15,7 +15,7 @@
 #include "instrument.hpp"
 #include "logging.hpp"
 
-constexpr const char* FMTK_TOML_PATH = "fmtk.toml";
+constexpr const char* FMTK_TOML_PATH = "mods/fmtk/fmtk.toml";
 std::vector<FMTKMod*> mods;
 
 void print(const char* msg)

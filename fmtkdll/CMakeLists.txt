@@ -24,9 +24,3 @@ add_dependencies(fmtkdll sinker)
 target_link_options(fmtkdll PRIVATE /export:DetourFinishHelperProcess,@1,NONAME)
 target_compile_options(fmtkdll PRIVATE /EHa)
 target_compile_definitions(fmtkdll PRIVATE FMTK_INTERNAL)
-
-set_target_properties(fmtkdll PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
