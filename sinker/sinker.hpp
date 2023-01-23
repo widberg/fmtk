@@ -76,7 +76,7 @@ namespace sinker
         }
         Module *get_module(std::string_view module_name);
 
-        void emplace_module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address);
+        void emplace_module(std::string_view name, std::optional<std::string> lpModuleName);
         void dump(std::ostream &out) const;
         void dump_def(std::ostream &out) const;
         bool interpret(std::istream &input_stream, Language language, std::string input_filename, bool debug = false);
@@ -143,17 +143,17 @@ namespace sinker
         bool has_variant(std::string_view name) const;
         void dump(std::ostream &out) const;
         void dump_def(std::ostream &out) const;
-        expression_value_t get_preferred_base_address() const;
+        std::optional<expression_value_t> get_preferred_base_address() const;
         std::optional<expression_value_t> get_relocated_base_address() const;
         HMODULE get_hModule() const;
 
     private:
-        Module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t preferred_base_address, Context *context)
-            : name(name), lpModuleName(lpModuleName), preferred_base_address(preferred_base_address), context(context){};
+        Module(std::string_view name, std::optional<std::string> lpModuleName, Context *context)
+            : name(name), lpModuleName(lpModuleName), context(context){};
         Context *context;
         std::string name;
         std::optional<std::string> lpModuleName;
-        expression_value_t preferred_base_address;
+        std::optional<expression_value_t> preferred_base_address;
         std::optional<expression_value_t> relocated_base_address;
         std::vector<Symbol> symbols;
         std::map<std::string, std::string, std::less<>> variants;
@@ -305,10 +305,12 @@ namespace sinker
         virtual std::optional<expression_value_t> calculate(Symbol *symbol) const override
         {
             auto expression_result = expression->calculate(symbol);
-            auto module_result = symbol->get_module()->get_relocated_base_address();
+            auto relocated_base_address_result = symbol->get_module()->get_relocated_base_address();
+            auto preferred_base_address_result = symbol->get_module()->get_preferred_base_address();
             PROPAGATE_UNRESOLVED(expression_result);
-            PROPAGATE_UNRESOLVED(module_result);
-            return expression_result.value() - symbol->get_module()->get_preferred_base_address() + module_result.value();
+            PROPAGATE_UNRESOLVED(relocated_base_address_result);
+            PROPAGATE_UNRESOLVED(preferred_base_address_result);
+            return expression_result.value() - preferred_base_address_result.value() + relocated_base_address_result.value();
         }
         virtual void dump(std::ostream &out) const override
         {

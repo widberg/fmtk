@@ -15,7 +15,7 @@ namespace sinker
             }
             else if (std::holds_alternative<bool>(attribute_value))
             {
-                out << (std::get<bool>(attribute_value) ? "true" : "false");
+                out << std::boolalpha << std::get<bool>(attribute_value);
             }
             else
             {
@@ -54,7 +54,7 @@ namespace sinker
         {
             out << ", \"" << lpModuleName.value() << "\"";
         }
-        out << ", " << preferred_base_address << ";\n";
+        out << ";\n";
 
         for (auto const &attribute : get_attributes())
         {
@@ -93,7 +93,7 @@ namespace sinker
     {
         return hModule;
     }
-    expression_value_t Module::get_preferred_base_address() const
+    std::optional<expression_value_t> Module::get_preferred_base_address() const
     {
         return preferred_base_address;
     }
@@ -172,9 +172,9 @@ namespace sinker
         return nullptr;
     }
 
-    void Context::emplace_module(std::string_view name, std::optional<std::string> lpModuleName, expression_value_t prefered_base_address)
+    void Context::emplace_module(std::string_view name, std::optional<std::string> lpModuleName)
     {
-        modules.push_back(std::move(Module(name, lpModuleName, prefered_base_address, this)));
+        modules.push_back(std::move(Module(name, lpModuleName, this)));
     }
 
     void Symbol::dump(std::ostream &out) const

@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
     app.add_option("-o,--output", output_filename, "Output file");
     app.add_option("-d,--def", def_filename, "Definitions file");
     app.add_option("input_files", input_filenames, "Input files");
-    app.add_flag("--debug,!--no-debug", debug, "Input files");
+    app.add_flag("--debug,!--no-debug", debug, "Print parser trace");
 
     CLI11_PARSE(app, argc, argv);
 

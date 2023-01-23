@@ -153,15 +153,15 @@ attribute_value
     ;
 
 stmt
-    : "module" IDENTIFIER ',' STRING ',' INTEGER ';'
+    : "module" IDENTIFIER ',' STRING ';'
     {
         SINKER_ASSERT(!ctx->get_module($2), @2, "Module exists");
-        ctx->emplace_module($2, $4, $6);
+        ctx->emplace_module($2, $4);
     }
-    | "module" IDENTIFIER ',' INTEGER ';'
+    | "module" IDENTIFIER ';'
     {
         SINKER_ASSERT(!ctx->get_module($2), @2, "Module exists");
-        ctx->emplace_module($2, {}, $4);
+        ctx->emplace_module($2, {});
     }
     | "variant" IDENTIFIER ',' IDENTIFIER ',' STRING ';'
     {
@@ -325,7 +325,6 @@ bool Context::interpret(char *input, unsigned int size, Language language, std::
         }
         return !parser.parse();
 }
-
 
 bool Context::interpret(std::istream& input_stream, Language language, std::string input_filename, bool debug) {
         input_stream.seekg(0, std::ios::end);
