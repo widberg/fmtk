@@ -36,12 +36,12 @@ FMTK is fully compatible with legally obtained retail and Steam release copies o
   - This requirement will be removed in future releases once fingerprinting is implemented.
 2. Download the latest release from the [releases page](https://github.com/widberg/fmtk/releases). This will be the asset with a name matching the pattern `fmtk-*.zip`.
 3. Unzip the release into the root FUEL directory (the directory containing `FUEL.exe`)
-4. Verify that `fmtk.exe`, `mods`, and your `FUEL.exe` are all in the same directory.
-5. Run `fmtk.exe`.
+4. Verify that the `mods` directory and `FUEL.exe` are in the same directory.
+5. Run `fmtk.exe` in the `mods/fmtk` directory.
 
 In the event of a crash or other game state locking event, i.e. "Error: Shaders processing has failed."  or "The Game Disc could not be read.", please check the `fmtk.log` file in the `mods/fmtk` directory. If you cannot resolve the reported error yourself then please open an issue or contact an FMTK developer directly.
 
-**FMTK mods are only loaded when the fmtk.exe "Blue FUEL" launcher is used to run the game. To run the game without mods enabled, simply launch it how you normally would without FMTK; uninstalling FMTK is unnecessary. You can uninstall FMTK and all FMTK mods at any time by running the included `uninstall_fmtk.bat` script from the root FUEL directory.**
+**FMTK mods are only loaded when the fmtk.exe "Blue FUEL" launcher is used to run the game. To run the game without mods enabled, simply launch it how you normally would without FMTK; uninstalling FMTK is unnecessary. You can uninstall FMTK and all FMTK mods at any time by deleting the `mods` directory.**
 
 ## Discord
 
