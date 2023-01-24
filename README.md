@@ -77,16 +77,14 @@ You can support the project by [contributing](#Contributing).
 
 * Git
 * CMake
-* Visual Studio (Or another windows toolchain)
+* Visual Studio
 * Ninja (Optional)
 * A PC copy of FUEL (Optional)
 
 ### Checkout
 
 ```sh
-git clone https://github.com/widberg/fmtk.git
-cd fmtk
-git submodule update --init --recursive
+git clone https://github.com/widberg/fmtk.git --recurse-submodules --shallow-submodules
 ```
 
 ### Build
