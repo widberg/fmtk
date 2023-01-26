@@ -70,7 +70,7 @@ namespace sinker
         Context() {}
         Context(const Context &) = delete;
         Context &operator=(const Context &) = delete;
-        std::vector<Module> const &get_modules() const
+        std::vector<Module*> const &get_modules() const
         {
             return modules;
         }
@@ -81,8 +81,9 @@ namespace sinker
         void dump_def(std::ostream &out) const;
         bool interpret(std::istream &input_stream, Language language, std::string input_filename, bool debug = false);
         bool interpret(char *input, unsigned int size, Language language, std::string input_filename, bool debug = false);
+        ~Context();
     private:
-        std::vector<Module> modules;
+        std::vector<Module*> modules;
     };
 
     std::ostream &operator<<(std::ostream &os, Context const &context);

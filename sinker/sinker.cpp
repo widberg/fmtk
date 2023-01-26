@@ -129,9 +129,9 @@ namespace sinker
 
     void Context::dump(std::ostream &out) const
     {
-        for (Module const &module : modules)
+        for (Module const *module : modules)
         {
-            module.dump(out);
+            module->dump(out);
         }
     }
 
@@ -147,9 +147,9 @@ namespace sinker
 
 )%";
 
-        for (Module const &module : modules)
+        for (Module const *module : modules)
         {
-            module.dump_def(out);
+            module->dump_def(out);
             out << "\n";
         }
 
@@ -161,20 +161,27 @@ namespace sinker
 
     Module *Context::get_module(std::string_view module_name)
     {
-        for (Module &module : modules)
+        for (Module *module : modules)
         {
-            if (module_name == module.get_name())
+            if (module_name == module->get_name())
             {
-                return &module;
+                return module;
             }
         }
 
         return nullptr;
     }
 
+    Context::~Context()
+    {
+        for (Module *module : modules) {
+            delete module;
+        }
+    }
+
     void Context::emplace_module(std::string_view name, std::optional<std::string> lpModuleName)
     {
-        modules.push_back(std::move(Module(name, lpModuleName, this)));
+        modules.push_back(new Module(name, lpModuleName, this));
     }
 
     void Symbol::dump(std::ostream &out) const
