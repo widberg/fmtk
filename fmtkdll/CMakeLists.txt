@@ -19,7 +19,7 @@ add_library(fmtkdll SHARED
 	gadgets/idirectsoundbufferplay.hpp
 	gadgets/createdialogparama.hpp
 )
-target_link_libraries(fmtkdll common fmtksdk detours spdlog d3d9 dbghelp tomlplusplus::tomlplusplus usercall_hpp hl++)
+target_link_libraries(fmtkdll common fmtksdk detours spdlog d3d9 dbghelp tomlplusplus::tomlplusplus hl++)
 add_dependencies(fmtkdll sinker)
 target_link_options(fmtkdll PRIVATE /export:DetourFinishHelperProcess,@1,NONAME)
 target_compile_options(fmtkdll PRIVATE /EHa)

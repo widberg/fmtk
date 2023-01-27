@@ -6,11 +6,11 @@ add_library(sinker STATIC
 	${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
 )
 target_include_directories(sinker PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-add_dependencies(sinker win_bison re2c)
+add_dependencies(sinker re2c)
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
-	COMMAND $<TARGET_FILE:win_bison> ${CMAKE_CURRENT_SOURCE_DIR}/parser.yy -o ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re -Wcounterexamples
+	COMMAND bison ${CMAKE_CURRENT_SOURCE_DIR}/parser.yy -o ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re -Wcounterexamples
 	COMMAND $<TARGET_FILE:re2c> ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re -o ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp --no-debug-info
 	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/parser.yy
 )

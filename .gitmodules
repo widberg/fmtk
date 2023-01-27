@@ -13,9 +13,6 @@
 [submodule "dependencies/tomlplusplus"]
 	path = dependencies/tomlplusplus
 	url = https://github.com/marzer/tomlplusplus.git
-[submodule "dependencies/usercall.hpp"]
-	path = dependencies/usercall.hpp
-	url = https://github.com/widberg/usercall.hpp.git
 [submodule "dependencies/hashlibpp"]
 	path = dependencies/hashlibpp
 	url = https://github.com/pkcakeout/hashlibpp.git

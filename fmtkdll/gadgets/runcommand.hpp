@@ -1,14 +1,11 @@
-BF(bool __usercall Real_RunCommand AT al)(LPCVOID pState, LPCSTR cmd, DWORD depth)
-	(0x0069a590);
-
-FF(bool __usercall FMTK_RunCommand AT al)(LPCVOID pState, LPCSTR cmd, DWORD depth)
-(
+FUNCTION(RunCommand, 0x0069a590, bool, __stdcall, LPCVOID pState, LPCSTR cmd, DWORD depth)
+{
 	LOG(trace, FUEL, "Running command: {} | {}", cmd, depth);
 
-	RETURN(Real_RunCommand_trampoline(pState, cmd, depth));
-)
+	return Real_RunCommand(pState, cmd, depth);
+}
 
 bool RunCommand(const char* cmd)
 {
-	return Real_RunCommand_trampoline(*pGlobalCommandState, cmd, 0);
+	return Real_RunCommand(*pGlobalCommandState, cmd, 0);
 }

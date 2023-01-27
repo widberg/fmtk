@@ -1,10 +1,10 @@
-BF(char __usercall Real_GetPlayerPosition AT al)(p_float_t playerPosVecOut AT edi)
-	(0x00421F60);
+bool (__usercall *Real_GetPlayerPosition)@<al>(p_float_t playerPosVecOut@<edi>) =
+	reinterpret_cast<bool (__usercall *)@<al>(p_float_t playerPosVecOut@<edi>)>(0x00421F60);
 
 float* GetPlayerPosition()
 {
 	static float vec[3];
-	if (Real_GetPlayerPosition_trampoline(vec))
+	if (Real_GetPlayerPosition(vec))
 	{
 		return vec;
 	}

@@ -1,14 +1,12 @@
-BF(void __usercall Real_RegisterCommand)(LPCSTR name AT edi, LPCVOID pThis, LPVOID callback)
-	(0x0069a400);
+void (__usercall *Real_RegisterCommand)(LPCSTR name@<edi>, LPCVOID pThis, LPVOID callback) =
+	reinterpret_cast<void (__usercall *)(LPCSTR name@<edi>, LPCVOID pThis, LPVOID callback)>(0x0069a400);
 
-FF(void __usercall FMTK_RegisterCommand)(LPCSTR name AT edi, LPCVOID pThis, LPVOID callback)
-(
+void __usercall FMTK_RegisterCommand(LPCSTR name@<edi>, LPCVOID pThis, LPVOID callback)
+{
 	LOG(trace, FMTK, "Registering command: {}", name);
 
-	Real_RegisterCommand_trampoline(name, pThis, callback);
-
-	RETURN;
-)
+	Real_RegisterCommand(name, pThis, callback);
+}
 
 struct CommandName
 {
@@ -77,7 +75,7 @@ bool GenericCommandCallback()
 void RegisterCommand(const char* name, bool(*callback)(int argc, const char** argv))
 {
 	commandCallbacks.push_back({ name, callback});
-	Real_RegisterCommand_trampoline(name, *pGlobalCommandState, (void*)GenericCommandCallback);
+	Real_RegisterCommand(name, *pGlobalCommandState, (void*)GenericCommandCallback);
 }
 
 void UnregisterCommand(const char* name)

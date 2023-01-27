@@ -7,8 +7,6 @@
 
 #include <filesystem>
 
-#include <usercall_hpp/usercall.hpp>
-
 #include "fmtkdll.hpp"
 #include "logging.hpp"
 #include "sehexception.hpp"
