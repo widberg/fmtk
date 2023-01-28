@@ -1,39 +1,7 @@
-module fuel, 0x400000;
+module fuel;
 variant fuel, retail, "ac1b2077137b7c6299c344111857b032635fe3d4794bc5135dad7c35feeda856";
-symbol fuel::RegisterCommand, "";
-address fuel::RegisterCommand, @0x0069a400;
-symbol fuel::RunCommand, "";
-address fuel::RunCommand, @0x0069a590;
-symbol fuel::ScriptManagerInit, "";
-address fuel::ScriptManagerInit, @0x0081cdb0;
-symbol fuel::WinMain, "";
-address fuel::WinMain, @0x0081e340;
-symbol fuel::CoreMainLoop, "";
-address fuel::CoreMainLoop, @0x00688bf0;
-symbol fuel::GetPlayerPosition, "";
-address fuel::GetPlayerPosition, @0x00421F60;
-
-module kernel32, "Kernel32.dll", 0x400000;
-symbol kernel32::OutputDebugStringA, "";
-address kernel32::OutputDebugStringA, !kernel32::OutputDebugStringA;
-symbol kernel32::OutputDebugStringW, "";
-address kernel32::OutputDebugStringW, !kernel32::OutputDebugStringW;
-symbol kernel32::ReadFile, "";
-address kernel32::ReadFile, !kernel32::ReadFile;
-symbol kernel32::CreateFileW, "";
-address kernel32::CreateFileW, !kernel32::CreateFileW;
-
-module user32, "User32.dll", 0x400000;
-symbol user32::CreateDialogParamA, "";
-address user32::CreateDialogParamA, !user32::CreateDialogParamA;
-symbol user32::CreateWindowExW, "";
-address user32::CreateWindowExW, !user32::CreateWindowExW;
-
-module d3dx9_39, "d3dx9_39.dll", 0x400000;
-symbol d3dx9_39::D3DXCompileShaderFromFileA, "";
-address d3dx9_39::D3DXCompileShaderFromFileA, !d3dx9_39::D3DXCompileShaderFromFileA;
-
-module xlive, "xlive.dll", 0x400000;
-variant xlive, 3_5_95_0, "8ae328cc7e9f22a8ed1b63f7f0c4977e36bc6c7f7582f1b8e41f1fdf960d5796";
-symbol xlive::ValidateMemory, "";
-address xlive::ValidateMemory, @0x004f36b3;
+module kernel32, "Kernel32.dll";
+module user32, "User32.dll";
+module d3dx9_39, "d3dx9_39.dll";
+module xlive, "xlive.dll";
+variant xlive, v3_5_95_0, "8ae328cc7e9f22a8ed1b63f7f0c4977e36bc6c7f7582f1b8e41f1fdf960d5796";

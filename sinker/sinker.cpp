@@ -60,6 +60,11 @@ namespace sinker
         {
             out << "set " << name << ", " << attribute.first << ", " << attribute.second << ";\n";
         }
+        
+        for (auto it = tags.begin(); it != tags.end(); ++it)
+        {
+            out << "tag " << name << ", " << *it << ";\n";
+        }
 
         for (auto variant : variants)
         {
@@ -71,19 +76,41 @@ namespace sinker
             symbol.dump(out);
         }
     }
+
+
+    identifier_set_t const& Context::get_symbol_tags() const
+    {
+        return symbol_tags;
+    }
+
     void Module::dump_def(std::ostream &out) const
     {
-        out << "#ifndef SINKER_" << name << "_SYMBOLS\n";
-        out << "#define SINKER_" << name << "_SYMBOLS(symbol_name, symbol_type)\n";
+        out << "#ifndef SINKER_" << name << "_SYMBOL\n";
+        out << "#define SINKER_" << name << "_SYMBOL(symbol_name, symbol_type)\n";
         out << "#endif\n";
+        for (auto it = get_context()->get_symbol_tags().begin(); it != get_context()->get_symbol_tags().end(); ++it)
+        {
+            out << "#ifndef SINKER_" << name << "_TAG_" << *it << "_SYMBOL\n";
+            out << "#define SINKER_" << name << "_TAG_" << *it << "_SYMBOL(symbol_name, symbol_type)\n";
+            out << "#endif\n";
+        }
         out << "SINKER_MODULE(" << name << ")\n";
+
+        for (auto it = tags.begin(); it != tags.end(); ++it)
+        {
+            out << "SINKER_TAG_" << *it << "_MODULE(" << name << ")\n";
+        }
 
         for (Symbol const &symbol : symbols)
         {
             symbol.dump_def(out);
         }
 
-        out << "#undef SINKER_" << name << "_SYMBOLS\n";
+        for (auto it = get_context()->get_symbol_tags().rbegin(); it != get_context()->get_symbol_tags().rend(); ++it)
+        {
+            out << "#undef SINKER_" << name << "_TAG_" << *it << "_SYMBOL\n";
+        }
+        out << "#undef SINKER_" << name << "_SYMBOL\n";
     }
     std::optional<expression_value_t> Module::get_relocated_base_address() const
     {
@@ -111,9 +138,9 @@ namespace sinker
         return module;
     }
 
-    void Symbol::add_address(std::optional<std::string> const &variant, std::shared_ptr<Expression> expression)
+    void Symbol::add_address(identifier_set_t const &variant_set, std::shared_ptr<Expression> expression)
     {
-        variants.push_back({variant, std::move(expression)});
+        addresses.push_back({variant_set, std::move(expression)});
     }
 
     std::map<std::string, attribute_value_t, std::less<>> const &Attributable::get_attributes() const
@@ -124,7 +151,15 @@ namespace sinker
     void Symbol::dump_def(std::ostream &out) const
     {
         out << "SINKER_SYMBOL(" << module->get_name() << ", " << name << ", " << type << ")\n";
+        for (auto it = tags.begin(); it != tags.end(); ++it)
+        {
+            out << "SINKER_TAG_" << *it << "_SYMBOL(" << module->get_name() << ", " << name << ", " << type << ")\n";
+        }
         out << "SINKER_" << module->get_name() << "_SYMBOL(" << name << ", " << type << ")\n";
+        for (auto it = tags.begin(); it != tags.end(); ++it)
+        {
+            out << "SINKER_" << module->get_name() << "_TAG_" << *it << "_SYMBOL(" << name << ", " << type << ")\n";
+        }
     }
 
     void Context::dump(std::ostream &out) const
@@ -144,13 +179,38 @@ namespace sinker
 #ifndef SINKER_SYMBOL
 #define SINKER_SYMBOL(module_name, symbol_name, symbol_type)
 #endif
-
 )%";
+
+        for (auto it = module_tags.begin(); it != module_tags.end(); ++it)
+        {
+            out << "#ifndef SINKER_TAG_" << *it << "_MODULE\n"
+                << "#define SINKER_TAG_" << *it << "_MODULE(module_name)\n"
+                << "#endif\n";
+        }
+
+        for (auto it = symbol_tags.begin(); it != symbol_tags.end(); ++it)
+        {
+            out << "#ifndef SINKER_TAG_" << *it << "_SYMBOL\n"
+                << "#define SINKER_TAG_" << *it << "_SYMBOL(module_name, symbol_name, symbol_type)\n"
+                << "#endif\n";
+        }
+
+        out << '\n';
 
         for (Module const *module : modules)
         {
             module->dump_def(out);
             out << "\n";
+        }
+
+        for (auto it = symbol_tags.rbegin(); it != symbol_tags.rend(); ++it)
+        {
+            out << "#undef SINKER_TAG_" << *it << "_SYMBOL\n";
+        }
+
+        for (auto it = module_tags.rbegin(); it != module_tags.rend(); ++it)
+        {
+            out << "#undef SINKER_TAG_" << *it << "_MODULE\n";
         }
 
         out <<
@@ -190,18 +250,50 @@ namespace sinker
 
         for (auto const &attribute : get_attributes())
         {
-            out << "set " << name << ", " << attribute.first << ", " << attribute.second << ";\n";
+            out << "set " << module->get_name() << "::" << name << ", " << attribute.first << ", " << attribute.second << ";\n";
         }
 
-        for (auto const& address : variants)
+        for (auto it = tags.begin(); it != tags.end(); ++it)
+        {
+            out << "tag " << module->get_name() << "::" << name << ", " << *it << ";\n";
+        }
+
+        for (auto const& address : addresses)
         {
             out << "address " << module->get_name() << "::" << name;
-            if (address.first)
+            for (auto it = address.first.begin(); it != address.first.end(); ++it)
             {
-                out << ", " << address.first.value();
+                out << ", " << *it;
             }
             out << ", " << *address.second << ";\n";
         }
+    }
+
+    Context *Module::get_context() const
+    {
+        return context;
+    }
+
+    void Symbol::add_tag(std::string const& tag)
+    {
+        tags.insert(tag);
+        get_module()->get_context()->add_symbol_tag(tag);
+    }
+    
+    void Module::add_tag(std::string const& tag)
+    {
+        tags.insert(tag);
+        get_context()->add_module_tag(tag);
+    }
+
+    void Context::add_module_tag(std::string const& tag)
+    {
+        module_tags.insert(tag);
+    }
+
+    void Context::add_symbol_tag(std::string const& tag)
+    {
+        symbol_tags.insert(tag);
     }
 
     std::ostream &operator<<(std::ostream &os, Expression const &expression)

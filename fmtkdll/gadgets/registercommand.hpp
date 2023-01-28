@@ -1,3 +1,7 @@
+//$ symbol fuel::RegisterCommand, "void (__usercall *)(LPCSTR name@<edi>, LPCVOID pThis, LPVOID callback)";
+//$ tag fuel::RegisterCommand, hook;
+//$ address fuel::RegisterCommand, [retail], @0x0069a400;
+
 void (__usercall *Real_RegisterCommand)(LPCSTR name@<edi>, LPCVOID pThis, LPVOID callback) =
 	reinterpret_cast<void (__usercall *)(LPCSTR name@<edi>, LPCVOID pThis, LPVOID callback)>(0x0069a400);
 

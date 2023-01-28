@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <memory>
 #include <Windows.h>
+#include <set>
 
 namespace sinker
 {
@@ -25,6 +26,7 @@ namespace sinker
 
     typedef unsigned long long expression_value_t;
     typedef std::variant<expression_value_t, bool, std::string> attribute_value_t;
+    typedef std::set<std::string> identifier_set_t;
 
     std::ostream &operator<<(std::ostream &out, attribute_value_t const &attribute_value);
 
@@ -81,9 +83,14 @@ namespace sinker
         void dump_def(std::ostream &out) const;
         bool interpret(std::istream &input_stream, Language language, std::string input_filename, bool debug = false);
         bool interpret(char *input, unsigned int size, Language language, std::string input_filename, bool debug = false);
+        void add_module_tag(std::string const& tag);
+        void add_symbol_tag(std::string const& tag);
+        identifier_set_t const& get_symbol_tags() const;
         ~Context();
     private:
         std::vector<Module*> modules;
+        identifier_set_t module_tags;
+        identifier_set_t symbol_tags;
     };
 
     std::ostream &operator<<(std::ostream &os, Context const &context);
@@ -109,10 +116,11 @@ namespace sinker
 
         Module *get_module() const;
 
-        void add_address(std::optional<std::string> const &variant, std::shared_ptr<Expression> expression);
+        void add_address(identifier_set_t const &variant_set, std::shared_ptr<Expression> expression);
         void dump(std::ostream &out) const;
 
         void dump_def(std::ostream &out) const;
+        void add_tag(std::string const& tag);
 
     private:
         Symbol(std::string const &name, std::string const &type, Module *module)
@@ -121,7 +129,8 @@ namespace sinker
         std::string name;
         std::string type;
         Module *module;
-        std::vector<std::pair<std::optional<std::string>, std::shared_ptr<Expression>>> variants;
+        std::vector<std::pair<identifier_set_t, std::shared_ptr<Expression>>> addresses;
+        identifier_set_t tags;
     };
 
     std::ostream &operator<<(std::ostream &os, Symbol const &symbol);
@@ -147,6 +156,8 @@ namespace sinker
         std::optional<expression_value_t> get_preferred_base_address() const;
         std::optional<expression_value_t> get_relocated_base_address() const;
         HMODULE get_hModule() const;
+        void add_tag(std::string const& tag);
+        Context *get_context() const;
 
     private:
         Module(std::string_view name, std::optional<std::string> lpModuleName, Context *context)
@@ -160,6 +171,7 @@ namespace sinker
         std::map<std::string, std::string, std::less<>> variants;
         std::string real_variant;
         HMODULE hModule = 0;
+        identifier_set_t tags;
     };
 
     std::ostream &operator<<(std::ostream &os, Module const &module);

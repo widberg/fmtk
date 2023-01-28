@@ -137,18 +137,22 @@ LONG AttachDetours()
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
-	ATTACH(CreateFileW);
-	ATTACH(WinMain);
-	ATTACH(CoreMainLoop);
-	ATTACH(OutputDebugStringA);
-	ATTACH(OutputDebugStringW);
-	ATTACH(RunCommand);
-	ATTACH(D3DXCompileShaderFromFileA);
-	//ATTACH(CreateWindowExW);
-	ATTACH(RegisterCommand);
-	ATTACH(ScriptManagerInit);
-	ATTACH(ReadFile);
-	ATTACH(CreateDialogParamA);
+#define SINKER_TAG_hook_SYMBOL(module_name, symbol_name, symbol_type) \
+	ATTACH(symbol_name);
+#include "fmtk.def"
+
+	// ATTACH(CreateFileW);
+	// ATTACH(WinMain);
+	// ATTACH(CoreMainLoop);
+	// ATTACH(OutputDebugStringA);
+	// ATTACH(OutputDebugStringW);
+	// ATTACH(RunCommand);
+	// ATTACH(D3DXCompileShaderFromFileA);
+	// //ATTACH(CreateWindowExW);
+	// ATTACH(RegisterCommand);
+	// ATTACH(ScriptManagerInit);
+	// ATTACH(ReadFile);
+	// ATTACH(CreateDialogParamA);
 
 	//HINSTANCE hiDSOUND = GetModuleHandleA("dsound.dll");
 
@@ -171,18 +175,23 @@ LONG DetachDetours()
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
-	DETACH(CreateFileW);
-	DETACH(WinMain);
-	DETACH(CoreMainLoop);
-	DETACH(OutputDebugStringA);
-	DETACH(OutputDebugStringW);
-	DETACH(RunCommand);
-	DETACH(D3DXCompileShaderFromFileA);
-	//DETACH(CreateWindowExW);
-	DETACH(RegisterCommand);
-	DETACH(ScriptManagerInit);
-	DETACH(ReadFile);
-	DETACH(CreateDialogParamA);
+
+#define SINKER_TAG_hook_SYMBOL(module_name, symbol_name, symbol_type) \
+	DETACH(symbol_name);
+#include "fmtk.def"
+
+	// DETACH(CreateFileW);
+	// DETACH(WinMain);
+	// DETACH(CoreMainLoop);
+	// DETACH(OutputDebugStringA);
+	// DETACH(OutputDebugStringW);
+	// DETACH(RunCommand);
+	// DETACH(D3DXCompileShaderFromFileA);
+	// //DETACH(CreateWindowExW);
+	// DETACH(RegisterCommand);
+	// DETACH(ScriptManagerInit);
+	// DETACH(ReadFile);
+	// DETACH(CreateDialogParamA);
 
 	//DETACHDSOUND(IDirectSoundBuffer_Play);
 	//DETACHDSOUND(IDirectSoundBuffer_SetVolume);

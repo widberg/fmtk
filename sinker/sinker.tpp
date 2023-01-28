@@ -6,11 +6,11 @@ namespace sinker
     template <typename T>
     std::optional<T> Symbol::calculate_address()
     {
-        for (auto variant : variants)
+        for (auto address : addresses)
         {
-            if (!variant.first.has_value() || variant.first.value() == module->get_real_variant())
+            if (address.first.empty() || address.first.find(module->get_real_variant()) != address.first.end())
             {
-                cached_calculated_address = variant.second->calculate(this);
+                cached_calculated_address = address.second->calculate(this);
                 if (cached_calculated_address)
                 {
                     return cached_calculated_address;

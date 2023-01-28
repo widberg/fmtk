@@ -1,3 +1,7 @@
+//$ symbol fuel::WinMain, "INT (WINAPI *)(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)";
+//$ tag fuel::WinMain, hook;
+//$ address fuel::WinMain, [retail], @0x0081e340;
+
 FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	// while (1);

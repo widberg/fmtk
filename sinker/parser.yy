@@ -82,6 +82,7 @@ lexer_state->in_pattern_match_expression = false;
 %token SYMBOL "symbol"
 %token ADDRESS "address"
 %token SET "set"
+%token TAG "tag"
 
 %type<std::string> IDENTIFIER STRING
 %type<expression_value_t> INTEGER
@@ -90,6 +91,7 @@ lexer_state->in_pattern_match_expression = false;
 %type<bool> BOOL
 %type<attribute_value_t> attribute_value
 %type<std::vector<pattern_byte>> pattern_match_expression
+%type<identifier_set_t> identifier_set identifier_set_full
 
 %left '+' '-'
 %left '*'
@@ -152,6 +154,17 @@ attribute_value
     | BOOL    { $$ = attribute_value_t {$1}; }
     ;
 
+
+identifier_set_full
+    : IDENTIFIER                    { $$ = identifier_set_t {$1}; }
+    | identifier_set ',' IDENTIFIER { $$.insert($3); }
+    ;
+
+identifier_set
+    : identifier_set_full
+    | %empty { $$ = identifier_set_t {}; }
+    ;
+
 stmt
     : "module" IDENTIFIER ',' STRING ';'
     {
@@ -175,17 +188,11 @@ stmt
         SINKER_ASSERT(!ctx->get_module($2)->get_symbol($5), @5, "Symbol exists");
         ctx->get_module($2)->emplace_symbol($5, $7);
     }
-    | "address" IDENTIFIER ':' ':' IDENTIFIER ',' expression ';'
+    | "address" IDENTIFIER ':' ':' IDENTIFIER ',' '[' identifier_set ']' ',' expression ';'
     {
         SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
         SINKER_ASSERT(ctx->get_module($2)->get_symbol($5), @5, "Symbol does not exist");
-        ctx->get_module($2)->get_symbol($5)->add_address({}, $7);
-    }
-    | "address" IDENTIFIER ':' ':' IDENTIFIER ',' IDENTIFIER ',' expression ';'
-    {
-        SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
-        SINKER_ASSERT(ctx->get_module($2)->get_symbol($5), @5, "Symbol does not exist");
-        ctx->get_module($2)->get_symbol($5)->add_address($7, $9);
+        ctx->get_module($2)->get_symbol($5)->add_address($8, $11);
     }
     | "set" IDENTIFIER ',' IDENTIFIER ',' attribute_value ';'
     {
@@ -197,6 +204,17 @@ stmt
         SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
         SINKER_ASSERT(ctx->get_module($2)->get_symbol($5), @4, "Symbol does not exist");
         ctx->get_module($2)->get_symbol($5)->set_attribute($7, $9);
+    }
+    | "tag" IDENTIFIER ',' IDENTIFIER ';'
+    {
+        SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
+        ctx->get_module($2)->add_tag($4);
+    }
+    | "tag" IDENTIFIER ':' ':' IDENTIFIER ',' IDENTIFIER ';'
+    {
+        SINKER_ASSERT(ctx->get_module($2), @2, "Module does not exist");
+        SINKER_ASSERT(ctx->get_module($2)->get_symbol($5), @4, "Symbol does not exist");
+        ctx->get_module($2)->get_symbol($5)->add_tag($7);
     }
     ;
 
@@ -243,6 +261,7 @@ sinker::Parser::symbol_type sinker::yylex(LexerState *lexer_state)
         'variant'      { TOKEN(VARIANT); }
         'symbol'       { TOKEN(SYMBOL); }
         'address'      { TOKEN(ADDRESS); }
+        'tag'          { TOKEN(TAG); }
 
         'true'         { TOKENV(BOOL, true); }
         'false'        { TOKENV(BOOL, false); }

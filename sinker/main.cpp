@@ -36,12 +36,14 @@ int main(int argc, char const *argv[])
 
     if (!output_filename.empty())
     {
+        std::filesystem::create_directories(std::filesystem::path(output_filename).parent_path());
         std::ofstream output_stream(output_filename);
         context.dump(output_stream);
     }
 
     if (!def_filename.empty())
     {
+        std::filesystem::create_directories(std::filesystem::path(def_filename).parent_path());
         std::ofstream def_stream(def_filename);
         context.dump_def(def_stream);
     }
