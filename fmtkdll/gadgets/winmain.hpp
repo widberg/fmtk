@@ -8,8 +8,6 @@ FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevI
 
 	LOG(trace, FMTK, "Entry Point");
 
-	AttachDetoursXLive();
-
 	int result = 0;
 
 	_set_se_translator([](unsigned int code, EXCEPTION_POINTERS* pEP)

@@ -1,5 +1,5 @@
 //$ symbol user32::CreateWindowExW, "HANDLE (WINAPI *)(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)";
-//$ tag user32::CreateWindowExW, hook;
+// //$ tag user32::CreateWindowExW, hook;
 //$ address user32::CreateWindowExW, [], !user32::CreateWindowExW;
 
 FUNCTION(CreateWindowExW, CreateWindowExW, HWND, WINAPI,

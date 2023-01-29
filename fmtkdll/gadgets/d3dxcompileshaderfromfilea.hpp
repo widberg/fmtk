@@ -1,6 +1,3 @@
-#include <d3dx9shader.h>
-
-
 //$ symbol d3dx9_39::D3DXCompileShaderFromFileA, "HRESULT (WINAPI *)(LPCSTR pSrcFile, CONST D3DXMACRO* pDefines, LPD3DXINCLUDE pInclude, LPCSTR pFunctionName, LPCSTR pProfile, DWORD Flags, LPD3DXBUFFER* ppShader, LPD3DXBUFFER* ppErrorMsgs, LPD3DXCONSTANTTABLE* ppConstantTable)";
 //$ tag d3dx9_39::D3DXCompileShaderFromFileA, hook;
 //$ address d3dx9_39::D3DXCompileShaderFromFileA, [], !d3dx9_39::D3DXCompileShaderFromFileA;

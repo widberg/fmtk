@@ -260,12 +260,16 @@ namespace sinker
 
         for (auto const& address : addresses)
         {
-            out << "address " << module->get_name() << "::" << name;
+            out << "address " << module->get_name() << "::" << name << ", [";
             for (auto it = address.first.begin(); it != address.first.end(); ++it)
             {
-                out << ", " << *it;
+                out << *it;
+                if (next(it) != address.first.end())
+                {
+                    out << ", ";
+                }
             }
-            out << ", " << *address.second << ";\n";
+            out << "], " << *address.second << ";\n";
         }
     }
 
