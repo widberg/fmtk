@@ -83,7 +83,7 @@ LONG AttachDetours()
 #define SINKER_TAG_hook_SYMBOL(module_name, symbol_name, symbol_type) \
 	auto module_name ## _ ## symbol_name ## _ ## calculated_address = \
 	ctx.get_module(#module_name)->get_symbol(#symbol_name)->calculate_address<symbol_type>(); \
-	if (!module_name ## _ ## symbol_name ## _ ## calculated_address) \
+	if (!module_name ## _ ## symbol_name ## _ ## calculated_address && ctx.get_module(#module_name)->get_symbol(#symbol_name)->get_attribute<bool>("required").value_or(true)) \
 	{ \
     	LOG(critical, FMTK, "Calculate symbol \"" #module_name "_" #symbol_name "_calculated_address" "\" failed!"); \
 		return 0; \

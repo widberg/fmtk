@@ -31,7 +31,7 @@ namespace sinker
             return {};
         }
 
-        attribute_value_t const &attr = attributes.at(attribute_name);
+        attribute_value_t const &attr = attributes.find(attribute_name)->second;
 
         if (T const *value = std::get_if<T>(&attr))
         {
