@@ -36,7 +36,7 @@ add_library(fmtkdll SHARED
 )
 add_dependencies(fmtkdll fmtkdll_sinker)
 target_include_directories(fmtkdll PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(fmtkdll common fmtksdk detours spdlog d3d9 dbghelp tomlplusplus::tomlplusplus hl++ sinker)
+target_link_libraries(fmtkdll common fmtksdk detours spdlog d3d9 dbghelp tomlplusplus::tomlplusplus sinker)
 target_link_options(fmtkdll PRIVATE /export:DetourFinishHelperProcess,@1,NONAME)
 target_compile_options(fmtkdll PRIVATE /EHa)
 target_compile_definitions(fmtkdll PRIVATE FMTK_INTERNAL)

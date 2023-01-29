@@ -4,6 +4,7 @@
 #include <iostream>
 #include <filesystem>
 #include <istream>
+#include <hashlibpp.h>
 
 #include "sinker.hpp"
 
@@ -136,29 +137,55 @@ namespace sinker
     
     bool Module::concretize()
     {
+        HMODULE tmphModule;
         if (lpModuleName) {
-            hModule = GetModuleHandleA(lpModuleName.value().c_str());
+            tmphModule = GetModuleHandleA(lpModuleName.value().c_str());
         } else {
-            hModule = GetModuleHandleA(NULL);
+            tmphModule = GetModuleHandleA(NULL);
         }
 
-        if(hModule == NULL)
+        if(tmphModule == NULL)
         {
             return false;
         }
-        IMAGE_DOS_HEADER* pDOSHeader = (IMAGE_DOS_HEADER*)hModule;
+        
+        char path[MAX_PATH + 1];
+        if (!GetModuleFileNameA(tmphModule, path, MAX_PATH + 1))
+        {
+            return false;
+        }
+
+        sha256wrapper sha256;
+
+        try
+        {
+            std::string hash = sha256.getHashFromFile(path);
+            for (auto variant : variants)
+            {
+                if (variant.second == hash)
+                {
+                    real_variant = variant.first;
+                    break;
+                }
+            }
+        } catch(hlException &e) {
+            std::cerr << "Error("  << e.error_number() << "): " << e.error_message() << std::endl;
+            return false;
+        }
+
+        IMAGE_DOS_HEADER* pDOSHeader = (IMAGE_DOS_HEADER*)tmphModule;
         IMAGE_NT_HEADERS* pNTHeaders =(IMAGE_NT_HEADERS*)((BYTE*)pDOSHeader + pDOSHeader->e_lfanew);
 
         preferred_base_address = pNTHeaders->OptionalHeader.ImageBase;
-        relocated_base_address = (expression_value_t)hModule;
+        relocated_base_address = (expression_value_t)tmphModule;
+        hModule = tmphModule;
 
-        concrete = true;
         return true;
     }
 
     bool Module::is_concrete() const
     {
-        return concrete;
+        return hModule;
     }
 
     Module *Symbol::get_module() const
@@ -289,12 +316,17 @@ namespace sinker
         for (auto const& address : addresses)
         {
             out << "address " << module->get_name() << "::" << name << ", [";
-            for (auto it = address.first.begin(); it != address.first.end(); ++it)
+            if (address.first.empty())
             {
+                out << "*";
+            } else {
+                auto it = address.first.begin();
                 out << *it;
-                if (next(it) != address.first.end())
+                ++it;
+
+                for (; it != address.first.end(); ++it)
                 {
-                    out << ", ";
+                    out << ", " << *it;
                 }
             }
             out << "], " << *address.second << ";\n";

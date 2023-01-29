@@ -6,6 +6,7 @@ add_library(sinker STATIC
 	${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
 )
 target_include_directories(sinker PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(sinker hl++)
 add_dependencies(sinker re2c)
 
 add_custom_command(

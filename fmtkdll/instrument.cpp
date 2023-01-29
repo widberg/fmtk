@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <cwctype>
 #include <d3dx9shader.h>
+#include <fstream>
+#include <sinker.hpp>
 
 #include "fmtkdll.hpp"
 #include "logging.hpp"
@@ -49,12 +51,43 @@ const void** pGlobalCommandState = reinterpret_cast<const void**>(0x00a7c080);
 // Instrument
 LONG AttachDetours()
 {
+    LOG(trace, FMTK, "Concretizing modules");
+
+	sinker::Context ctx;
+	std::ifstream in("mods/fmtk/fmtk.skr", std::ios::binary);
+	if (!in.good())
+	{
+    	LOG(critical, FMTK, "Can't open sinker file!");
+		return 0;
+	}
+
+	if (!ctx.interpret(in, sinker::Language::SINKER, "fmtk.skr"))
+	{
+    	LOG(critical, FMTK, "Interpreting sinker file failed!");
+		return 0;
+	}
+
+#define SINKER_MODULE(module_name) \
+	if (!ctx.get_module(#module_name)->concretize()) \
+	{ \
+    	LOG(critical, FMTK, "Concretizing module \"" #module_name "\" failed!"); \
+		return 0; \
+	}
+#include "fmtk.def"
+
     LOG(trace, FMTK, "Attaching detours");
 
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
 #define SINKER_TAG_hook_SYMBOL(module_name, symbol_name, symbol_type) \
+	auto module_name ## _ ## symbol_name ## _ ## calculated_address = \
+	ctx.get_module(#module_name)->get_symbol(#symbol_name)->calculate_address<symbol_type>(); \
+	if (!module_name ## _ ## symbol_name ## _ ## calculated_address) \
+	{ \
+    	LOG(critical, FMTK, "Calculate symbol \"" #module_name "_" #symbol_name "_calculated_address" "\" failed!"); \
+		return 0; \
+	} \
 	ATTACH(symbol_name);
 #include "fmtk.def"
 

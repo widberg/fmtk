@@ -9,6 +9,7 @@ add_subdirectory(detours)
 
 # hashlibpp
 add_subdirectory(hashlibpp)
+target_include_directories(hl++ PUBLIC $<TARGET_PROPERTY:hl++,SOURCE_DIR>/src)
 
 # LuaJIT
 add_subdirectory(luajit)

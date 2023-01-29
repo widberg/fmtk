@@ -173,7 +173,6 @@ namespace sinker
         std::optional<std::string> lpModuleName;
         std::optional<expression_value_t> preferred_base_address;
         std::optional<expression_value_t> relocated_base_address;
-        bool concrete = false;
         std::vector<Symbol> symbols;
         std::map<std::string, std::string, std::less<>> variants;
         std::string real_variant;
