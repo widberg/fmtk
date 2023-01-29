@@ -1,6 +1,6 @@
 //$ symbol kernel32::CreateFileW, "HWND (WINAPI *)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)";
 //$ tag kernel32::CreateFileW, hook;
-//$ address kernel32::CreateFileW, [], !kernel32::CreateFileW;
+//$ address kernel32::CreateFileW, [*], !kernel32::CreateFileW;
 FUNCTION(CreateFileW, CreateFileW, HANDLE, WINAPI,
 	LPCWSTR               lpFileName,
 	DWORD                 dwDesiredAccess,

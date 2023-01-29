@@ -3,6 +3,7 @@ add_custom_target(package_fmtk
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtklua>" "${CMAKE_BINARY_DIR}/mods/native/fmtklua.dll"
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:lua51>" "${CMAKE_BINARY_DIR}/mods/path/lua5.1.dll"
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtkdll>" "${CMAKE_BINARY_DIR}/mods/fmtk/fmtkdll.dll"
+	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE_DIR:fmtkdll>/fmtk.skr" "${CMAKE_BINARY_DIR}/mods/fmtk/fmtk.skr"
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:secudll>" "${CMAKE_BINARY_DIR}/mods/fmtk/secudll.dll"
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtk>" "${CMAKE_BINARY_DIR}/mods/fmtk/fmtk.exe"
 	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/README.md" "${CMAKE_BINARY_DIR}/README.md"

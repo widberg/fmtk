@@ -162,7 +162,7 @@ identifier_set_full
 
 identifier_set
     : identifier_set_full
-    | %empty { $$ = identifier_set_t {}; }
+    | '*' { $$ = identifier_set_t {}; }
     ;
 
 stmt

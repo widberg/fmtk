@@ -1,6 +1,6 @@
 //$ symbol kernel32::ReadFile, "BOOL (WINAPI *)(HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped)";
 //$ tag kernel32::ReadFile, hook;
-//$ address kernel32::ReadFile, [], !kernel32::ReadFile;
+//$ address kernel32::ReadFile, [*], !kernel32::ReadFile;
 
 FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 	HANDLE       hFile,
