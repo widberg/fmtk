@@ -487,7 +487,7 @@ namespace sinker
         std::vector<pattern_byte> pattern;
     };
 
-    template<std::size_t S = 32, std::uint8_t C = 0xEF>
+    template<std::size_t S = 32, std::uint8_t C = 0xEF, bool D = true>
     class StackCheck {
     public:
         StackCheck();

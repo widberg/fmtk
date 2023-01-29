@@ -58,14 +58,14 @@ namespace sinker
         return static_cast<T>(cached_calculated_address.value());
     }
 
-    template<std::size_t S, std::uint8_t C>
-    StackCheck<S, C>::StackCheck(bool destructor_check)
+    template<std::size_t S, std::uint8_t C, bool D>
+    StackCheck<S, C, D>::StackCheck()
     {
         std::memset(buffer, C, S);
     }
 
-    template<std::size_t S, std::uint8_t C>
-    bool StackCheck<S, C>::good() const
+    template<std::size_t S, std::uint8_t C, bool D>
+    bool StackCheck<S, C, D>::good() const
     {
         for (std::size_t i = 0; i < S; ++i)
         {
@@ -77,10 +77,10 @@ namespace sinker
         return true;
     }
     
-    template<std::size_t S, std::uint8_t C>
-    bool StackCheck<S, C>::~StackCheck()
+    template<std::size_t S, std::uint8_t C, bool D>
+    StackCheck<S, C, D>::~StackCheck()
     {
-        if (!good())
+        if (D && !good())
         {
             throw std::runtime_error("Stack check failed");
         }
