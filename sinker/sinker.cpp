@@ -156,6 +156,11 @@ namespace sinker
         return true;
     }
 
+    bool Module::is_concrete() const
+    {
+        return concrete;
+    }
+
     Module *Symbol::get_module() const
     {
         return module;

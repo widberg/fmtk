@@ -163,6 +163,7 @@ namespace sinker
         void add_tag(std::string const& tag);
         Context *get_context() const;
         bool concretize();
+        bool is_concrete() const;
 
     private:
         Module(std::string_view name, std::optional<std::string> lpModuleName, Context *context)
