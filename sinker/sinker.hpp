@@ -17,6 +17,7 @@
 #include <cstring>
 #include <cstdint>
 #include <cstddef>
+#include <stdexcept>
 
 namespace sinker
 {
@@ -491,6 +492,7 @@ namespace sinker
     public:
         StackCheck();
         bool good() const;
+        ~StackCheck();
     private:
         std::uint8_t buffer[S];
     };

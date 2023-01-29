@@ -2,6 +2,7 @@
 #define SINKER_TPP
 
 #include <cstring>
+#include <stdexcept>
 namespace sinker
 {
     template <typename T>
@@ -58,7 +59,7 @@ namespace sinker
     }
 
     template<std::size_t S, std::uint8_t C>
-    StackCheck<S, C>::StackCheck()
+    StackCheck<S, C>::StackCheck(bool destructor_check)
     {
         std::memset(buffer, C, S);
     }
@@ -74,6 +75,15 @@ namespace sinker
             }
         }
         return true;
+    }
+    
+    template<std::size_t S, std::uint8_t C>
+    bool StackCheck<S, C>::~StackCheck()
+    {
+        if (!good())
+        {
+            throw std::runtime_error("Stack check failed");
+        }
     }
 }
 
