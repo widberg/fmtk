@@ -162,15 +162,17 @@ namespace sinker
         HMODULE get_hModule() const;
         void add_tag(std::string const& tag);
         Context *get_context() const;
+        bool concretize();
 
     private:
         Module(std::string_view name, std::optional<std::string> lpModuleName, Context *context)
-            : name(name), lpModuleName(lpModuleName), context(context){};
+            : context(context), name(name), lpModuleName(lpModuleName){};
         Context *context;
         std::string name;
         std::optional<std::string> lpModuleName;
         std::optional<expression_value_t> preferred_base_address;
         std::optional<expression_value_t> relocated_base_address;
+        bool concrete = false;
         std::vector<Symbol> symbols;
         std::map<std::string, std::string, std::less<>> variants;
         std::string real_variant;

@@ -1,3 +1,4 @@
+#include <windows.h>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -131,6 +132,28 @@ namespace sinker
     std::string const &Module::get_real_variant() const
     {
         return real_variant;
+    }
+    
+    bool Module::concretize()
+    {
+        if (lpModuleName) {
+            hModule = GetModuleHandleA(lpModuleName.value().c_str());
+        } else {
+            hModule = GetModuleHandleA(NULL);
+        }
+
+        if(hModule == NULL)
+        {
+            return false;
+        }
+        IMAGE_DOS_HEADER* pDOSHeader = (IMAGE_DOS_HEADER*)hModule;
+        IMAGE_NT_HEADERS* pNTHeaders =(IMAGE_NT_HEADERS*)((BYTE*)pDOSHeader + pDOSHeader->e_lfanew);
+
+        preferred_base_address = pNTHeaders->OptionalHeader.ImageBase;
+        relocated_base_address = (expression_value_t)hModule;
+
+        concrete = true;
+        return true;
     }
 
     Module *Symbol::get_module() const
