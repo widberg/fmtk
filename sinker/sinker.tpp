@@ -1,6 +1,7 @@
 #ifndef SINKER_TPP
 #define SINKER_TPP
 
+#include <cstring>
 namespace sinker
 {
     template <typename T>
@@ -56,6 +57,24 @@ namespace sinker
         return static_cast<T>(cached_calculated_address.value());
     }
 
+    template<std::size_t S, std::uint8_t C>
+    StackCheck<S, C>::StackCheck()
+    {
+        std::memset(buffer, C, S);
+    }
+
+    template<std::size_t S, std::uint8_t C>
+    bool StackCheck<S, C>::good() const
+    {
+        for (std::size_t i = 0; i < S; ++i)
+        {
+            if (buffer[i] != C)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 #endif // !SINKER_TPP

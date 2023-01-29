@@ -14,6 +14,9 @@
 #include <memory>
 #include <Windows.h>
 #include <set>
+#include <cstring>
+#include <cstdint>
+#include <cstddef>
 
 namespace sinker
 {
@@ -483,6 +486,15 @@ namespace sinker
         std::vector<pattern_byte> pattern;
     };
 
+    template<std::size_t S = 32, std::uint8_t C = 0xEF>
+    class StackCheck {
+    public:
+        StackCheck();
+        bool good() const;
+    private:
+        std::uint8_t buffer[S];
+    };
+
     // class Installable {
     // public:
     //     virtual void install();
@@ -510,12 +522,6 @@ namespace sinker
     //     void abort();
     // };
 
-    // class StackCheck {
-    // public:
-    //     StackCheck();
-    //     bool good() const;
-    // };
-
     // class Process {
     // public:
     //     Process(std::string_view path, std::vector<std::string_view> const& argv, std::vector<std::pair<std::string_view, std::string_view>> const& env);
@@ -523,7 +529,6 @@ namespace sinker
     //     void execute();
     //     int wait();
     // };
-
 }
 
 #include "sinker.tpp"
