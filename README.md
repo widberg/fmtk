@@ -78,6 +78,7 @@ You can support the project by [contributing](#Contributing).
 * Git
 * CMake
 * Bison or [WinFlexBison](https://github.com/lexxmark/winflexbison)
+* [llvm-project-widberg-extensions](https://github.com/widberg/llvm-project-widberg-extensions)
 * Any Win32 toolchain
 * A PC copy of FUEL (Optional)
 
@@ -90,7 +91,7 @@ git clone https://github.com/widberg/fmtk.git --recurse-submodules --shallow-sub
 ### Building On Windows
 
 Use the `x86 Native Tools Command Prompt for VS 2022` environment while generating and building the
-project. Install the [llvm-project-widberg-extensions](https://github.com/widberg/llvm-project-widberg-extensions) binaries.
+project.
 
 #### Ninja
 
