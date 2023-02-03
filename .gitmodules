@@ -19,9 +19,6 @@
 [submodule "dependencies/CLI11"]
 	path = dependencies/CLI11
 	url = https://github.com/CLIUtils/CLI11.git
-[submodule "dependencies/winflexbison"]
-	path = dependencies/winflexbison
-	url = https://github.com/lexxmark/winflexbison.git
 [submodule "dependencies/re2c"]
 	path = dependencies/re2c
 	url = https://github.com/skvadrik/re2c.git

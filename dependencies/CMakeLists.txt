@@ -27,5 +27,5 @@ target_compile_definitions(spdlog PUBLIC "SPDLOG_WCHAR_TO_UTF8_SUPPORT" "SPDLOG_
 # tomlplusplus
 add_subdirectory(tomlplusplus)
 
-# winflexbison
-# add_subdirectory(winflexbison)
+# bison
+find_package(BISON 3.4.1 REQUIRED)

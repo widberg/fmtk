@@ -77,8 +77,8 @@ You can support the project by [contributing](#Contributing).
 
 * Git
 * CMake
-* Visual Studio
-* Ninja (Optional)
+* Bison or [WinFlexBison](https://github.com/lexxmark/winflexbison)
+* Any Win32 toolchain
 * A PC copy of FUEL (Optional)
 
 ### Checkout
