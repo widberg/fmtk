@@ -87,24 +87,14 @@ You can support the project by [contributing](#Contributing).
 git clone https://github.com/widberg/fmtk.git --recurse-submodules --shallow-submodules
 ```
 
-### Build
+### Building On Windows
 
-Use the `x86 Native Tools Command Prompt for VS 2022` environment while generating and building the project.
-
-#### Visual Studio Generator
-
-```sh
-mkdir build
-cd build
-cmake -G "Visual Studio 17 2022" -A Win32 ..
-cmake --build .
-```
+Use the `x86 Native Tools Command Prompt for VS 2022` environment while generating and building the
+project. Install the [llvm-project-widberg-extensions](https://github.com/widberg/llvm-project-widberg-extensions) binaries.
 
 #### Ninja
 
 ```sh
-mkdir build
-cd build
-cmake -GNinja ..
+cmake -B build -G Ninja -DCMAKE_C_COMPILER="<llvm-project-widberg-extensions>/clang-cl.exe" -DCMAKE_CXX_COMPILER_TARGET="i386-pc-win32-msvc" -DCMAKE_CXX_COMPILER="<llvm-project-widberg-extensions>/clang-cl.exe" -DCMAKE_C_COMPILER_TARGET="i386-pc-win32-msvc"
 cmake --build .
 ```
