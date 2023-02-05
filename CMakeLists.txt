@@ -20,7 +20,7 @@ include(cmake/widberg-toolchain.cmake)
 
 project(fmtk VERSION 0.0.7.0 LANGUAGES CXX)
 
-option(FMTK_DOCS        "Build only the documentation." OFF)
+option(FMTK_DOCS        "Build the documentation." OFF)
 
 set(CMAKE_CXX_STANDARD 20 CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE INTERNAL "")
@@ -44,5 +44,3 @@ add_subdirectory(package_fmtk)
 if(FMTK_DOCS)
 	add_subdirectory(docs)
 endif()
-
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT fmtk)

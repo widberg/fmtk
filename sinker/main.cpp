@@ -26,6 +26,11 @@ int main(int argc, char const *argv[])
     for (std::string const &input_filename : input_filenames)
     {
         std::ifstream file(input_filename, std::ios::binary);
+        if (!file.good())
+        {
+            std::cerr << "Could not open " << input_filename << "!\n";
+            return 2;
+        }
 
         std::filesystem::path file_path(input_filename);
         sinker::Language language = file_path.extension() == ".skr" ? sinker::Language::SINKER : sinker::Language::SOURCE_CODE;

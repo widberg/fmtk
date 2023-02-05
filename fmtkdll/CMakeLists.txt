@@ -1,26 +1,26 @@
 set(fmtkdll_SOURCES
-	${CMAKE_CURRENT_SOURCE_DIR}/fmtkdll.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/fmtkdll.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/instrument.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/instrument.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/sehexception.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/sehexception.hpp
+	fmtkdll.cpp
+	fmtkdll.hpp
+	instrument.cpp
+	instrument.hpp
+	sehexception.cpp
+	sehexception.hpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/coremainloop.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/d3dxcompileshaderfromfilea.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/registercommand.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/validatememory.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/createfilew.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/outputdebugstringa.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/runcommand.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/winmain.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/createwindowexw.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/outputdebugstringw.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/scriptmanagerinit.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/getplayerposition.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/readfile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/idirectsoundbufferplay.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/gadgets/createdialogparama.hpp
+	gadgets/coremainloop.hpp
+	gadgets/d3dxcompileshaderfromfilea.hpp
+	gadgets/registercommand.hpp
+	gadgets/validatememory.hpp
+	gadgets/createfilew.hpp
+	gadgets/outputdebugstringa.hpp
+	gadgets/runcommand.hpp
+	gadgets/winmain.hpp
+	gadgets/createwindowexw.hpp
+	gadgets/outputdebugstringw.hpp
+	gadgets/scriptmanagerinit.hpp
+	gadgets/getplayerposition.hpp
+	gadgets/readfile.hpp
+	gadgets/idirectsoundbufferplay.hpp
+	gadgets/createdialogparama.hpp
 )
 
 add_sinker_target(fmtkdll_sinker
