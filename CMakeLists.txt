@@ -16,6 +16,8 @@ if (POLICY CMP0091)
 	cmake_policy(SET CMP0091 NEW)
 endif()
 
+include(cmake/widberg-toolchain.cmake)
+
 project(fmtk VERSION 0.0.7.0 LANGUAGES CXX)
 
 option(FMTK_DOCS        "Build only the documentation." OFF)

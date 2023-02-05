@@ -96,6 +96,6 @@ project.
 #### Ninja
 
 ```sh
-cmake -B build -G Ninja -DCMAKE_C_COMPILER="<llvm-project-widberg-extensions>/clang-cl.exe" -DCMAKE_CXX_COMPILER_TARGET="i386-pc-win32-msvc" -DCMAKE_CXX_COMPILER="<llvm-project-widberg-extensions>/clang-cl.exe" -DCMAKE_C_COMPILER_TARGET="i386-pc-win32-msvc"
+cmake -B build -G Ninja -DWIDBERG_CLANG_CL="/path/to/llvm-project-with-widberg-extensions/clang-cl.exe"
 cmake --build build
 ```
