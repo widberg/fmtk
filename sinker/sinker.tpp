@@ -15,7 +15,7 @@ namespace sinker
                 cached_calculated_address = address.second->calculate(this);
                 if (cached_calculated_address)
                 {
-                    return static_cast<T>(cached_calculated_address.value());
+                    return (T)(cached_calculated_address.value());
                 }
             }
         }
@@ -55,7 +55,7 @@ namespace sinker
             return {};
         }
 
-        return static_cast<T>(cached_calculated_address.value());
+        return (T)(cached_calculated_address.value());
     }
 
     template<std::size_t S, std::uint8_t C, bool D>

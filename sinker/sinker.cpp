@@ -39,7 +39,7 @@ namespace sinker
     }
     void Module::emplace_symbol(std::string const &name, std::string const &type)
     {
-        symbols.push_back(std::move(Symbol(name, type, this)));
+        symbols.push_back(Symbol(name, type, this));
     }
     void Module::add_variant(std::string const &name, std::string const &hash)
     {
