@@ -13,12 +13,30 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: true
+    - uses: ilammy/msvc-dev-cmd@v1.12.0
+      with:
+        arch: win32
+      
+    - name: Download WinFlexBison
+      uses: suisei-cn/actions-download-file@v1.3.0
+      with:
+        url: "https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip"
+    
+    - name: Unzip WinFlexBison
+      run: 7z x win_flex_bison-2.5.25.zip -obin
+      
+    - name: Download llvm-project-with-widberg-extensions
+      uses: suisei-cn/actions-download-file@v1.3.0
+      with:
+        url: "https://github.com/widberg/llvm-project-widberg-extensions/releases/download/widberg-0.0.1/widberg-0.0.1-windows-x86_64-c1243607943cc7e89a09d93e2c25711ea6d201a9.zip"
+    
+    - name: Unzip llvm-project-with-widberg-extensions
+      run: 7z x widberg-0.0.1-windows-x86_64-c1243607943cc7e89a09d93e2c25711ea6d201a9.zip -obin
 
     - name: Package
       run: |
-           mkdir build && cd build
-           cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_BUILD_TYPE=Release ..
-           cmake --build . --target package_fmtk --config Release
+           cmake -B build -G Ninja -DWIDBERG_CLANG_CL="${GITHUB_WORKSPACE}/bin/clang-cl.exe" -DBISON_EXECUTABLE="${GITHUB_WORKSPACE}/bin/win_bison.exe" -DCMAKE_BUILD_TYPE=Release
+           cmake --build build --target package_fmtk --config Release
     
     - name: Create Release
       id: create_release
@@ -26,8 +44,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{ github.ref_name }}
+        release_name: ${{ github.ref_name }}
         body: |
           Check the README for [installation instructions](https://github.com/widberg/fmtk#installing-for-users-and-mod-developers).
           
@@ -41,7 +59,7 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_name: fmtk-${{ github.sha }}.zip
+        asset_name: fmtk-${{ github.ref_name }}-${{ github.sha }}.zip
         asset_path: build/fmtk.zip
         asset_content_type: application/zip
 
@@ -51,6 +69,6 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_name: fmtksdk-${{ github.sha }}.zip
+        asset_name: fmtksdk-${{ github.ref_name }}-${{ github.sha }}.zip
         asset_path: build/fmtksdk.zip
         asset_content_type: application/zip
