@@ -2,14 +2,11 @@
 //$ tag fuel::RegisterCommand, hook;
 //$ address fuel::RegisterCommand, [retail], @0x0069a400;
 
-void (__usercall *Real_RegisterCommand)(LPCSTR name@<edi>, LPCVOID pThis, LPVOID callback) =
-	reinterpret_cast<void (__usercall *)(LPCSTR name@<edi>, LPCVOID pThis, LPVOID callback)>(0x0069a400);
-
-void __usercall FMTK_RegisterCommand(LPCSTR name@<edi>, LPCVOID pThis, LPVOID callback)
+void __usercall wrap_fuel_RegisterCommand(LPCSTR name@<edi>, LPCVOID pThis, LPVOID callback)
 {
 	LOG(trace, FMTK, "Registering command: {}", name);
 
-	Real_RegisterCommand(name, pThis, callback);
+	real_fuel_RegisterCommand(name, pThis, callback);
 }
 
 struct CommandName
@@ -54,9 +51,9 @@ std::list<std::pair<CommandName, bool(*)(int, const char**)>> commandCallbacks;
 
 bool GenericCommandCallback()
 {
-	const char** pArg0 = (const char**)((char*)*pGlobalCommandState + 0xa3b0);
+	const char** pArg0 = (const char**)((char*)*real_fuel_pGlobalCommandState + 0xa3b0);
 	std::string name = *pArg0;
-	int argc = *(int*)((char*)*pGlobalCommandState + 0x23ac);
+	int argc = *(int*)((char*)*real_fuel_pGlobalCommandState + 0x23ac);
 
 	static const char* argv[32];
 
@@ -79,7 +76,7 @@ bool GenericCommandCallback()
 void RegisterCommand(const char* name, bool(*callback)(int argc, const char** argv))
 {
 	commandCallbacks.push_back({ name, callback});
-	Real_RegisterCommand(name, *pGlobalCommandState, (void*)GenericCommandCallback);
+	real_fuel_RegisterCommand(name, *real_fuel_pGlobalCommandState, (void*)GenericCommandCallback);
 }
 
 void UnregisterCommand(const char* name)

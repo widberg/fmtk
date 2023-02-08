@@ -1,7 +1,7 @@
-//$ symbol kernel32::CreateFileW, "HWND (WINAPI *)(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)";
+//$ symbol kernel32::CreateFileW, "HANDLE (WINAPI *)(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)";
 //$ tag kernel32::CreateFileW, hook;
 //$ address kernel32::CreateFileW, [*], !kernel32::CreateFileW;
-FUNCTION(CreateFileW, CreateFileW, HANDLE, WINAPI,
+HANDLE WINAPI wrap_kernel32_CreateFileW(
 	LPCWSTR               lpFileName,
 	DWORD                 dwDesiredAccess,
 	DWORD                 dwShareMode,
@@ -36,7 +36,7 @@ FUNCTION(CreateFileW, CreateFileW, HANDLE, WINAPI,
 		LOGW(trace, FMTK, "FUEL opening file: {}", fileName);
 	}
 
-	HANDLE rv = Real_CreateFileW(fileName.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+	HANDLE rv = real_kernel32_CreateFileW(fileName.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
 
 	if (rv == INVALID_HANDLE_VALUE)
 	{

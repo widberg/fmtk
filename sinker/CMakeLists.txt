@@ -6,8 +6,8 @@ add_library(sinker STATIC
 	${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
 )
 target_include_directories(sinker PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(sinker hl++)
-add_dependencies(sinker re2c)
+target_link_libraries(sinker hl++ detours)
+target_link_options(sinker INTERFACE /export:DetourFinishHelperProcess,@1,NONAME)
 
 add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp.re ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
@@ -20,6 +20,7 @@ add_executable(sinkerc
 		main.cpp
 )
 target_link_libraries(sinkerc sinker CLI11::CLI11)
+add_dependencies(sinkerc re2c)
 
 macro(add_sinker_target SINKER_TARGET)
 	set(options )

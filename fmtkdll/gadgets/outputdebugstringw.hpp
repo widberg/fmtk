@@ -2,7 +2,7 @@
 //$ tag kernel32::OutputDebugStringW, hook;
 //$ address kernel32::OutputDebugStringW, [*], !kernel32::OutputDebugStringW;
 
-FUNCTION(OutputDebugStringW, OutputDebugStringW, void, WINAPI, LPCWSTR lpOutputString)
+void WINAPI wrap_kernel32_OutputDebugStringW(LPCWSTR lpOutputString)
 {
 	LOGW(debug, FUEL, "{}", lpOutputString);
 }

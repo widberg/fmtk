@@ -2,7 +2,7 @@
 //$ tag kernel32::ReadFile, hook;
 //$ address kernel32::ReadFile, [*], !kernel32::ReadFile;
 
-FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
+BOOL WINAPI wrap_kernel32_ReadFile(
 	HANDLE       hFile,
 	LPVOID       lpBuffer,
 	DWORD        nNumberOfBytesToRead,
@@ -20,5 +20,5 @@ FUNCTION(ReadFile, ReadFile, BOOL, WINAPI,
 	//	// FMTK_BREAKPOINT_IF(strcmp(pszFilename, "d:\\steamlibrary\\steamapps\\common\\fuel\\datas\\p_moto.dpc") == 0);
 	//}
 	
-	return Real_ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
+	return real_kernel32_ReadFile(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, lpOverlapped);
 }

@@ -1,7 +1,6 @@
 #include "instrument.hpp"
 
 #include <Windows.h>
-#include <detours.h>
 
 //#include <dsound.h>
 
@@ -11,25 +10,20 @@
 #include <d3dx9shader.h>
 #include <fstream>
 #include <sinker.hpp>
+using namespace sinker;
 
 #include "fmtkdll.hpp"
 #include "logging.hpp"
 #include "sehexception.hpp"
 
-#define FUNCTION(name, address, returnType, callingConvention, ...) \
-returnType (callingConvention * Real_##name)(__VA_ARGS__)           \
-	= reinterpret_cast<decltype(Real_##name)>(address);             \
-returnType callingConvention FMTK_##name(__VA_ARGS__)
-
-#define ATTACH(x)       DetourAttach(&(PVOID&)Real_##x, FMTK_##x)
-#define DETACH(x)       DetourDetach(&(PVOID&)Real_##x, FMTK_##x)
+#define ATTACH(module_name, symbol_name) DetourAttach(&(PVOID&)real_ ## module_name ## _ ## symbol_name, wrap_ ## module_name ## _ ## symbol_name)
+#define DETACH(module_name, symbol_name) DetourDetach(&(PVOID&)real_ ## module_name ## _ ## symbol_name, wrap_ ## module_name ## _ ## symbol_name)
 
 //$ symbol fuel::pGlobalCommandState, "const void**";
 //$ address fuel::pGlobalCommandState, [retail], @0x00a7c080;
-const void** pGlobalCommandState = reinterpret_cast<const void**>(0x00a7c080);
 
 #define SINKER_SYMBOL(module_name, symbol_name, symbol_type) \
-	auto FUEL_ ## module_name ## _ ## symbol_name = static_cast<symbol_type>(nullptr);
+	auto real_ ## module_name ## _ ## symbol_name = static_cast<symbol_type>(nullptr);
 #include "fmtk.def"
 
 #include "gadgets/createfilew.hpp"
@@ -77,8 +71,7 @@ LONG AttachDetours()
 
     LOG(trace, FMTK, "Attaching detours");
 
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
+    Transaction transaction;
 
 #define SINKER_TAG_hook_SYMBOL(module_name, symbol_name, symbol_type) \
 	auto module_name ## _ ## symbol_name ## _ ## calculated_address = \
@@ -88,7 +81,10 @@ LONG AttachDetours()
     	LOG(critical, FMTK, "Calculate symbol \"" #module_name "_" #symbol_name "_calculated_address" "\" failed!"); \
 		return 0; \
 	} \
-	ATTACH(symbol_name);
+	real_ ## module_name ## _ ## symbol_name = module_name ## _ ## symbol_name ## _ ## calculated_address.value();\
+	auto detour ## module_name ## _ ## symbol_name = Detour(real_ ## module_name ## _ ## symbol_name, wrap_ ## module_name ## _ ## symbol_name); \
+	auto action ## module_name ## _ ## symbol_name = ActionInstall(detour ## module_name ## _ ## symbol_name); \
+	transaction.push_back(action ## module_name ## _ ## symbol_name);
 #include "fmtk.def"
 
 	//HINSTANCE hiDSOUND = GetModuleHandleA("dsound.dll");
@@ -100,18 +96,19 @@ LONG AttachDetours()
 
     LOG(trace, FMTK, "Ready to commit");
 
-    return DetourTransactionCommit();
+    return transaction.commit();
 }
 
 LONG DetachDetours()
 {
     LOG(trace, FMTK, "Detaching detours");
 
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
+    Transaction transaction;
 
 #define SINKER_TAG_hook_SYMBOL(module_name, symbol_name, symbol_type) \
-	DETACH(symbol_name);
+	auto detour ## module_name ## _ ## symbol_name = Detour(real_ ## module_name ## _ ## symbol_name, wrap_ ## module_name ## _ ## symbol_name); \
+	auto action ## module_name ## _ ## symbol_name = ActionUninstall(detour ## module_name ## _ ## symbol_name); \
+	transaction.push_back(action ## module_name ## _ ## symbol_name);
 #include "fmtk.def"
 
 	//DETACHXLIVE(ValidateMemory);
@@ -123,5 +120,5 @@ LONG DetachDetours()
 
     LOG(trace, FMTK, "Ready to commit");
 
-    return DetourTransactionCommit();
+    return transaction.commit();
 }

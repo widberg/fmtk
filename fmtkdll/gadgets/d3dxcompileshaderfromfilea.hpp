@@ -1,7 +1,7 @@
 //$ symbol d3dx9_39::D3DXCompileShaderFromFileA, "HRESULT (WINAPI *)(LPCSTR pSrcFile, CONST D3DXMACRO* pDefines, LPD3DXINCLUDE pInclude, LPCSTR pFunctionName, LPCSTR pProfile, DWORD Flags, LPD3DXBUFFER* ppShader, LPD3DXBUFFER* ppErrorMsgs, LPD3DXCONSTANTTABLE* ppConstantTable)";
 //$ tag d3dx9_39::D3DXCompileShaderFromFileA, hook;
 //$ address d3dx9_39::D3DXCompileShaderFromFileA, [*], !d3dx9_39::D3DXCompileShaderFromFileA;
-FUNCTION(D3DXCompileShaderFromFileA, 0x008b11e6, HRESULT, WINAPI,
+HRESULT WINAPI wrap_d3dx9_39_D3DXCompileShaderFromFileA(
 	LPCSTR                          pSrcFile,
 	CONST D3DXMACRO* pDefines,
 	LPD3DXINCLUDE                   pInclude,
@@ -17,7 +17,7 @@ FUNCTION(D3DXCompileShaderFromFileA, 0x008b11e6, HRESULT, WINAPI,
 	*ppErrorMsgs = nullptr;
 	LPD3DXBUFFER errorBuffer;
 
-	HRESULT result = Real_D3DXCompileShaderFromFileA(pSrcFile, pDefines, pInclude, pFunctionName, pProfile, Flags, ppShader, &errorBuffer, ppConstantTable);
+	HRESULT result = real_d3dx9_39_D3DXCompileShaderFromFileA(pSrcFile, pDefines, pInclude, pFunctionName, pProfile, Flags, ppShader, &errorBuffer, ppConstantTable);
 
 	if (errorBuffer != nullptr)
 	{

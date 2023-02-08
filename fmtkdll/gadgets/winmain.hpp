@@ -2,9 +2,10 @@
 //$ tag fuel::WinMain, hook;
 //$ address fuel::WinMain, [retail], @0x0081e340;
 
-FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+INT WINAPI wrap_fuel_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	// while (1);
+	// volatile bool x = true;
+	// while (x);
 
 	LOG(trace, FMTK, "Entry Point");
 
@@ -20,7 +21,7 @@ FUNCTION(WinMain, 0x0081e340, INT, WINAPI, HINSTANCE hInstance, HINSTANCE hPrevI
 	{
 		BROADCAST(Initialize);
 
-		result = Real_WinMain(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
+		result = real_fuel_WinMain(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
 		LOG(trace, FMTK, "FUEL returned {}", result);
 	}
 	catch (const std::exception& e)

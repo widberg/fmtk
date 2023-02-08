@@ -1,6 +1,9 @@
 #ifndef SINKER_HPP
 #define SINKER_HPP
 
+#include <Windows.h>
+#include <detours.h>
+
 #include <map>
 #include <set>
 #include <variant>
@@ -499,17 +502,34 @@ namespace sinker
         std::uint8_t buffer[S];
     };
 
-    // class Installable {
-    // public:
-    //     virtual void install();
-    //     virtual void uninstall();
-    // };
+    class Installable {
+    public:
+        virtual void install() = 0;
+    };
 
-    // template<typename T>
-    // class Detour : Installable {
-    // public:
-    //     Detour(T& original, T detour);
-    // };
+    class Uninstallable {
+    public:
+        virtual void uninstall() = 0;
+    };
+
+    template<typename T>
+    class Detour : public Installable, public Uninstallable {
+    public:
+        Detour(T& real, T wrap)
+            : real(&real), wrap(wrap) {}
+        virtual void install() override
+        {
+            DetourAttach(reinterpret_cast<PVOID*>(real), reinterpret_cast<PVOID>(wrap));
+        }
+
+        virtual void uninstall() override
+        {
+            DetourDetach(reinterpret_cast<PVOID*>(real), reinterpret_cast<PVOID>(wrap));
+        }
+    private:
+        T *real = nullptr;
+        T wrap = nullptr;
+    };
 
     // template<typename T>
     // class Patch : Installable {
@@ -517,14 +537,60 @@ namespace sinker
     //     Patch(T *dst, T *src);
     // };
 
-    // class Transaction {
-    // public:
-    //     Transaction();
-    //     Transaction(Installable& installable);
-    //     void push_back(Installable& installable);
-    //     void commit();
-    //     void abort();
-    // };
+    class Action
+    {
+    public:
+        virtual void act() = 0;
+    };
+
+    class ActionInstall : public Action
+    {
+    public:
+        ActionInstall(Installable& installable)
+            : installable(&installable) {}
+        virtual void act() override
+        {
+            installable->install();
+        }
+    private:
+        Installable *installable = nullptr;
+    };
+
+    class ActionUninstall : public Action
+    {
+    public:
+        ActionUninstall(Uninstallable& uninstallable)
+            : uninstallable(&uninstallable) {}
+        virtual void act() override
+        {
+            uninstallable->uninstall();
+        }
+    private:
+        Uninstallable *uninstallable = nullptr;
+    };
+
+    class Transaction
+    {
+    public:
+        Transaction() {}
+
+        void push_back(Action& action)
+        {
+            actions.push_back(&action);
+        }
+
+        long commit()
+        {
+            DetourTransactionBegin();
+            for (auto action : actions)
+            {
+                action->act();
+            }
+            return DetourTransactionCommit();
+        }
+    private:
+        std::vector<Action*> actions;
+    };
 
     // class Process {
     // public:

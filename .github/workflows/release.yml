@@ -10,7 +10,7 @@ jobs:
     name: Publish
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
     - uses: ilammy/msvc-dev-cmd@v1.12.0
@@ -35,7 +35,7 @@ jobs:
 
     - name: Package
       run: |
-           cmake -B build -G Ninja -DWIDBERG_CLANG_CL="${GITHUB_WORKSPACE}/bin/clang-cl.exe" -DBISON_EXECUTABLE="${GITHUB_WORKSPACE}/bin/win_bison.exe" -DCMAKE_BUILD_TYPE=Release
+           cmake -B build -G Ninja -DWIDBERG_CLANG_CL="${{ github.workspace }}/bin/clang-cl.exe" -DBISON_EXECUTABLE="${{ github.workspace }}/bin/win_bison.exe" -DCMAKE_BUILD_TYPE=Release
            cmake --build build --target package_fmtk --config Release
     
     - name: Create Release

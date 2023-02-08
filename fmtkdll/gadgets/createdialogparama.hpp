@@ -2,9 +2,9 @@
 //$ tag user32::CreateDialogParamA, hook;
 //$ address user32::CreateDialogParamA, [*], !user32::CreateDialogParamA;
 
-FUNCTION(CreateDialogParamA, CreateDialogParamA, HWND, WINAPI, HINSTANCE hInstance, LPCSTR lpTemplateName, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam)
+HWND WINAPI wrap_user32_CreateDialogParamA(HINSTANCE hInstance, LPCSTR lpTemplateName, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam)
 {
-	HWND result = Real_CreateDialogParamA(hInstance, lpTemplateName, hWndParent, lpDialogFunc, dwInitParam);
+	HWND result = real_user32_CreateDialogParamA(hInstance, lpTemplateName, hWndParent, lpDialogFunc, dwInitParam);
 	//ShowWindow(result, 1);
 	return result;
 }
