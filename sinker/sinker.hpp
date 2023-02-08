@@ -590,8 +590,8 @@ namespace sinker
     class ActionInstall : public Action
     {
     public:
-        ActionInstall(Installable& installable)
-            : installable(&installable) {}
+        ActionInstall(Installable *installable)
+            : installable(installable) {}
         virtual void act() override
         {
             installable->install();
@@ -603,8 +603,8 @@ namespace sinker
     class ActionUninstall : public Action
     {
     public:
-        ActionUninstall(Uninstallable& uninstallable)
-            : uninstallable(&uninstallable) {}
+        ActionUninstall(Uninstallable *uninstallable)
+            : uninstallable(uninstallable) {}
         virtual void act() override
         {
             uninstallable->uninstall();
@@ -618,9 +618,9 @@ namespace sinker
     public:
         Transaction() {}
 
-        void push_back(Action& action)
+        void add(Action *action)
         {
-            actions.push_back(&action);
+            actions.push_back(action);
         }
 
         long commit()

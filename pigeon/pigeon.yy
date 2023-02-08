@@ -41,6 +41,8 @@
 #include <vector>
 #include <memory>
 #include <optional>
+#include <string>
+#include <cstring>
 #include <CLI/CLI.hpp>
 
 // Bison generates weird switch statements
@@ -91,6 +93,7 @@ namespace pigeon
         virtual std::string type_definition(std::string const& type_name) const = 0;
         virtual bool can_return() const override = 0;
         virtual bool by_reference() const override = 0;
+        virtual ~Type() {}
     };
     
     class PrimitiveType : public Type
@@ -312,7 +315,7 @@ namespace pigeon
         std::string name;
         std::shared_ptr<Type> type;
     };
-    
+
     class StructType : public Type
     {
     public:
@@ -369,7 +372,7 @@ namespace pigeon
             } else {
                 out += returns[0].type->declaration("");
             }
-            out += "(*" + variable_name + ")(";
+            out += "(__stdcall *" + variable_name + ")(";
             
             bool has_parameters = false;
 
@@ -430,14 +433,22 @@ namespace pigeon
         std::vector<Declaration> returns;
     };
 
+    static std::string to_upper_str(std::string str)
+    {
+        for (char& c : str)
+        {
+            c = std::toupper(c);
+        }
+        return str;
+    }
     
     class Namespace : public DumpC
     {
     public:
         Namespace(std::string const& name, Namespace *parent)
-            : name(name), parent(parent) {}
+            : name(name), uppercase_name(to_upper_str(name)), parent(parent) {}
         Namespace(std::string const& name)
-            : name(name), parent(nullptr) {}
+            : name(name), uppercase_name(to_upper_str(name)), parent(nullptr) {}
         
         std::optional<std::shared_ptr<Type>> get_type(std::string_view name) const {
             for (auto it : types) {
@@ -501,6 +512,11 @@ namespace pigeon
             return name;
         }
 
+        std::string const& get_uppercase_name() const
+        {
+            return uppercase_name;
+        }
+
         void dump(std::ostream& out) const {
             std::string prefix;
             for (Namespace *p = parent; p; p = p->get_parent())
@@ -561,7 +577,7 @@ namespace pigeon
 
             for (auto eksport : exports)
             {
-                out << eksport.second->declaration(eksport.first) << ";\n\n";
+                out << eksport.second->declaration(eksport.first) << ";\n";
             }
 
             for (Namespace *child : children)
@@ -582,6 +598,7 @@ namespace pigeon
 
     private:
         std::string name;
+        std::string uppercase_name;
         std::vector<Namespace*> children;
         Namespace *parent;
         std::vector<std::pair<std::string, std::shared_ptr<Type>>> types;
@@ -619,21 +636,26 @@ namespace pigeon
 
         void dump_c(std::ostream& out) const
         {
-            out << "#ifndef " << global.get_name() << "_H\n";
-            out << "#define " << global.get_name() << "_H\n";
+            out << "#ifndef " << global.get_uppercase_name() << "_H\n";
+            out << "#define " << global.get_uppercase_name() << "_H\n";
             out << "#ifdef __cplusplus\n";
             out << "extern \"C\"\n";
             out << "{\n";
+            out << "#include <cstdint>\n";
+            out << "#include <cstdbool>\n";
+            out << "#define " << global.get_uppercase_name() << "API extern \"C\" __declspec(dllexport) __declspec(noinline) __stdcall\n";
+            out << "#else // __cplusplus\n";
+            out << "#include <stdint.h>\n";
+            out << "#include <stdbool.h>\n";
+            out << "#define " << global.get_uppercase_name() << "API __declspec(dllexport) __declspec(noinline) __stdcall\n";
             out << "#endif // __cplusplus\n\n";
-            out << "#include <stdint.h>\n\n";
-            out << "#define " << global.get_name() << "API extern \"C\" __declspec(dllexport) __declspec(noinline)\n\n";
 
             global.dump_c(out);
 
             out << "\n#ifdef __cplusplus\n";
             out << "}\n";
             out << "#endif // __cplusplus\n";
-            out << "#endif // !" << global.get_name() << "_H\n";
+            out << "#endif // !" << global.get_uppercase_name() << "_H\n";
         }
     };
 
