@@ -16,9 +16,6 @@ using namespace sinker;
 #include "logging.hpp"
 #include "sehexception.hpp"
 
-#define ATTACH(module_name, symbol_name) DetourAttach(&(PVOID&)real_ ## module_name ## _ ## symbol_name, wrap_ ## module_name ## _ ## symbol_name)
-#define DETACH(module_name, symbol_name) DetourDetach(&(PVOID&)real_ ## module_name ## _ ## symbol_name, wrap_ ## module_name ## _ ## symbol_name)
-
 //$ symbol fuel::pGlobalCommandState, "const void**";
 //$ address fuel::pGlobalCommandState, [retail], @0x00a7c080;
 
@@ -87,13 +84,6 @@ LONG AttachDetours()
 	transaction.push_back(action ## module_name ## _ ## symbol_name);
 #include "fmtk.def"
 
-	//HINSTANCE hiDSOUND = GetModuleHandleA("dsound.dll");
-
-	//ATTACHDSOUND(IDirectSoundBuffer_Play);
-	//ATTACHDSOUND(IDirectSoundBuffer_SetVolume);
-	//ATTACHDSOUND(IDirectSoundBuffer_Release);
-	//ATTACHDSOUND(IDirectSound_CreateSoundBuffer);
-
     LOG(trace, FMTK, "Ready to commit");
 
     return transaction.commit();
@@ -110,13 +100,6 @@ LONG DetachDetours()
 	auto action ## module_name ## _ ## symbol_name = ActionUninstall(detour ## module_name ## _ ## symbol_name); \
 	transaction.push_back(action ## module_name ## _ ## symbol_name);
 #include "fmtk.def"
-
-	//DETACHXLIVE(ValidateMemory);
-
-	//DETACHDSOUND(IDirectSoundBuffer_Play);
-	//DETACHDSOUND(IDirectSoundBuffer_SetVolume);
-	//DETACHDSOUND(IDirectSoundBuffer_Release);
-	//DETACHDSOUND(IDirectSound_CreateSoundBuffer);
 
     LOG(trace, FMTK, "Ready to commit");
 
