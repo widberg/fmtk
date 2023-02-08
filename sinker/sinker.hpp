@@ -527,15 +527,59 @@ namespace sinker
             DetourDetach(reinterpret_cast<PVOID*>(real), reinterpret_cast<PVOID>(wrap));
         }
     private:
-        T *real = nullptr;
-        T wrap = nullptr;
+        T *real = {};
+        T wrap = {};
     };
 
-    // template<typename T>
-    // class Patch : Installable {
-    // public:
-    //     Patch(T *dst, T *src);
-    // };
+    template<typename T>
+    class Patch : public Installable, public Uninstallable
+    {
+    public:
+        Patch(T *dst, T *src)
+            : dst(dst), src(src) {}
+        virtual void install() override
+        {
+            backup = *dst;
+            *dst = *src;
+        }
+
+        virtual void uninstall() override
+        {
+            *dst = backup;
+        }
+    private:
+        T *dst = {};
+        T *src = {};
+        T backup = {};
+    };
+
+    template<typename T, std::size_t N>
+    class Patch<T[N]> : public Installable, public Uninstallable
+    {
+    public:
+        Patch(T *dst, T *src)
+            : dst(dst), src(src) {}
+        virtual void install() override
+        {
+            for (std::size_t i = 0; i < N; ++i)
+            {
+                backup[i] = dst[i];
+                dst[i] = src[i];
+            }
+        }
+
+        virtual void uninstall() override
+        {
+            for (std::size_t i = 0; i < N; ++i)
+            {
+                dst[i] = backup[i];
+            }
+        }
+    private:
+        T *dst = {};
+        T *src = {};
+        T backup[N] = {};
+    };
 
     class Action
     {
