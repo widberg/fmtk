@@ -80,8 +80,8 @@ LONG AttachDetours()
 	} \
 	real_ ## module_name ## _ ## symbol_name = module_name ## _ ## symbol_name ## _ ## calculated_address.value();\
 	auto detour ## module_name ## _ ## symbol_name = Detour(real_ ## module_name ## _ ## symbol_name, wrap_ ## module_name ## _ ## symbol_name); \
-	auto action ## module_name ## _ ## symbol_name = ActionInstall(detour ## module_name ## _ ## symbol_name); \
-	transaction.add(action ## module_name ## _ ## symbol_name);
+	auto action ## module_name ## _ ## symbol_name = ActionInstall(&detour ## module_name ## _ ## symbol_name); \
+	transaction.add(&action ## module_name ## _ ## symbol_name);
 #include "fmtk.def"
 
     LOG(trace, FMTK, "Ready to commit");
@@ -97,8 +97,8 @@ LONG DetachDetours()
 
 #define SINKER_TAG_hook_SYMBOL(module_name, symbol_name, symbol_type) \
 	auto detour ## module_name ## _ ## symbol_name = Detour(real_ ## module_name ## _ ## symbol_name, wrap_ ## module_name ## _ ## symbol_name); \
-	auto action ## module_name ## _ ## symbol_name = ActionUninstall(detour ## module_name ## _ ## symbol_name); \
-	transaction.add(action ## module_name ## _ ## symbol_name);
+	auto action ## module_name ## _ ## symbol_name = ActionUninstall(&detour ## module_name ## _ ## symbol_name); \
+	transaction.add(&action ## module_name ## _ ## symbol_name);
 #include "fmtk.def"
 
     LOG(trace, FMTK, "Ready to commit");
