@@ -8,9 +8,10 @@
 #include "debug.hpp"
 
 #if FMTK_DEBUG
-#define LOG_LEVEL() spdlog::set_level(spdlog::level::trace)
+#define LOG_LEVEL() spdlog::set_level(spdlog::level::debug)
+// #define LOG_LEVEL() spdlog::set_level(spdlog::level::trace)
 #else
-#define LOG_LEVEL() spdlog::set_level(spdlog::level::debug);
+#define LOG_LEVEL() spdlog::set_level(spdlog::level::debug)
 #endif
 
 #define LOG_INIT(path)                                                                                \

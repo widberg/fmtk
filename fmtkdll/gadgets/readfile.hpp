@@ -9,7 +9,7 @@ BOOL WINAPI wrap_kernel32_ReadFile(
 	LPDWORD      lpNumberOfBytesRead,
 	LPOVERLAPPED lpOverlapped)
 {
-	static CHAR pszFilename[MAX_PATH + 1];
+	// static CHAR pszFilename[MAX_PATH + 1];
 
 	//if (GetFinalPathNameByHandleA(hFile, pszFilename, sizeof(pszFilename), FILE_NAME_NORMALIZED))
 	//{

@@ -21,6 +21,7 @@ set(fmtkdll_SOURCES
 	gadgets/readfile.hpp
 	gadgets/idirectsoundbufferplay.hpp
 	gadgets/createdialogparama.hpp
+	gadgets/regqueryvalueexw.hpp
 )
 
 add_sinker_target(fmtkdll_sinker

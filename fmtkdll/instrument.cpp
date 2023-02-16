@@ -37,6 +37,7 @@ using namespace sinker;
 #include "gadgets/getplayerposition.hpp"
 #include "gadgets/readfile.hpp"
 #include "gadgets/createdialogparama.hpp"
+#include "gadgets/regqueryvalueexw.hpp"
 //#include "gadgets/idirectsoundbufferplay.hpp"
 
 // Instrument
@@ -66,19 +67,28 @@ LONG AttachDetours()
 	}
 #include "fmtk.def"
 
-    LOG(trace, FMTK, "Attaching detours");
+    LOG(trace, FMTK, "Calculating addresses");
 
-    Transaction transaction;
-
-#define SINKER_TAG_hook_SYMBOL(module_name, symbol_name, symbol_type) \
+#define SINKER_SYMBOL(module_name, symbol_name, symbol_type) \
 	auto module_name ## _ ## symbol_name ## _ ## calculated_address = \
-	ctx.get_module(#module_name)->get_symbol(#symbol_name)->calculate_address<symbol_type>(); \
+	ctx.get_module(#module_name)->get_symbol(#symbol_name)->calculate_address<decltype(real_ ## module_name ## _ ## symbol_name)>(); \
 	if (!module_name ## _ ## symbol_name ## _ ## calculated_address && ctx.get_module(#module_name)->get_symbol(#symbol_name)->get_attribute<bool>("required").value_or(true)) \
 	{ \
     	LOG(critical, FMTK, "Calculate symbol \"" #module_name "_" #symbol_name "_calculated_address" "\" failed!"); \
 		return 0; \
 	} \
-	real_ ## module_name ## _ ## symbol_name = module_name ## _ ## symbol_name ## _ ## calculated_address.value();\
+	if (module_name ## _ ## symbol_name ## _ ## calculated_address) \
+	{ \
+		LOG(trace, FMTK, "Calculate symbol \"" #module_name "_" #symbol_name "_calculated_address" "\" = {}", (void*)(module_name ## _ ## symbol_name ## _ ## calculated_address.value())); \
+		real_ ## module_name ## _ ## symbol_name = module_name ## _ ## symbol_name ## _ ## calculated_address.value(); \
+	}
+#include "fmtk.def"
+
+    LOG(trace, FMTK, "Attaching detours");
+
+    Transaction transaction;
+
+#define SINKER_TAG_hook_SYMBOL(module_name, symbol_name, symbol_type) \
 	auto detour ## module_name ## _ ## symbol_name = Detour(real_ ## module_name ## _ ## symbol_name, wrap_ ## module_name ## _ ## symbol_name); \
 	auto action ## module_name ## _ ## symbol_name = ActionInstall(&detour ## module_name ## _ ## symbol_name); \
 	transaction.add(&action ## module_name ## _ ## symbol_name);
