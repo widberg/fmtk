@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: true
+        submodules: recursive
     - uses: ilammy/msvc-dev-cmd@v1.12.0
       with:
         arch: win32
