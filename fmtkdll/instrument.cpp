@@ -9,7 +9,7 @@
 #include <cwctype>
 #include <d3dx9shader.h>
 #include <fstream>
-#include <sinker.hpp>
+#include <sinker/sinker.hpp>
 using namespace sinker;
 
 #include "fmtkdll.hpp"

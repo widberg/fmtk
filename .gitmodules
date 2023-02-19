@@ -4,21 +4,18 @@
 [submodule "dependencies/spdlog"]
 	path = dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "dependencies/detours/Detours"]
-	path = dependencies/detours/Detours
-	url = https://github.com/microsoft/Detours.git
 [submodule "dependencies/luajit/LuaJIT"]
 	path = dependencies/luajit/LuaJIT
 	url = https://github.com/LuaJIT/LuaJIT.git
 [submodule "dependencies/tomlplusplus"]
 	path = dependencies/tomlplusplus
 	url = https://github.com/marzer/tomlplusplus.git
-[submodule "dependencies/hashlibpp"]
-	path = dependencies/hashlibpp
-	url = https://github.com/pkcakeout/hashlibpp.git
 [submodule "dependencies/CLI11"]
 	path = dependencies/CLI11
 	url = https://github.com/CLIUtils/CLI11.git
 [submodule "dependencies/re2c"]
 	path = dependencies/re2c
 	url = https://github.com/skvadrik/re2c.git
+[submodule "dependencies/sinker"]
+	path = dependencies/sinker
+	url = https://github.com/widberg/sinker.git

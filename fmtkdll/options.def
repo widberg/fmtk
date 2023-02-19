@@ -1,0 +1,3 @@
+FMTK_OPTION(unsigned int, width, override the resolution width)
+FMTK_OPTION(unsigned int, height, override the resolution height)
+FMTK_OPTION(std::string, log-level, override the log level)

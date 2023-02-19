@@ -32,7 +32,6 @@ find_package(FUEL)
 add_subdirectory(dependencies)
 
 add_subdirectory(pigeon)
-add_subdirectory(sinker)
 add_subdirectory(fmtksdk)
 add_subdirectory(common)
 add_subdirectory(fmtklua)

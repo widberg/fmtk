@@ -1,21 +1,21 @@
 # CLI11
-add_subdirectory(CLI11)
+if(NOT TARGET CLI11::CLI11)
+    add_subdirectory(CLI11)
+endif()
 
 # D3D9
 add_subdirectory(d3d9)
-
-# Detours
-add_subdirectory(detours)
-
-# hashlibpp
-add_subdirectory(hashlibpp)
-target_include_directories(hl++ PUBLIC $<TARGET_PROPERTY:hl++,SOURCE_DIR>/src)
 
 # LuaJIT
 add_subdirectory(luajit)
 
 # re2c
-add_subdirectory(re2c)
+if(NOT TARGET CLI11::CLI11)
+    add_subdirectory(re2c)
+endif()
+
+# sinker
+add_subdirectory(sinker)
 
 # sol2
 add_subdirectory(sol2)
