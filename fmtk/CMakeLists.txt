@@ -3,7 +3,7 @@ add_executable(fmtk
 	fmtk.rc
 )
 target_link_libraries(fmtk common detours spdlog tomlplusplus::tomlplusplus)
-add_dependencies(fmtk fmtkdll secudll fmtklua)
+add_dependencies(fmtk fmtkdll fmtklua)
 
 if (FUEL_FOUND)
 	add_custom_target(run

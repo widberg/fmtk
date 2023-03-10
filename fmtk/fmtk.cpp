@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 
     std::wstringstream ss;
 
-    ss << L"\"../../SecuLauncher.exe\" " << arguments;
+    ss << L"\"../../FUEL.exe\" " << arguments;
 
     std::vector<wchar_t> buf;
     buf.resize(ss.str().size() + 1);
@@ -77,18 +77,18 @@ int main(int argc, char** argv)
 
     if (!DetourCreateProcessWithDllExW(NULL, buf.data(),
         NULL, NULL, TRUE, dwFlags, NULL,
-        std::filesystem::absolute("../..").wstring().c_str(), &si, &pi, "mods/fmtk/secudll.dll", NULL))
+        std::filesystem::absolute("../..").wstring().c_str(), &si, &pi, "mods/fmtk/fmtkdll.dll", NULL))
     {
         LOG(error, FMTK, "DetourCreateProcessWithDllEx failed: {}\n", GetLastError());
         LogLastError();
         return 9009;
     }
 
-    LOG(trace, FMTK, "Resuming SecuLauncher");
+    LOG(trace, FMTK, "Resuming FUEL");
 
     ResumeThread(pi.hThread);
 
-    LOG(trace, FMTK, "SecuLauncher resumed");
+    LOG(trace, FMTK, "FUEL resumed");
 
     WaitForSingleObject(pi.hProcess, INFINITE);
 
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        LOG(trace, FMTK, "SecuLauncher exited with code: 0x{0:x}", dwResult);
+        LOG(trace, FMTK, "FUEL exited with code: 0x{0:x}", dwResult);
     }
 
     return dwResult;
