@@ -38,6 +38,7 @@ using namespace sinker;
 #include "gadgets/readfile.hpp"
 #include "gadgets/createdialogparama.hpp"
 #include "gadgets/regqueryvalueexw.hpp"
+#include "gadgets/securom.hpp"
 //#include "gadgets/idirectsoundbufferplay.hpp"
 
 // Instrument

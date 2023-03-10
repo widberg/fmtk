@@ -1,3 +1,4 @@
-FMTK_OPTION(unsigned int, width, override the resolution width)
-FMTK_OPTION(unsigned int, height, override the resolution height)
-FMTK_OPTION(std::string, log-level, override the log level)
+FMTK_OPTION(unsigned int, --width, width, override the resolution width)
+FMTK_OPTION(unsigned int, --height, height, override the resolution height)
+FMTK_OPTION(std::string, --log-level, log_level, override the log level)
+FMTK_OPTION(std::string, --args, args, forward args to the game)
