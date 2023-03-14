@@ -27,9 +27,9 @@ Index,Description,Notes
 25,,
 26,,
 27,,
-28,,
-29,,
-30,,
+28,,IT_Dyn_VehicleMove_G
+29,,IT_Dyn_VehicleMove_G
+30,,IT_Dyn_VehicleMove_G
 31,,
 32,,
 33,,
@@ -43,18 +43,18 @@ Index,Description,Notes
 41,,
 42,,
 43,,
-44,,
-45,,num wheels
-46,,gear related
+44,,some count used later to select even or odd params in a loop, odd actually means 1,3, or 5
+45,,num wheels IT_Dyn_VehicleMove_G
+46,,gear related IT_Dyn_VehicleMove_G
 47,,
-48,,gear related
-49,,gear related
+48,,gear related IT_Dyn_VehicleMove_G
+49,,gear related IT_Dyn_VehicleMove_G
 50,,
 51,,
 52,,
 53,,
-54,,
-55,,
+54,,54/55 even for each param 44 IT_Dyn_VehicleMove_G
+55,,54/55 odd for each param 44 IT_Dyn_VehicleMove_G
 56,,
 57,,
 58,,
@@ -69,26 +69,26 @@ Index,Description,Notes
 67,,
 68,,
 69,,
-70,,
-71,,
-72,,
-73,,
-74,,
-75,,
-76,,
-77,,
-78,,
-79,,
-80,,
-81,,
-82,,
-83,,
-84,,
-85,,
+70,,70/71 even for each param 44 IT_Dyn_VehicleMove_G
+71,,70/71 odd for each param 44 IT_Dyn_VehicleMove_G
+72,,72/73 even for each param 44 IT_Dyn_VehicleMove_G
+73,,72/73 odd for each param 44 IT_Dyn_VehicleMove_G
+74,,74/75 even for each param 44 IT_Dyn_VehicleMove_G
+75,,74/75 odd for each param 44 IT_Dyn_VehicleMove_G
+76,,76/77 even for each param 44 IT_Dyn_VehicleMove_G
+77,,76/77 odd for each param 44 IT_Dyn_VehicleMove_G
+78,,78/79 even for each param 44 IT_Dyn_VehicleMove_G
+79,,78/79 odd for each param 44 IT_Dyn_VehicleMove_G
+80,,80/81 even for each param 44 IT_Dyn_VehicleMove_G
+81,,80/81 odd for each param 44 IT_Dyn_VehicleMove_G
+82,,82/83 even for each param 44 IT_Dyn_VehicleMove_G
+83,,82/83 odd for each param 44 IT_Dyn_VehicleMove_G
+84,,84/85 even for each param 44 IT_Dyn_VehicleMove_G
+85,,84/85 odd for each param 44 IT_Dyn_VehicleMove_G
 86,,
 87,,
-88,,
-89,,
+88,,88/89 even for each param 44 IT_Dyn_VehicleMove_G
+89,,88/89 odd for each param 44 IT_Dyn_VehicleMove_G
 90,,
 91,,
 92,,
@@ -106,8 +106,8 @@ Index,Description,Notes
 104,,
 105,,
 106,,
-107,,
-108,,
+107,,107/108 even for each param 44 IT_Dyn_VehicleMove_G
+108,,107/108 odd for each param 44 IT_Dyn_VehicleMove_G
 109,,
 110,,
 111,,
@@ -118,8 +118,8 @@ Index,Description,Notes
 116,,
 117,,
 118,,
-119,,
-120,,
+119,,119/120 even for each param 44 IT_Dyn_VehicleMove_G
+120,,119/120 odd for each param 44 IT_Dyn_VehicleMove_G
 121,,
 122,,
 123,,
@@ -154,13 +154,13 @@ Index,Description,Notes
 152,,
 153,,
 154,,
-155,,
-156,,
+155,,155/156 even for each param 44 IT_Dyn_VehicleMove_G
+156,,155/156 odd for each param 44 IT_Dyn_VehicleMove_G
 157,,
 158,,
-159,,
-160,,
-161,,
+159,,159/160 even for each param 44 IT_Dyn_VehicleMove_G
+160,,159/160 odd for each param 44 IT_Dyn_VehicleMove_G
+161,,161/161 even and odd for each param 44 IT_Dyn_VehicleMove_G
 162,,
 163,,
 164,,
@@ -273,14 +273,14 @@ Index,Description,Notes
 271,,
 272,,
 273,,
-274,,
-275,,
-276,,
-277,,
+274,,274/275 even for each param 44 IT_Dyn_VehicleMove_G
+275,,274/275 odd for each param 44 IT_Dyn_VehicleMove_G
+276,,276/277 even for each param 44 IT_Dyn_VehicleMove_G
+277,,276/277 odd for each param 44 IT_Dyn_VehicleMove_G
 278,,
 279,,
 280,,
-281,,
+281,,Clamped to >=0
 282,,
 283,,
 284,,
@@ -320,10 +320,10 @@ Index,Description,Notes
 318,,
 319,,
 320,,
-321,,
+321,,IT_Dyn_VehicleMove_G
 322,,
-323,,gear related
-324,,
+323,,gear related IT_Dyn_VehicleMove_G
+324,,IT_Dyn_VehicleMove_G
 325,,
 326,,gear related
 327,,
@@ -333,9 +333,9 @@ Index,Description,Notes
 331,,
 332,,
 333,,
-334,,
-335,,
-336,,
+334,,IT_Dyn_VehicleMove_G
+335,,IT_Dyn_VehicleMove_G
+336,,IT_Dyn_VehicleMove_G
 337,,
 338,Curve height 0,
 339,Curve height 1,
@@ -366,10 +366,10 @@ Index,Description,Notes
 364,Gear 6 height,
 365,,
 366,,
-367,,
-368,,
-369,,
-370,,
+367,,IT_Dyn_VehicleMove_G
+368,,IT_Dyn_VehicleMove_G
+369,,IT_Dyn_VehicleMove_G
+370,,IT_Dyn_VehicleMove_G
 371,,
 372,,
 373,,
@@ -387,10 +387,10 @@ Index,Description,Notes
 385,,
 386,,
 387,,
-388,,
-389,,
-390,,
-391,,
+388,,IT_Dyn_VehicleMove_G
+389,,IT_Dyn_VehicleMove_G
+390,,IT_Dyn_VehicleMove_G
+391,,IT_Dyn_VehicleMove_G
 392,,
 393,,
 394,,
@@ -570,9 +570,9 @@ Index,Description,Notes
 568,,
 569,,
 570,,
-571,,
-572,,
-573,,
+571,,CameraMove_G
+572,,CameraMove_G
+573,,CameraMove_G
 574,,
 575,,
 576,,
@@ -592,37 +592,37 @@ Index,Description,Notes
 590,,
 591,,
 592,,
-593,,
-594,,
-595,,
-596,,
-597,,
+593,,IT_Dyn_VehicleMove_G
+594,,IT_Dyn_VehicleMove_G
+595,,IT_Dyn_VehicleMove_G
+596,,IT_Dyn_VehicleMove_G
+597,,IT_Dyn_VehicleMove_G
 598,,
-599,,
-600,,
-601,,
-602,,
-603,,
-604,,
-605,,
-606,,
-607,,
-608,,
-609,,
-610,,
-611,,
+599,Point value for a SMALL DRIFT stunt,StuntHUD SMALL DRIFT
+600,Point value for a DRIFT stunt,StuntHUD DRIFT
+601,Point value for a BIG DRIFT stunt,StuntHUD BIG DRIFT
+602,Point value for a SMALL JUMP stunt,StuntHUD SMALL JUMP
+603,Point value for a JUMP stunt,StuntHUD JUMP
+604,Point value for a BIG JUMP stunt,StuntHUD BIG JUMP
+605,Point value for a SMALL DESTRUCTION stunt,StuntHUD SMALL DESTRUCTION
+606,Point value for a DESTRUCTION stunt,StuntHUD DESTRUCTION
+607,Point value for a BIG DESTRUCTION stunt,StuntHUD BIG DESTRUCTION
+608,Point value for a SMALL WHEELING stunt,StuntHUD SMALL WHEELING
+609,Point value for a WHEELING stunt,StuntHUD WHEELING
+610,Point value for a BIG WHEELING stunt,StuntHUD BIG WHEELING
+611,Point value for a ELUSIVE stunt,StuntHUD ELUSIVE
 612,,
 613,,
 614,,
 615,,
 616,,
 617,,
-618,,
-619,,
+618,,IAManipulator_G CameraMove_G MarkerVisibleObject GameCarClient_G TrafficManipulator_G
+619,,IAManipulator_G
 620,,
 621,,
-622,,
-623,,
+622,,IAManipulator_G
+623,,IAManipulator_G
 624,,
 625,,
 626,,
@@ -654,18 +654,18 @@ Index,Description,Notes
 652,,
 653,,
 654,,
-655,,
-656,,
-657,,
-658,,
-659,,
-660,,
+655,,IT_Dyn_VehicleMove_G
+656,,IT_Dyn_VehicleMove_G
+657,,IT_Dyn_VehicleMove_G
+658,,IT_Dyn_VehicleMove_G
+659,,IT_Dyn_VehicleMove_G
+660,,IT_Dyn_VehicleMove_G
 661,,
 662,,
-663,,
-664,,
-665,,
-666,,
+663,,Clamped to [0.0099999998, 5.0]
+664,,Clamped to [0.75, 5.0]
+665,,Clamped to [0.25, 2.0]
+666,,Clamped to [0.25, 2.0]
 667,,
 668,,
 669,,
@@ -675,6 +675,6 @@ Index,Description,Notes
 673,,
 674,,
 675,,
-676,,
+676,,IT_Dyn_VehicleMove_G
 677,,
-678,,
+678,,Special check for this in VPP but nothing is done with the value

@@ -18,7 +18,7 @@ int __stdcall wrap_fuel_securom() {
 
 LRESULT WINAPI wrap_user32_SendMessageA(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-    if (hWnd == (HWND)0xFFFFFFFF && Msg == (UINT)0xFFFFFFFF && wParam == (WPARAM)0x00000000 && lParam == (LPARAM)0xFFFFFFFF)
+    if (hWnd == (HWND)0xFFFFFFFF && Msg == (UINT)0xFFFFFFFF && wParam == (WPARAM)0x00000000 && lParam == (LPARAM)0x00000000)
     {
         return 0;
     }
