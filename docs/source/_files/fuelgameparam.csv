@@ -1,5 +1,5 @@
 Index,Type,Description,Notes
-1,Int,pp001.tsc version,Must equal 88
+1,Numeric,pp001.tsc version,Must equal 88
 2,,,Related to Navigator3dHUD
 3,,,Related to Navigator3dHUD
 4,,,Related to Navigator3dHUD
@@ -31,11 +31,11 @@ Index,Type,Description,Notes
 30,,,
 31,,,
 32-38,Unused,Unused,Unused
-39,,,Related to ViewportHUD and MapHUD
-40,,,Related to ViewportHUD and MapHUD
-41,,,Related to ViewportHUD and MapHUD
-42,,,Related to ViewportHUD and MapHUD
-43,,,Related to ViewportHUD and MapHUD
+39,Numeric,Menu tint red,Red component of the menu tint color
+40,Numeric,Menu tint green,Green component of the menu tint color
+41,Numeric,Menu tint blue,Blue component of the menu tint color
+42,Numeric,Menu distortion,Amount of distortion around the edge of the screen in menus
+43,Numeric,Menu tint amount,Amount of tint over the camera view behind the menus
 44,Unused,Unused,Unused
 45,,,Related to menus
 46,,,
@@ -61,75 +61,19 @@ Index,Type,Description,Notes
 72,,,Related to InGame3DVehicle
 73,,,Related to InGame3DVehicle
 74-79,Unused,Unused,Unused
-80,,,Related to F14Move_G
-81,,,Related to F14Move_G
-82,,,Related to F14Move_G
+80,Numeric,F14 Delay,Time between planes flying overhead
+81,Numeric,F14 Speed,Speed of planes flying overhead
+82,Numeric,F14 Height,Height of planes flying overhead
 83-89,Unused,Unused,Unused
 90,,,Related to MeterHUD
-91-100,Unused,Unused,Unused
-101,,,The game boots fine without this
-102,,,The game boots fine without this
-103,,,The game boots fine without this
-104,,,The game boots fine without this
-105,,,The game boots fine without this
-106,,,The game boots fine without this
-107,,,The game boots fine without this
-108,,,The game boots fine without this
-109,,,The game boots fine without this
-110,,,The game boots fine without this
-111,,,The game boots fine without this
-112,,,The game boots fine without this
-113,,,The game boots fine without this
-114,,,The game boots fine without this
-115-119,Unused,Unused,Unused
+91-119,Unused,Unused,Unused
 120,,,Related to IT_COLLECTMove_G
 121-129,Unused,Unused,Unused
 130,,,
 131-149,Unused,Unused,Unused
 150,,,Related to IT_DYNOBJMove_G
 151,,,Related to IT_DYNOBJMove_G
-152-199,Unused,Unused,Unused
-200,,,The game boots fine without this
-201,,,The game boots fine without this
-202,,,The game boots fine without this
-203,,,The game boots fine without this
-204,,,The game boots fine without this
-205,,,The game boots fine without this
-206,,,The game boots fine without this
-207,,,The game boots fine without this
-208,,,The game boots fine without this
-209,,,The game boots fine without this
-210,,,The game boots fine without this
-211,,,The game boots fine without this
-212,,,The game boots fine without this
-213,,,The game boots fine without this
-214,,,The game boots fine without this
-215,,,The game boots fine without this
-216,,,The game boots fine without this
-217,,,The game boots fine without this
-218,,,The game boots fine without this
-219,,,The game boots fine without this
-220,,,The game boots fine without this
-221,,,The game boots fine without this
-222,,,The game boots fine without this
-223,,,The game boots fine without this
-224,,,The game boots fine without this
-225,,,The game boots fine without this
-226,,,The game boots fine without this
-227,,,The game boots fine without this
-228,,,The game boots fine without this
-229,,,The game boots fine without this
-230,,,The game boots fine without this
-231,,,The game boots fine without this
-232,,,The game boots fine without this
-233,,,The game boots fine without this
-234,,,The game boots fine without this
-235,,,The game boots fine without this
-236,,,The game boots fine without this
-237,,,The game boots fine without this
-238,,,The game boots fine without this
-239,,,The game boots fine without this
-240-249,Unused,Unused,Unused
+152-249,Unused,Unused,Unused
 250,,,Related to ScriptManager_G
 251,,,Related to ScriptManager_G
 252,,,Related to ScriptManager_G
@@ -154,27 +98,27 @@ Index,Type,Description,Notes
 317,,,Value is excluded
 318,,,Value is excluded
 319,,,Value is excluded
-320,,,Related to prices or InGameMapHUD
-321,,,Related to prices or InGameMapHUD
-322,,,Related to prices or InGameMapHUD
-323,,,Related to prices or InGameMapHUD
-324,,,Related to prices or InGameMapHUD
-325,,,Related to prices or InGameMapHUD
-326,,,Related to prices or InGameMapHUD
-327,,,Related to prices or InGameMapHUD
-328,,,Related to prices or InGameMapHUD
-329,,,Related to prices or InGameMapHUD
-330,,,Related to prices or InGameMapHUD
-331,,,Related to prices or InGameMapHUD
-332,,,Related to prices or InGameMapHUD
-333,,,Related to prices or InGameMapHUD
-334,,,Related to prices or InGameMapHUD
-335,,,Related to prices or InGameMapHUD
-336,,,Related to prices or InGameMapHUD
-337,,,Related to prices or InGameMapHUD
-338,,,Related to prices or InGameMapHUD
-339,,,Related to prices or InGameMapHUD
-340,,,Related to prices or InGameMapHUD
+320,,,InGameMapHUD crashes if 0; affects zoom
+321,,,InGameMapHUD
+322,,,InGameMapHUD
+323,,,InGameMapHUD
+324,,,InGameMapHUD
+325,,,InGameMapHUD
+326,,,InGameMapHUD
+327,,,InGameMapHUD
+328,,,InGameMapHUD
+329,,,InGameMapHUD
+330,,,InGameMapHUD
+331,,,InGameMapHUD
+332,,,InGameMapHUD
+333,,,InGameMapHUD
+334,,,InGameMapHUD
+335,,,InGameMapHUD
+336,,,InGameMapHUD
+337,,,InGameMapHUD
+338,,,InGameMapHUD
+339,,,InGameMapHUD
+340,,,InGameMapHUD
 341,,,Value is excluded
 342,,,Value is excluded
 343,,,Value is excluded

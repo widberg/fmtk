@@ -66,6 +66,7 @@ These are projects that are related to researching FUEL but not directly part of
 * [blender_fuel](https://github.com/widberg/blender_fuel) - Blender scripts for object formats
 * [atk](https://github.com/widberg/atk) - Frida agent for asobo games
 * [fuel-save-editor](https://github.com/widberg/fuel-save-editor) - Save editor for Asobo's FUEL
+* [ImFUEL](https://github.com/widberg/ImFUEL) - ImHex patterns for FUEL data structures
 
 ## Support
 
