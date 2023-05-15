@@ -45,7 +45,7 @@ In the event of a crash or other game state locking event, i.e. "Error: Shaders 
 
 ## Discord
 
-Join the [TotemTech Underground Discord](https://discord.gg/CQgMNbYeUR) for general Asobo Studio modding, beyond and including FUEL. Or, join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FUEL discussion and FMTK support; please do not join the Unofficial FUEL Discord server to ask about games that are not FUEL. If you plan on joining to ask a specific question, please read the [FMTK FAQ](https://github.com/widberg/fmtk/wiki/FAQ) first to see if it has already been answered.
+Join the [Zouna Underground Discord](https://discord.gg/CQgMNbYeUR) for general Asobo Studio modding, beyond and including FUEL. Or, join the [Unofficial FUEL Discord](https://discord.gg/8uJVY9mWZT) for general FUEL discussion and FMTK support; please do not join the Unofficial FUEL Discord server to ask about games that are not FUEL. If you plan on joining to ask a specific question, please read the [FMTK FAQ](https://github.com/widberg/fmtk/wiki/FAQ) first to see if it has already been answered.
 
 ## Documentation
 
