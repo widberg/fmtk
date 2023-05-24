@@ -23,14 +23,14 @@ Custom Missions
 
    EMD_HideStartEnd
 
-   The start area will not show up in free ride
+The start area will not show up in free ride
 
 .. code-block:: c
 
    EMD_Save [filename]
 
-   miss.tsc writes all the mission commands for the existing missions to a file
-   save never writes EMD_SetCheckpointTimerBonus
+miss.tsc writes all the mission commands for the existing missions to a file
+save never writes EMD_SetCheckpointTimerBonus
 
 .. code-block:: c
 
@@ -40,13 +40,13 @@ Custom Missions
 
    EMD_SetCheckpoint x y z [rx ry rz rw] [type] [w]
 
-   ww = w * pi * 180 * 1/2, (0, sin(ww), 0, cos(ww)), overrides rx ry rz rw
+ww = w * pi * 180 * 1/2, (0, sin(ww), 0, cos(ww)), overrides rx ry rz rw
 
 .. code-block:: c
 
    EMD_SetCheckpointTimerBonus bonus
 
-    Used for blits sets the time added to the timer for each checkpoint. One of these command for each checkpoint command. Otherwise uses EMD_SetTimerCheckBonus.
+Used for blits sets the time added to the timer for each checkpoint. One of these command for each checkpoint command. Otherwise uses EMD_SetTimerCheckBonus.
 
 .. code-block:: c
 
@@ -56,7 +56,7 @@ Custom Missions
 
    EMD_SetEndRot <w | rx ry rz rw>
 
-   ww = w * pi * 180 * 1/2, (0, sin(ww), 0, cos(ww)), sets rx ry rz rw
+ww = w * pi * 180 * 1/2, (0, sin(ww), 0, cos(ww)), sets rx ry rz rw
 
 .. code-block:: c
 
@@ -66,13 +66,13 @@ Custom Missions
 
    EMD_SetName name
 
-   at most 31 characters
+at most 31 characters
 
 .. code-block:: c
 
    EMD_SetNbIA num
 
-   at most 32
+at most 32
 
 .. code-block:: c
 
@@ -82,19 +82,19 @@ Custom Missions
 
    EMD_SetPlayerAllowedClassFilter id...
 
-   at most 10 ids
+at most 10 ids
 
 .. code-block:: c
 
    EMD_SetPlayerAllowedGroupFilter id...
 
-   at most 10 ids
+at most 10 ids
 
 .. code-block:: c
 
    EMD_SetPlayerAllowedVehiculeFilter id...
 
-   at most 32 ids
+at most 32 ids
 
 .. code-block:: c
 
@@ -112,13 +112,13 @@ Custom Missions
 
    EMD_SetRaceMode mode
 
-   0 < mode < 7
+0 < mode < 7
 
 .. code-block:: c
 
    EMD_SetRaceScenario scenario
 
-   scenario < 15
+scenario < 15
 
 .. code-block:: c
 
@@ -128,7 +128,7 @@ Custom Missions
 
    EMD_SetStartRot <w | rx ry rz rw>
 
-   ww = w * pi * 180 * 1/2, (0, sin(ww), 0, cos(ww)), sets rx ry rz rw
+ww = w * pi * 180 * 1/2, (0, sin(ww), 0, cos(ww)), sets rx ry rz rw
 
 .. code-block:: c
 
@@ -144,15 +144,15 @@ Custom Missions
 
    EMD_SetWeatherScenario
 
-   stub, does nothing
+stub, does nothing
 
 .. code-block:: c
 
     AddHubCareerRaces hub_name mission_name tt_name tt_description
 
-    careful with this one, itll fuck up your save file
+careful with this one, it'll fuck up your save file
 
-    tt_description does not do anything, should be NONE
+tt_description does not do anything, should be NONE
 
 .. code-block:: c
 
