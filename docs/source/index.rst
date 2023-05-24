@@ -15,6 +15,7 @@ Welcome to FMTK's documentation!
    fuelgameparam
    fuelvehicleparam
    fuelautomesh
+   fuelcustommissions
 
 .. toctree::
    :maxdepth: 2
