@@ -134,7 +134,7 @@ ww = w * pi * 180 * 1/2, (0, sin(ww), 0, cos(ww)), sets rx ry rz rw
 
    EMD_SetTimer time
 
-   Sets the time attack time out
+Sets the time attack time out
 
 .. code-block:: c
 
