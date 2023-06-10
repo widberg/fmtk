@@ -33,6 +33,7 @@
 
 # Build
 /build
+/_build
 
 # VsCode
 .vscode/

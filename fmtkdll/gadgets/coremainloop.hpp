@@ -6,4 +6,8 @@ void __stdcall wrap_fuel_CoreMainLoop()
 	BROADCAST(Tick);
 
 	real_fuel_CoreMainLoop();
+
+	if (GetKeyState(23)->is_key_pressed) {
+		LOG("Enter pressed");
+	}
 }

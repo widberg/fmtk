@@ -122,6 +122,53 @@ scenario < 15
 
 .. code-block:: c
 
+   // switch RaceScenario
+   // 1,7,(9,0) -> 12
+   // 2,(9,1) -> 9
+   // 3,(9,2) -> 7
+   // 4,5,(9,3)
+      // If NbCheckpointPositions != 0
+         // If (*(float *)&this[1].pCheckpointPositions > 0.0) || (NbCheckpointTimerBonus != 0)
+               // -> 5
+         // Else
+               // 6
+      // Else
+         // -> 1
+   // 6,8,(9,4) -> 8
+   // (9,5) -> 11
+   // (9,6) -> 4
+   // (9,_) -> -1
+   // 11 -> 2
+   // 13 -> 3
+   // default -> -1
+
+   // If sub_577D70(*(_DWORD *)(v55 + 660)) == 1
+      // switch ^^^
+      // 0,1,4,10,12 -> Raid
+      // 2 -> Follow Copter
+      // 3 -> Catch Destruction
+      // 5 -> Checkpoint Attack
+      // 6 -> Time Trial CP
+      // 7 -> Knock-Out Challenge
+      // 8 -> Circuit Race
+      // 9,11 -> Checkpoint Race
+   // Else
+      // switch ^^^
+      // 0,1 -> Time Trial A2B
+      // 2 -> Follow Copter
+      // 3 -> Catch Destruction
+      // 4 -> Raid
+      // 5 -> Checkpoint Attack
+      // 6 -> Time Trial CP
+      // 7 -> Knock-Out Challenge
+      // 8 -> Circuit Race
+      // 9 -> Checkpoint Race
+      // 10 -> Long Raid
+      // 11 -> Baja
+      // 12 -> A to B
+
+.. code-block:: c
+
    EMD_SetStartPos x y z
 
 .. code-block:: c

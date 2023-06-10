@@ -1187,7 +1187,9 @@ Skips the "Processing Shaders" step when loading the game.
 
 .. code-block:: c
 
-   LoadFOnt
+   LoadFOnt path
+
+While a BigFile is open this command will load a ``Fonts_Z``. The path ``FONTES\BIG_FONT`` will be transformed to ``DB:>FONTES>BIG_FONT.TFONT`` then hashed and looked up in the open BigFile.
 
 .. code-block:: c
 

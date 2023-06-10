@@ -1,6 +1,8 @@
 AutoMesh
 ========
 
+`FUEL Fandom Wiki Edit Landscape Object Frequency entry <https://fuel.fandom.com/wiki/Edit_Landscape_Object_Frequency>`_
+
 `ADDMESH: <mesh name> [<property> ...]`
 
 Properties

@@ -19,10 +19,45 @@ using namespace sinker;
 //$ symbol fuel::pGlobalCommandState, "const void**";
 //$ address fuel::pGlobalCommandState, [retail], @0x00a7c080;
 
+struct KeyState {
+	bool is_down_test;
+	bool some_condition1_or;
+	bool is_digital;
+	bool field_3;
+	int zero1;
+	bool some_condition1;
+	bool field_9;
+	bool some_down;
+	bool field_B;
+	float some_duration_minus_delta;
+	float some_duration_minus_delta_replacement_value;
+	float some_duration_minus_delta_replacement_value_other;
+	int is_less_than;
+	float activation_threshold_floor;
+	float activation_threshold;
+	float activation_threshold_ceil;
+	bool some_condition;
+	bool field_29;
+	bool field_2A;
+	bool field_2B;
+	int should_not_square_result;
+	float is_down_float_analog;
+	bool is_something;
+	bool is_key_pressed;
+	bool is_down_final;
+	bool field_37;
+	float time_down_while_down;
+	float time_since_last_down_event;
+	float time_since_last_up_event;
+	int zero;
+	int key_code;
+};
+
 #define SINKER_SYMBOL(module_name, symbol_name, symbol_type) \
 	auto real_ ## module_name ## _ ## symbol_name = static_cast<symbol_type>(nullptr);
 #include "fmtk.def"
 
+#include "gadgets/input.hpp"
 #include "gadgets/createfilew.hpp"
 #include "gadgets/registercommand.hpp"
 #include "gadgets/scriptmanagerinit.hpp"
