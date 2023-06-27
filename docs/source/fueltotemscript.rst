@@ -5,6 +5,12 @@ Totem Script is a shell-like scripting language used in FUEL. Most of the textua
 
 Command arguments have two types. The first type is a numeric argument. Numeric arguments are backed by a float value but in practice they are used as integers, booleans, and floats. The second type is a string argument. String arguments are unsurprisingly backed by a C-string value.
 
+Text Editor Extensions
+----------------------
+
+* `Visual Studio Code <https://marketplace.visualstudio.com/items?itemName=widberg.totemscript>`_
+* `Notepad++ <https://gist.github.com/widberg/bb0339674bcee092c029a29f686d3cc7#file-tsc-xml>`_
+
 Commands
 --------
 
@@ -112,7 +118,7 @@ Integer, boolean, and float values can be used as arguments to commands. Integer
 String Values
 -------------
 
-For basic strings with no whitespace, quotes, or backslashes, the string can be given as an argument verbatim, unquoted. For complex strings, a C-style string literal can be supplied as an argument to commands. A string literal is a sequence of characters enclosed by two ``"``s. To escape a ``"`` in a string literal use ``\"``. Likewise, a ``\`` can be escaped by using  ``\\``. Rather than splitting on the spaces, the entire string will be given as one argument. This is useful when you want to pass a command an argument with spaces in it.
+For basic strings with no whitespace, quotes, or backslashes, the string can be given as an argument verbatim, unquoted. For complex strings, a C-style string literal can be supplied as an argument to commands. A string literal is a sequence of characters enclosed by two ``"``\ s. To escape a ``"`` in a string literal use ``\\\"``. Likewise, a ``\`` can be escaped by using ``\\``. Rather than splitting on the spaces, the entire string will be given as one argument. This is useful when you want to pass a command an argument with spaces in it.
 
 Comments
 --------

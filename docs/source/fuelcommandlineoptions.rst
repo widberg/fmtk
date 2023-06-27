@@ -16,7 +16,7 @@ Command Line Options
      When present, ``logfile.txt`` is used as a log file. There are 2 places in ``WinConsole_Z`` that could potentially write to this file but I have yet to observe this being used. It is likely that all logging calls were stripped in release builds.
 
    ``-mce``
-     Related to `Windows XP Media Center Edition <https://en.wikipedia.org/wiki/Windows_XP_Media_Center_Edition>`_. When the game is lauched with this command line option, the ``%SystemRoot%\ehome\ehshell.exe`` executable will be run upon exiting the game if the executable is present.
+     Related to `Windows XP Media Center Edition <https://en.wikipedia.org/wiki/Windows_XP_Media_Center_Edition>`_. When the game is lauched with this command line option, the ``%SystemRoot%\ehome\ehshell.exe`` executable will be run upon exiting the game, or if Windows Virtual-Memory is not enabled, if the executable is present.
 
    ``-W``
      Launch in windowed mode with right-click menu.
