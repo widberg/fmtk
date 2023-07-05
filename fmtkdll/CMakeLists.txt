@@ -23,6 +23,7 @@ set(fmtkdll_SOURCES
 	gadgets/createdialogparama.hpp
 	gadgets/regqueryvalueexw.hpp
 	gadgets/securom.hpp
+	gadgets/input.hpp
 )
 
 add_sinker_target(fmtkdll_sinker
@@ -39,5 +40,4 @@ add_library(fmtkdll SHARED
 add_dependencies(fmtkdll fmtkdll_sinker)
 target_include_directories(fmtkdll PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include)
 target_link_libraries(fmtkdll common fmtksdk spdlog d3d9 dbghelp tomlplusplus::tomlplusplus sinker)
-target_compile_options(fmtkdll PRIVATE /EHa)
 target_compile_definitions(fmtkdll PRIVATE FMTK_INTERNAL)

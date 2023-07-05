@@ -6,6 +6,9 @@ endif()
 # D3D9
 add_subdirectory(d3d9)
 
+# Discord GameSDK
+add_subdirectory(discord_game_sdk)
+
 # LuaJIT
 add_subdirectory(luajit)
 

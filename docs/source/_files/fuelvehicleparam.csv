@@ -43,7 +43,7 @@ Index,Description,Notes
 41,,
 42,,
 43,,
-44,,some count used later to select even or odd params in a loop, odd actually means 1,3, or 5
+44,,Suspension count? some count used later to select even or odd params in a loop, odd actually means 1,3, or 5
 45,,num wheels IT_Dyn_VehicleMove_G
 46,,gear related IT_Dyn_VehicleMove_G
 47,,
@@ -59,9 +59,9 @@ Index,Description,Notes
 57,,
 58,,
 59,,
-60,,
-61,,
-62,,
+60,,Vehicle center X checked with water
+61,,Vehicle center Y checked with water
+62,,Vehicle center Z checked with water
 63,,
 64,,
 65,,
@@ -575,11 +575,11 @@ Index,Description,Notes
 573,,CameraMove_G
 574,,
 575,,
-576,,
+576,,Water
 577,,
-578,,
-579,,
-580,,
+578,,Water
+579,,Water
+580,,Water
 581,,
 582,,
 583,,
