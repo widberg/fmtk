@@ -3,8 +3,7 @@ set(fmtkdll_SOURCES
 	fmtkdll.hpp
 	instrument.cpp
 	instrument.hpp
-	sehexception.cpp
-	sehexception.hpp
+	backward.hpp
 
 	gadgets/coremainloop.hpp
 	gadgets/d3dxcompileshaderfromfilea.hpp
