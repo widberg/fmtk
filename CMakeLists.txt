@@ -25,7 +25,7 @@ option(FMTK_DOCS        "Build the documentation." OFF)
 set(CMAKE_CXX_STANDARD 20 CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE INTERNAL "")
 add_definitions(-DUNICODE -D_UNICODE)
-add_compile_options(/EHa)
+add_compile_options(/EHa "/clang:-fdebug-prefix-map=${PROJECT_SOURCE_DIR}=.")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" CACHE INTERNAL "")
 set_property(GLOBAL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE INTERNAL "")
 
