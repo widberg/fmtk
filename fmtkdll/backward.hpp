@@ -1390,7 +1390,15 @@ private:
 
   void print_header(std::ostream &os, size_t thread_id,
                     std::string const &exception_description) {
-    os << exception_description;
+    if (exception_description.size()) {
+      os << "Exception";
+      if (thread_id) {
+        os << " in thread " << thread_id;
+      }
+      os << ":\n";
+      os << exception_description;
+    }
+
     os << "Stack trace";
     if (thread_id) {
       os << " in thread " << thread_id;
@@ -1400,7 +1408,7 @@ private:
 
   void print_trace(std::ostream &os, const ResolvedTrace &trace,
                    Colorize &colorize) {
-    os << "    #" << std::left << std::setw(2) << trace.idx << std::right;
+    os << "#" << std::left << std::setw(2) << trace.idx << std::right;
     bool already_indented = true;
 
     os << " " << trace.module_name;
@@ -1418,7 +1426,7 @@ private:
     for (size_t inliner_idx = trace.inliners.size(); inliner_idx > 0;
          --inliner_idx) {
       if (!already_indented) {
-        os << "       ";
+        os << "   ";
       }
       const ResolvedTrace::SourceLoc &inliner_loc =
           trace.inliners[inliner_idx - 1];
@@ -1659,7 +1667,7 @@ private:
   static std::string format_exception_record(EXCEPTION_RECORD *er) {
     std::ostringstream oss;
     oss << "Exception code: " << exception_code_to_string(er->ExceptionCode)
-        << " (" << std::hex << (void*)er->ExceptionCode << ")\n";
+        << " (" << std::hex << (void *)er->ExceptionCode << ")\n";
     oss << "Exception flags: " << std::hex << er->ExceptionFlags << "\n";
     oss << "Exception address: " << std::hex << er->ExceptionAddress << "\n";
     oss << "Number of parameters: " << std::dec << er->NumberParameters << "\n";
@@ -1670,51 +1678,51 @@ private:
     return oss.str();
   }
 
-  static std::string format_context(CONTEXT * ct) {
+  static std::string format_context(CONTEXT *ct) {
 #ifdef _M_X64
     std::ostringstream oss;
-    oss << "CS: " << std::hex << (void*)ct->SegCs << "\n";
-    oss << "DS: " << std::hex << (void*)ct->SegDs << "\n";
-    oss << "ES: " << std::hex << (void*)ct->SegEs << "\n";
-    oss << "FS: " << std::hex << (void*)ct->SegFs << "\n";
-    oss << "GS: " << std::hex << (void*)ct->SegGs << "\n";
-    oss << "SS: " << std::hex << (void*)ct->SegSs << "\n";
-    oss << "EFLAGS: " << std::hex << (void*)ct->EFlags << "\n";
-    oss << "RAX: " << std::hex << (void*)ct->Rax << "\n";
-    oss << "RBX: " << std::hex << (void*)ct->Rbx << "\n";
-    oss << "RCX: " << std::hex << (void*)ct->Rcx << "\n";
-    oss << "RDX: " << std::hex << (void*)ct->Rdx << "\n";
-    oss << "RSP: " << std::hex << (void*)ct->Rsp << "\n";
-    oss << "RBP: " << std::hex << (void*)ct->Rbp << "\n";
-    oss << "RSI: " << std::hex << (void*)ct->Rsi << "\n";
-    oss << "RDI: " << std::hex << (void*)ct->Rdi << "\n";
-    oss << "R8: " << std::hex << (void*)ct->R8 << "\n";
-    oss << "R9: " << std::hex << (void*)ct->R9 << "\n";
-    oss << "R10: " << std::hex << (void*)ct->R10 << "\n";
-    oss << "R11: " << std::hex << (void*)ct->R11 << "\n";
-    oss << "R12: " << std::hex << (void*)ct->R12 << "\n";
-    oss << "R13: " << std::hex << (void*)ct->R13 << "\n";
-    oss << "R14: " << std::hex << (void*)ct->R14 << "\n";
-    oss << "R15: " << std::hex << (void*)ct->R15 << "\n";
-    oss << "RIP: " << std::hex << (void*)ct->Rip << "\n";
+    oss << "CS: " << std::hex << (void *)ct->SegCs << "\n";
+    oss << "DS: " << std::hex << (void *)ct->SegDs << "\n";
+    oss << "ES: " << std::hex << (void *)ct->SegEs << "\n";
+    oss << "FS: " << std::hex << (void *)ct->SegFs << "\n";
+    oss << "GS: " << std::hex << (void *)ct->SegGs << "\n";
+    oss << "SS: " << std::hex << (void *)ct->SegSs << "\n";
+    oss << "EFLAGS: " << std::hex << (void *)ct->EFlags << "\n";
+    oss << "RAX: " << std::hex << (void *)ct->Rax << "\n";
+    oss << "RBX: " << std::hex << (void *)ct->Rbx << "\n";
+    oss << "RCX: " << std::hex << (void *)ct->Rcx << "\n";
+    oss << "RDX: " << std::hex << (void *)ct->Rdx << "\n";
+    oss << "RSP: " << std::hex << (void *)ct->Rsp << "\n";
+    oss << "RBP: " << std::hex << (void *)ct->Rbp << "\n";
+    oss << "RSI: " << std::hex << (void *)ct->Rsi << "\n";
+    oss << "RDI: " << std::hex << (void *)ct->Rdi << "\n";
+    oss << "R8: " << std::hex << (void *)ct->R8 << "\n";
+    oss << "R9: " << std::hex << (void *)ct->R9 << "\n";
+    oss << "R10: " << std::hex << (void *)ct->R10 << "\n";
+    oss << "R11: " << std::hex << (void *)ct->R11 << "\n";
+    oss << "R12: " << std::hex << (void *)ct->R12 << "\n";
+    oss << "R13: " << std::hex << (void *)ct->R13 << "\n";
+    oss << "R14: " << std::hex << (void *)ct->R14 << "\n";
+    oss << "R15: " << std::hex << (void *)ct->R15 << "\n";
+    oss << "RIP: " << std::hex << (void *)ct->Rip << "\n";
 #else
     std::ostringstream oss;
-    oss << "CS: " << std::hex << (void*)ct->SegCs << "\n";
-    oss << "DS: " << std::hex << (void*)ct->SegDs << "\n";
-    oss << "ES: " << std::hex << (void*)ct->SegEs << "\n";
-    oss << "FS: " << std::hex << (void*)ct->SegFs << "\n";
-    oss << "GS: " << std::hex << (void*)ct->SegGs << "\n";
-    oss << "SS: " << std::hex << (void*)ct->SegSs << "\n";
-    oss << "EFLAGS: " << std::hex << (void*)ct->EFlags << "\n";
-    oss << "EAX: " << std::hex << (void*)ct->Eax << "\n";
-    oss << "EBX: " << std::hex << (void*)ct->Ebx << "\n";
-    oss << "ECX: " << std::hex << (void*)ct->Ecx << "\n";
-    oss << "EDX: " << std::hex << (void*)ct->Edx << "\n";
-    oss << "ESP: " << std::hex << (void*)ct->Esp << "\n";
-    oss << "EBP: " << std::hex << (void*)ct->Ebp << "\n";
-    oss << "ESI: " << std::hex << (void*)ct->Esi << "\n";
-    oss << "EDI: " << std::hex << (void*)ct->Edi << "\n";
-    oss << "EIP: " << std::hex << (void*)ct->Eip << "\n";
+    oss << "CS: " << std::hex << (void *)ct->SegCs << "\n";
+    oss << "DS: " << std::hex << (void *)ct->SegDs << "\n";
+    oss << "ES: " << std::hex << (void *)ct->SegEs << "\n";
+    oss << "FS: " << std::hex << (void *)ct->SegFs << "\n";
+    oss << "GS: " << std::hex << (void *)ct->SegGs << "\n";
+    oss << "SS: " << std::hex << (void *)ct->SegSs << "\n";
+    oss << "EFLAGS: " << std::hex << (void *)ct->EFlags << "\n";
+    oss << "EAX: " << std::hex << (void *)ct->Eax << "\n";
+    oss << "EBX: " << std::hex << (void *)ct->Ebx << "\n";
+    oss << "ECX: " << std::hex << (void *)ct->Ecx << "\n";
+    oss << "EDX: " << std::hex << (void *)ct->Edx << "\n";
+    oss << "ESP: " << std::hex << (void *)ct->Esp << "\n";
+    oss << "EBP: " << std::hex << (void *)ct->Ebp << "\n";
+    oss << "ESI: " << std::hex << (void *)ct->Esi << "\n";
+    oss << "EDI: " << std::hex << (void *)ct->Edi << "\n";
+    oss << "EIP: " << std::hex << (void *)ct->Eip << "\n";
 #endif
     return oss.str();
   }
@@ -1733,7 +1741,8 @@ private:
     }
 
     if (er != nullptr) {
-      exception_description() = format_exception_record(er) + format_context(ct);
+      exception_description() =
+          format_exception_record(er) + format_context(ct);
     }
 
     DuplicateHandle(GetCurrentProcess(), GetCurrentThread(),
