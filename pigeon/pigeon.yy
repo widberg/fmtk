@@ -28,6 +28,7 @@
 %token STRUCT "struct"
 %token DEPRICATED "depricated"
 %token NAMESPACE "namespace"
+%token EVENT "event"
 
 %type<std::string> IDENTIFIER
 %type<std::shared_ptr<Type>> TYPE type
@@ -479,6 +480,11 @@ namespace pigeon
             exports.push_back({name, type});
         }
 
+        void add_event(std::string const& name, std::shared_ptr<Type> type)
+        {
+            events.push_back({name, type});
+        }
+
         Namespace *get_child(std::string const& name)
         {
             for (auto child : children)
@@ -534,6 +540,11 @@ namespace pigeon
                 std::cout << prefix << ekport.first << '\n';
             }
 
+            for (auto event : events)
+            {
+                std::cout << prefix << event.first << '\n';
+            }
+
             for (auto child : children)
             {
                 child->dump(out);
@@ -580,6 +591,11 @@ namespace pigeon
                 out << eksport.second->declaration(eksport.first) << ";\n";
             }
 
+            for (auto event : exports)
+            {
+                out << event.second->declaration(event.first) << ";\n";
+            }
+
             for (Namespace *child : children)
             {
                 child->dump_c(out);
@@ -603,6 +619,7 @@ namespace pigeon
         Namespace *parent;
         std::vector<std::pair<std::string, std::shared_ptr<Type>>> types;
         std::vector<std::pair<std::string, std::shared_ptr<Type>>> exports;
+        std::vector<std::pair<std::string, std::shared_ptr<Type>>> events;
     };
 
     class Context : public DumpC
@@ -679,6 +696,7 @@ stmt
     | "use" type "as" IDENTIFIER docspec ';' {ctx->current_namespace->add_type($4, std::shared_ptr<Type>((Type*)new TypeDefType($2, $4)));}
     | "namespace" IDENTIFIER docspec { ctx->current_namespace = ctx->current_namespace->get_or_add_namespace($2);} '{' slist '}' { ctx->current_namespace = ctx->current_namespace->get_parent();} ';'
     | IDENTIFIER ':' type ';' {ctx->current_namespace->add_export($1, $3);}
+    | "event" IDENTIFIER ':' type ';' {ctx->current_namespace->add_event($2, $4);}
     ;
 
 enum_body
@@ -743,6 +761,7 @@ pigeon::Parser::symbol_type pigeon::yylex(Context *ctx)
         'struct' { TOKEN(STRUCT); }
         'depricated' { TOKEN(DEPRICATED); }
         'namespace' { TOKEN(NAMESPACE); }
+        'event' { TOKEN(EVENT); }
 
         @s [a-zA-Z_][a-zA-Z_0-9]* @e {
             std::string name(s, e - s);

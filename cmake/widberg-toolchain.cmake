@@ -8,3 +8,7 @@ set(CMAKE_C_COMPILER "${WIDBERG_CLANG_CL}")
 set(CMAKE_C_COMPILER_TARGET ${triple})
 set(CMAKE_CXX_COMPILER "${WIDBERG_CLANG_CL}")
 set(CMAKE_CXX_COMPILER_TARGET ${triple})
+
+set(CMAKE_LINKER "link.exe")
+set(CMAKE_AR "lib.exe")
+set(CMAKE_RC "rc.exe")

@@ -89,24 +89,25 @@ enum class Event
 	TICK,
 	SCRIPT_MANAGER_INITIALIZE,
 	SHUTDOWN,
+	COUNT,
 };
 
-std::unordered_map<Event, std::list<std::pair<std::string, sol::protected_function>>> hooks;
+static std::list<std::pair<std::string, sol::protected_function>> fmtk_lua_hooks[(std::size_t)Event::COUNT] = {};
 
 void Hook(Event event, const std::string& id, sol::protected_function fn)
 {
-	hooks[event].push_back({ id, fn });
+	fmtk_lua_hooks[(std::size_t)event].push_back({ id, fn });
 }
 
 void Unhook(Event event, const std::string& id)
 {
-	std::list<std::pair<std::string, sol::protected_function>>& eventHooks = hooks[event];
+	std::list<std::pair<std::string, sol::protected_function>>& eventHooks = fmtk_lua_hooks[(std::size_t)event];
 	auto newEnd = std::remove_if(eventHooks.begin(), eventHooks.end(), [&](const std::pair<std::string, sol::protected_function>& x) -> bool { return x.first == id; });
 	eventHooks.erase(newEnd, eventHooks.end());
 }
 
 #define BROADCAST(event, ...) \
-	for (const std::pair<std::string, sol::protected_function>& pair : hooks[Event::event]) \
+	for (const std::pair<std::string, sol::protected_function>& pair : fmtk_lua_hooks[(std::size_t)Event::event]) \
 	{ \
 		auto result = pair.second(__VA_ARGS__); \
 		if (!result.valid()) \

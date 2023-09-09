@@ -59,6 +59,7 @@ See the [FMTK Contributing Guidelines](https://github.com/widberg/fmtk/blob/mast
 
 These are projects that are related to researching FUEL but not directly part of the modding process.
 
+* [bff](https://github.com/widberg/bff) - A GUI/CLI utility to work with Zouna BigFiles
 * [dpc](https://github.com/widberg/dpc) - Tar analogous utility to work with the DPC file format
 * [fuel-brute](https://github.com/widberg/fuel-brute) - CRC32 Brute Force Solver For FUEL
 * [fuel-map](https://github.com/widberg/fuel-map) - It's just information about the map
@@ -97,6 +98,6 @@ project.
 #### Ninja
 
 ```sh
-cmake -B build -G Ninja -DWIDBERG_CLANG_CL="/path/to/llvm-project-with-widberg-extensions/clang-cl.exe" -DCMAKE_LINKER="link.exe"
+cmake -B build -G Ninja -DWIDBERG_CLANG_CL="/path/to/llvm-project-widberg-extensions/clang-cl.exe"
 cmake --build build
 ```
