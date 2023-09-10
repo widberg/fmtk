@@ -4,9 +4,6 @@
 [submodule "dependencies/spdlog"]
 	path = dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "dependencies/luajit/LuaJIT"]
-	path = dependencies/luajit/LuaJIT
-	url = https://github.com/LuaJIT/LuaJIT.git
 [submodule "dependencies/tomlplusplus"]
 	path = dependencies/tomlplusplus
 	url = https://github.com/marzer/tomlplusplus.git
@@ -19,3 +16,9 @@
 [submodule "dependencies/sinker"]
 	path = dependencies/sinker
 	url = https://github.com/widberg/sinker.git
+[submodule "dependencies/LuaJIT"]
+	path = dependencies/LuaJIT
+	url = https://github.com/LuaJIT/LuaJIT.git
+[submodule "luajit-cmake"]
+	path = dependencies/luajit-cmake
+	url = https://github.com/widberg/luajit-cmake.git

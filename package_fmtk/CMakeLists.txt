@@ -4,7 +4,7 @@ add_custom_target(package_fmtk
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/mods/path"
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_RUNTIME_DLLS:fmtkdiscord>" "${CMAKE_BINARY_DIR}/mods/path"
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtklua>" "${CMAKE_BINARY_DIR}/mods/native/fmtklua.dll"
-	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:lua51>" "${CMAKE_BINARY_DIR}/mods/path/lua5.1.dll"
+	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:libluajit>" "${CMAKE_BINARY_DIR}/mods/path/lua5.1.dll"
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtkdll>" "${CMAKE_BINARY_DIR}/mods/fmtk/fmtkdll.dll"
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE_DIR:fmtkdll>/fmtk.skr" "${CMAKE_BINARY_DIR}/mods/fmtk/fmtk.skr"
 	COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:fmtk>" "${CMAKE_BINARY_DIR}/mods/fmtk/fmtk.exe"
@@ -14,7 +14,7 @@ add_custom_target(package_fmtk
 		"${CMAKE_BINARY_DIR}/mods"
 		"${CMAKE_BINARY_DIR}/README.md"
 	WORKING_DIRECTORY "$<TARGET_FILE_DIR:fmtk>"
-	DEPENDS fmtk fmtkdll fmtklua lua51 fmtkdiscord
+	DEPENDS fmtk fmtkdll fmtklua libluajit fmtkdiscord
 	BYPRODUCTS "${CMAKE_BINARY_DIR}/fmtk.zip"
 )
 
