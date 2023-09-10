@@ -13,6 +13,7 @@
 [submodule "dependencies/re2c"]
 	path = dependencies/re2c
 	url = https://github.com/skvadrik/re2c.git
+	ignore = dirty
 [submodule "dependencies/sinker"]
 	path = dependencies/sinker
 	url = https://github.com/widberg/sinker.git
