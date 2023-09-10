@@ -7,7 +7,8 @@ target_link_libraries(pigeon CLI11::CLI11)
 add_dependencies(pigeon re2c)
 
 add_custom_command(
-	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pigeon.cpp.re ${CMAKE_CURRENT_BINARY_DIR}/pigeon.cpp
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pigeon.cpp
+	BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/pigeon.cpp.re
 	COMMAND ${BISON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/pigeon.yy -o ${CMAKE_CURRENT_BINARY_DIR}/pigeon.cpp.re -Wcounterexamples
 	COMMAND $<TARGET_FILE:re2c> ${CMAKE_CURRENT_BINARY_DIR}/pigeon.cpp.re -o ${CMAKE_CURRENT_BINARY_DIR}/pigeon.cpp --no-debug-info
 	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/pigeon.yy
