@@ -1,10 +1,15 @@
-Developer Menus
+Developer Tools
 ===============
 
 Command Palette
 ---------------
 
 See the :ref:`Commands documentation entry<Commands>`.
+
+Noclip
+------
+
+The ``SwitchCameraUser 0`` command can be used to enter and exit a freecam mode also know as the debug camera. When entering this mode the player's vehicle will be separated from the camera and remain active. When exiting this mode the player's vehicle will be teleported to the center of frame and normal gameplay will resume. There are several keys that can be used to control the debug camera. ``w``, ``a``, ``s``, and ``d`` can be used to move the camera relative to the direction it is facing. The ``y`` and ``i`` keys move the camera up and down very slowly relative to the direction the camera is facing. Note that ``y`` also opens the Command Palette so if you want to move up, I recommend opening the Palette and then closing it, holding the ``y`` key down as you close it to continue moving up. The arrow keys control the direction the camera is facing. Finally, holding down the ``e`` key will increase the effect of each of the other keys from ``0.25`` to ``5.00``, a 20x increase, this makes flying around a lot faster. Be careful when using ``e`` with the arrow keys as the camera will spin around wildly.
 
 Teleport
 --------

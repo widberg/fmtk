@@ -6,7 +6,7 @@ Welcome to FMTK's documentation!
    :caption: FUEL
    :name: sec-fuel
 
-   fueldevelopermenus
+   fueldevelopertools
    fuelcommands
    fueltotemscript
    fuelcommandlineoptions

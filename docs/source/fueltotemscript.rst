@@ -11,8 +11,8 @@ Text Editor Extensions
 * `Visual Studio Code <https://marketplace.visualstudio.com/items?itemName=widberg.totemscript>`_
 * `Notepad++ <https://gist.github.com/widberg/bb0339674bcee092c029a29f686d3cc7#file-tsc-xml>`_
 
-Commands
---------
+Command Names
+-------------
 
 All command names are case insensitive. Only the first ``15`` capital letters and numbers in each command name are required, this is called the "short form command name" and it is also case insensitive. However, I recommend using the full command name in scripts for readability.
 

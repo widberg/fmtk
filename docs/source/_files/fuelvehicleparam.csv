@@ -67,7 +67,7 @@ Index,Description,Notes
 65,,
 66,,
 67,,
-68,,
+68,,seems to make gears longer (not sure)
 69,,
 70,,70/71 even for each param 44 IT_Dyn_VehicleMove_G
 71,,70/71 odd for each param 44 IT_Dyn_VehicleMove_G
@@ -90,7 +90,7 @@ Index,Description,Notes
 88,,88/89 even for each param 44 IT_Dyn_VehicleMove_G
 89,,88/89 odd for each param 44 IT_Dyn_VehicleMove_G
 90,,
-91,,
+91,,seems to modify how close engine gets to max rpm.
 92,,
 93,,
 94,,
@@ -323,10 +323,10 @@ Index,Description,Notes
 321,,IT_Dyn_VehicleMove_G
 322,,
 323,,gear related IT_Dyn_VehicleMove_G
-324,,IT_Dyn_VehicleMove_G
+324,,IT_Dyn_VehicleMove_G to set max engine RPM.
 325,,
 326,,gear related
-327,,
+327,,for engine power.
 328,,
 329,,
 330,,
