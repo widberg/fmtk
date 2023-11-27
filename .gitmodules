@@ -20,6 +20,6 @@
 [submodule "dependencies/LuaJIT"]
 	path = dependencies/LuaJIT
 	url = https://github.com/LuaJIT/LuaJIT.git
-[submodule "luajit-cmake"]
+[submodule "dependencies/luajit-cmake"]
 	path = dependencies/luajit-cmake
 	url = https://github.com/widberg/luajit-cmake.git

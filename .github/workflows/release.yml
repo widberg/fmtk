@@ -28,10 +28,10 @@ jobs:
     - name: Download llvm-project-with-widberg-extensions
       uses: suisei-cn/actions-download-file@v1.3.0
       with:
-        url: "https://github.com/widberg/llvm-project-widberg-extensions/releases/download/widberg-0.0.2/widberg-0.0.2-windows-x86_64-58862f2eb56a195b86f7ed504a6391a62ce46090.zip"
+        url: "https://github.com/widberg/llvm-project-widberg-extensions/releases/download/widberg-0.0.3/widberg-0.0.3-windows-x86_64-ebf30081beeca3bf1ec166f789c0c1889e0c27c1.zip"
     
     - name: Unzip llvm-project-with-widberg-extensions
-      run: 7z x widberg-0.0.2-windows-x86_64-58862f2eb56a195b86f7ed504a6391a62ce46090.zip -obin
+      run: 7z x widberg-0.0.3-windows-x86_64-ebf30081beeca3bf1ec166f789c0c1889e0c27c1.zip -obin
 
     - name: Package
       run: |

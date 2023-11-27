@@ -85,7 +85,7 @@ FMTKApi fmtkApi{
 bool loadModDll(const std::filesystem::path &modDllPath) {
   HMODULE handle = LoadLibraryA(modDllPath.string().c_str());
   if (!handle) {
-    LOG(error, FMTK, "Could not LoadLibrary: {}", modDllPath.string());
+    LOG(error, FMTK, "Could not LoadLibrary: {}, {}", modDllPath.string(), GetLastError());
     return false;
   }
 
