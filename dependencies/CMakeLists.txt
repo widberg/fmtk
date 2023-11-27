@@ -10,10 +10,11 @@ add_subdirectory(d3d9 SYSTEM)
 add_subdirectory(discord_game_sdk SYSTEM)
 
 # LuaJIT
-set(BUILD_SHARED_LIBS ON CACHE PATH "LuaJIT Shared")
+set(BUILD_SHARED_LIBS ON CACHE PATH "LuaJIT Shared" FORCE)
 set(LUAJIT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/LuaJIT" CACHE PATH "LuaJIT directory")
 add_subdirectory(luajit-cmake SYSTEM)
 set_target_properties(libluajit PROPERTIES OUTPUT_NAME "lua5.1")
+set(BUILD_SHARED_LIBS OFF CACHE PATH "" FORCE)
 
 # re2c
 if(NOT TARGET re2c)
