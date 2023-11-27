@@ -11,6 +11,11 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Setup MSVC Developer Command Prompt
+      uses: TheMrMilchmann/setup-msvc-dev@v3.0.0
+      with:
+        arch: x86
+      
     - name: Download WinFlexBison
       uses: suisei-cn/actions-download-file@v1.3.0
       with:
@@ -29,7 +34,7 @@ jobs:
 
     - name: Build
       run: |
-           cmake -B build -AWin32 -DWIDBERG_CLANG_CL="${{ github.workspace }}/bin/clang-cl.exe" -DBISON_EXECUTABLE="${{ github.workspace }}/bin/win_bison.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=ON
+           cmake -B build -GNinja -DWIDBERG_CLANG_CL="${{ github.workspace }}/bin/clang-cl.exe" -DBISON_EXECUTABLE="${{ github.workspace }}/bin/win_bison.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=ON
            cmake --build build --target package_fmtk --config RelWithDebInfo
 
     - name: Archive Artifacts
