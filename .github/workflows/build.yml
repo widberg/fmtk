@@ -32,7 +32,7 @@ jobs:
 
     - name: Build
       run: |
-           cmake -B build -G Ninja -DWIDBERG_CLANG_CL="${{ github.workspace }}/bin/clang-cl.exe" -DBISON_EXECUTABLE="${{ github.workspace }}/bin/win_bison.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo
+           cmake -B build -G Ninja -DWIDBERG_CLANG_CL="${{ github.workspace }}/bin/clang-cl.exe" -DBISON_EXECUTABLE="${{ github.workspace }}/bin/win_bison.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=ON
            cmake --build build --target package_fmtk --config RelWithDebInfo
 
     - name: Archive Artifacts
