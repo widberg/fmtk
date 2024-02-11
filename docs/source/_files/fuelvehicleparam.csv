@@ -1,680 +1,680 @@
 Index,Description,Notes
 0,Vehicle Internal Name,The first argument to AddVehicleInfo in VehicleDef.tsc
-1,,
-2,,
-3,,
-4,,
-5,,
-6,,
-7,,
-8,,
-9,,
-10,,
-11,,
-12,,
-13,,
-14,,
-15,,
-16,,
-17,,
-18,,
-19,,
-20,,
-21,,
-22,,
-23,,
-24,,
-25,,
-26,,
-27,,
-28,,IT_Dyn_VehicleMove_G
-29,,IT_Dyn_VehicleMove_G
-30,,IT_Dyn_VehicleMove_G
-31,,
-32,,
-33,,
-34,,
-35,,
-36,,
-37,,
-38,,
-39,,
-40,,
-41,,
-42,,
-43,,
-44,,Suspension count? some count used later to select even or odd params in a loop, odd actually means 1,3, or 5
-45,,num wheels IT_Dyn_VehicleMove_G
-46,,gear related IT_Dyn_VehicleMove_G
-47,,
-48,,gear related IT_Dyn_VehicleMove_G
-49,,gear related IT_Dyn_VehicleMove_G
-50,,
-51,,
-52,,
-53,,
-54,,54/55 even for each param 44 IT_Dyn_VehicleMove_G
-55,,54/55 odd for each param 44 IT_Dyn_VehicleMove_G
-56,,
-57,,
-58,,
-59,,
-60,,Vehicle center X checked with water
-61,,Vehicle center Y checked with water
-62,,Vehicle center Z checked with water
-63,,
-64,,
-65,,
-66,,
-67,,
-68,,seems to make gears longer (not sure)
-69,,
-70,,70/71 even for each param 44 IT_Dyn_VehicleMove_G
-71,,70/71 odd for each param 44 IT_Dyn_VehicleMove_G
-72,,72/73 even for each param 44 IT_Dyn_VehicleMove_G
-73,,72/73 odd for each param 44 IT_Dyn_VehicleMove_G
-74,,74/75 even for each param 44 IT_Dyn_VehicleMove_G
-75,,74/75 odd for each param 44 IT_Dyn_VehicleMove_G
-76,,76/77 even for each param 44 IT_Dyn_VehicleMove_G
-77,,76/77 odd for each param 44 IT_Dyn_VehicleMove_G
-78,,78/79 even for each param 44 IT_Dyn_VehicleMove_G
-79,,78/79 odd for each param 44 IT_Dyn_VehicleMove_G
-80,,80/81 even for each param 44 IT_Dyn_VehicleMove_G
-81,,80/81 odd for each param 44 IT_Dyn_VehicleMove_G
-82,,82/83 even for each param 44 IT_Dyn_VehicleMove_G
-83,,82/83 odd for each param 44 IT_Dyn_VehicleMove_G
-84,,84/85 even for each param 44 IT_Dyn_VehicleMove_G
-85,,84/85 odd for each param 44 IT_Dyn_VehicleMove_G
-86,,
-87,,
-88,,88/89 even for each param 44 IT_Dyn_VehicleMove_G
-89,,88/89 odd for each param 44 IT_Dyn_VehicleMove_G
-90,,
-91,,seems to modify how close engine gets to max rpm.
-92,,
-93,,
-94,,
-95,,
-96,,
-97,,
-98,,
-99,,
-100,,
-101,,
-102,,
-103,,
-104,,
-105,,
-106,,
-107,,107/108 even for each param 44 IT_Dyn_VehicleMove_G
-108,,107/108 odd for each param 44 IT_Dyn_VehicleMove_G
-109,,
-110,,
-111,,
-112,,
-113,,
-114,,
-115,,
-116,,
-117,,
-118,,
-119,,119/120 even for each param 44 IT_Dyn_VehicleMove_G
-120,,119/120 odd for each param 44 IT_Dyn_VehicleMove_G
-121,,
-122,,
-123,,
-124,,
-125,,
-126,,
-127,,
-128,,
-129,,
-130,,
-131,,
-132,,
-133,,
-134,,
-135,,
-136,,
-137,,
-138,,
-139,,
-140,,
-141,,
-142,,
-143,,
-144,,
-145,,
-146,,
-147,,
-148,,
-149,,
-150,,
-151,,
-152,,
-153,,
-154,,
-155,,155/156 even for each param 44 IT_Dyn_VehicleMove_G
-156,,155/156 odd for each param 44 IT_Dyn_VehicleMove_G
-157,,
-158,,
-159,,159/160 even for each param 44 IT_Dyn_VehicleMove_G
-160,,159/160 odd for each param 44 IT_Dyn_VehicleMove_G
-161,,161/161 even and odd for each param 44 IT_Dyn_VehicleMove_G
-162,,
-163,,
-164,,
-165,,
-166,,
-167,,
-168,,
-169,,
-170,,
-171,,
-172,,
-173,,
-174,,
-175,,
-176,,
-177,,
-178,,
-179,,
-180,,
-181,,
-182,,
-183,,
-184,,
-185,,
-186,,
-187,,
-188,,
-189,,
-190,,
-191,,
-192,,
-193,,
-194,,
-195,,
-196,,
-197,,
-198,,
-199,,
-200,,
-201,,
-202,,
-203,,
-204,,
-205,,
-206,,
-207,,
-208,,
-209,,
-210,,
-211,,
-212,,
-213,,
-214,,
-215,,
-216,,
-217,,
-218,,
-219,,
-220,,
-221,,
-222,,
-223,,
-224,,
-225,,
-226,,
-227,,
-228,,
-229,,
-230,,
-231,,
-232,,
-233,,
-234,,
-235,,
-236,,
-237,,
-238,,
-239,,
-240,,
-241,,
-242,,
-243,,
-244,,
-245,,
-246,,
-247,,
-248,,
-249,,
-250,,
-251,,
-252,,
-253,,
-254,,
-255,,
-256,,
-257,,
-258,,
-259,,
-260,,
-261,,
-262,,
-263,,
-264,,
-265,,
-266,,
-267,,
-268,,
-269,,
-270,,
-271,,
-272,,
-273,,
-274,,274/275 even for each param 44 IT_Dyn_VehicleMove_G
-275,,274/275 odd for each param 44 IT_Dyn_VehicleMove_G
-276,,276/277 even for each param 44 IT_Dyn_VehicleMove_G
-277,,276/277 odd for each param 44 IT_Dyn_VehicleMove_G
-278,,
-279,,
-280,,
-281,,Clamped to >=0
-282,,
-283,,
-284,,
-285,,
-286,,
-287,,
-288,,
-289,,
-290,,
-291,,
-292,,
-293,,
-294,,
-295,,
-296,,
-297,,
-298,,
-299,,
-300,,
-301,,
-302,,
-303,,
-304,,
-305,,
-306,,
-307,,
-308,,
-309,,
-310,,
-311,,
-312,,
-313,,
-314,,
-315,,
-316,,
-317,,
-318,,
-319,,
-320,,
-321,,IT_Dyn_VehicleMove_G
-322,,
-323,,gear related IT_Dyn_VehicleMove_G
-324,,IT_Dyn_VehicleMove_G to set max engine RPM.
-325,,
-326,,gear related
-327,,for engine power.
-328,,
-329,,
-330,,
-331,,
-332,,
-333,,
-334,,IT_Dyn_VehicleMove_G
-335,,IT_Dyn_VehicleMove_G
-336,,IT_Dyn_VehicleMove_G
-337,,
-338,Curve height 0,
-339,Curve height 1,
-340,Curve height 2,
-341,Curve height 3,
-342,Curve height 4,
-343,Curve height 5,
-344,Curve height 6,
-345,Curve height 7,
-346,Curve height 8,
-347,Curve height 9,
-348,Curve height 10,
-349,Number of gears,
-350,Gear factor,
-351,Gear 0 width,
-352,Gear 1 width,
-353,Gear 2 width,
-354,Gear 3 width,
-355,Gear 4 width,
-356,Gear 5 width,
-357,Gear 6 width,
-358,Gear 0 height,
-359,Gear 1 height,
-360,Gear 2 height,
-361,Gear 3 height,
-362,Gear 4 height,
-363,Gear 5 height,
-364,Gear 6 height,
-365,,
-366,,
-367,,IT_Dyn_VehicleMove_G
-368,,IT_Dyn_VehicleMove_G
-369,,IT_Dyn_VehicleMove_G
-370,,IT_Dyn_VehicleMove_G
-371,,
-372,,
-373,,
-374,,
-375,,
-376,,
-377,,
-378,,
-379,,
-380,,
-381,,
-382,,
-383,,
-384,,
-385,,
-386,,
-387,,
-388,,IT_Dyn_VehicleMove_G
-389,,IT_Dyn_VehicleMove_G
-390,,IT_Dyn_VehicleMove_G
-391,,IT_Dyn_VehicleMove_G
-392,,
-393,,
-394,,
-395,,
-396,,
-397,,
-398,,
-399,,
-400,,
-401,,
-402,,
-403,,
-404,,
-405,,
-406,,
-407,,
-408,,
-409,,
-410,,
-411,,
-412,,
-413,,
-414,,
-415,,
-416,,
-417,,
-418,,
-419,,
-420,,
-421,,
-422,,
-423,,
-424,,
-425,,
-426,,
-427,,
-428,,
-429,,
-430,,
-431,,
-432,,
-433,,
-434,,
-435,,
-436,,
-437,,
-438,,
-439,,
-440,,
-441,,
-442,,
-443,,
-444,,
-445,,
-446,,
-447,,
-448,,
-449,,
-450,,
-451,,
-452,,
-453,,
-454,,
-455,,
-456,,
-457,,
-458,,
-459,,
-460,,
-461,,
-462,,
-463,,
-464,,
-465,,
-466,,
-467,,
-468,,
-469,,
-470,,
-471,,
-472,,
-473,,
-474,,
-475,,
-476,,
-477,,
-478,,
-479,,
-480,,
-481,,
-482,,
-483,,
-484,,
-485,,
-486,,
-487,,
-488,,
-489,,
-490,,
-491,,
-492,,
-493,,
-494,,
-495,,
-496,,
-497,,
-498,,
-499,,
-500,,
-501,,
-502,,
-503,,
-504,,
-505,,
-506,,
-507,,
-508,,
-509,,
-510,,
-511,,
-512,,
-513,,
-514,,
-515,,
-516,,
-517,,
-518,,
-519,,
-520,,
-521,,
-522,,
-523,,
-524,,
-525,,
-526,,
-527,,
-528,,
-529,,
-530,,
-531,,
-532,,
-533,,
-534,,
-535,,
-536,,
-537,,
-538,,
-539,,
-540,,
-541,,
-542,,
-543,,
-544,,
-545,,
-546,,
-547,,
-548,,
-549,,
-550,,
-551,,
-552,,
-553,,
-554,,
-555,,
-556,,
-557,,
-558,,
-559,,
-560,,
-561,,
-562,,
-563,,
-564,,
-565,,
-566,,
-567,,
-568,,
-569,,
-570,,
-571,,CameraMove_G
-572,Screen border blur,CameraMove_G
-573,,CameraMove_G
-574,,
-575,,
-576,,Water
-577,,
-578,,Water
-579,,Water
-580,,Water
-581,,
-582,,
-583,,
-584,,
-585,,
-586,,
-587,,
-588,,
-589,,
-590,,
-591,,
-592,,
-593,,IT_Dyn_VehicleMove_G
-594,,IT_Dyn_VehicleMove_G
-595,,IT_Dyn_VehicleMove_G
-596,,IT_Dyn_VehicleMove_G
-597,,IT_Dyn_VehicleMove_G
-598,,
-599,Point value for a SMALL DRIFT stunt,StuntHUD SMALL DRIFT
-600,Point value for a DRIFT stunt,StuntHUD DRIFT
-601,Point value for a BIG DRIFT stunt,StuntHUD BIG DRIFT
-602,Point value for a SMALL JUMP stunt,StuntHUD SMALL JUMP
-603,Point value for a JUMP stunt,StuntHUD JUMP
-604,Point value for a BIG JUMP stunt,StuntHUD BIG JUMP
-605,Point value for a SMALL DESTRUCTION stunt,StuntHUD SMALL DESTRUCTION
-606,Point value for a DESTRUCTION stunt,StuntHUD DESTRUCTION
-607,Point value for a BIG DESTRUCTION stunt,StuntHUD BIG DESTRUCTION
-608,Point value for a SMALL WHEELING stunt,StuntHUD SMALL WHEELING
-609,Point value for a WHEELING stunt,StuntHUD WHEELING
-610,Point value for a BIG WHEELING stunt,StuntHUD BIG WHEELING
-611,Point value for a ELUSIVE stunt,StuntHUD ELUSIVE
-612,,
-613,,
-614,,
-615,,
-616,,
-617,,
-618,,IAManipulator_G CameraMove_G MarkerVisibleObject GameCarClient_G TrafficManipulator_G
-619,,IAManipulator_G
-620,,
-621,,
-622,,IAManipulator_G
-623,,IAManipulator_G
-624,,
-625,,
-626,,
-627,,
-628,,
-629,,
-630,,
-631,,
-632,,
-633,,
-634,,
-635,,
-636,,
-637,,
-638,,
-639,,
-640,,
-641,,
-642,,
-643,,
-644,,
-645,,
-646,,
-647,,
-648,,
-649,,
-650,,
-651,,
-652,,
-653,,
-654,,
-655,,IT_Dyn_VehicleMove_G
-656,,IT_Dyn_VehicleMove_G
-657,,IT_Dyn_VehicleMove_G
-658,,IT_Dyn_VehicleMove_G
-659,,IT_Dyn_VehicleMove_G
-660,,IT_Dyn_VehicleMove_G
-661,,
-662,,
-663,,Clamped to [0.0099999998, 5.0]
-664,,Clamped to [0.75, 5.0]
-665,,Clamped to [0.25, 2.0]
-666,,Clamped to [0.25, 2.0]
-667,,
-668,,
-669,,
-670,,
-671,,
-672,,
-673,,
-674,,
-675,,
-676,,IT_Dyn_VehicleMove_G
-677,,
-678,,Special check for this in VPP but nothing is done with the value
+1,Unused?,Breakpoint wont hit
+2,,F Group related
+3,,1.0 - vp3 / (2 * vp3)
+4,,F Group related
+5,,F Group related
+6,,F Group related
+7,,F Group related
+8,,F Group related
+9,,F Group related
+10,,R Group related
+11,,F Group related
+12,,F Group related
+13,,K Group related
+14,,K Group related
+15,,H Group related
+16,,H Group related
+17,,H Group related
+18,,H Group related
+19,,H Group related
+20,,H Group related
+21,,H Group related. Accessed if vp15 is > 0
+22,,H Group related. Accessed if vp15 is > 0
+23,,H Group related. Accessed if vp15 is > 0
+24,,H Group related. Accessed if vp15 is > 0
+25,Unused?,Breakpoint wont hit
+26,Unused?,Breakpoint wont hit
+27,Unused?,Breakpoint wont hit
+28,Unused?,Breakpoint wont hit
+29,,D Group related
+30,,D Group related
+31,,D Group related
+32,,Converted to radian and some code runs if less than 180
+33,,L Group related
+34,Unused?,Breakpoint wont hit
+35,Unused?,Breakpoint wont hit
+36,,L Group related
+37,,J Group related
+38,,J Group related
+39,,J Group related
+40,,J Group related
+41,,M Group
+42,,M Group
+43,,M Group
+44,,Multiplied by something and squared. Suspension count?
+45,,num wheels
+46,,gear related
+47,,gear related
+48,,gear related
+49,,gear related. Even Wheels A
+50,,gear related. Odd Wheels A
+51,,gear related. Even Wheels B
+52,,gear related. Even Odd B
+53,,"P Group related. Wheels NOT 1, 3, 4, and 5"
+54,,"P Group related. Wheels 1, 3, 4, and 5"
+55,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+56,,"O Group related. Wheels 1, 3, 4, and 5"
+57,,Q Group related. Wheels 0 and 2
+58,,Q Group related. Wheels 0 and 2
+59,,Q Group related. Wheels 0 and 2
+60,,"Q Group related. Wheels 1, 3, 5, and 4"
+61,,"Q Group related. Wheels 1, 3, 5, and 4"
+62,,"Q Group related. Wheels 1, 3, 5, and 4"
+63,,"gear related.  Wheels 1, 3, 4, and 5"
+64,,"gear related.  Wheels NOT 1, 3, 4, and 5"
+65,,gear related
+66,,gear related
+67,,gear related
+68,,Wheel stuff is multiplies by this. seems to make gears longer (not sure)
+69,,gear related
+70,Unused?,Breakpoint wont hit
+71,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+72,,"O Group related. Wheels 1, 3, 4, and 5"
+73,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+74,,"O Group related. Wheels 1, 3, 4, and 5"
+75,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+76,,"O Group related. Wheels 1, 3, 4, and 5"
+77,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+78,,"O Group related. Wheels 1, 3, 4, and 5"
+79,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+80,,"O Group related. Wheels 1, 3, 4, and 5"
+81,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+82,,"O Group related. Wheels 1, 3, 4, and 5"
+83,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+84,,"O Group related. Wheels 1, 3, 4, and 5"
+85,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+86,,"O Group related. Wheels 1, 3, 4, and 5"
+87,,S Group related
+88,,S Group related
+89,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+90,,"O Group related. Wheels 1, 3, 4, and 5"
+91,,P Group related. seems to modify how close engine gets to max rpm
+92,,P Group related
+93,,I Group related. Option 1. Chosen if all suspension is compressed?
+94,,I Group related. Option 2. Else
+95,,I Group related
+96,,I Group related
+97,,I Group related
+98,,I Group related
+99,,I Group related
+100,,I Group related
+101,,I Group related
+102,,I Group related
+103,,I Group related
+104,,I Group related
+105,,T Group related
+106,,T Group related
+107,,Multiplied by 0.017453292
+108,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+109,,"O Group related. Wheels 1, 3, 4, and 5"
+110,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+111,,"O Group related. Wheels 1, 3, 4, and 5"
+112,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+113,,"O Group related. Wheels 1, 3, 4, and 5"
+114,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+115,,"O Group related. Wheels 1, 3, 4, and 5"
+116,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+117,,"O Group related. Wheels 1, 3, 4, and 5"
+118,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+119,,"O Group related. Wheels 1, 3, 4, and 5"
+120,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+121,,"O Group related. Wheels 1, 3, 4, and 5"
+122,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+123,,"O Group related. Wheels 1, 3, 4, and 5"
+124,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+125,,"O Group related. Wheels 1, 3, 4, and 5"
+126,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+127,,"O Group related. Wheels 1, 3, 4, and 5"
+128,,Related to vp152. used in 1.0 - (velocity - 0.75 * vp128) / (vp128 - 0.75 * vp128)
+129,,P Group related
+130,,Wheel related
+131,,Wheel related
+132,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+133,,"O Group related. Wheels 1, 3, 4, and 5"
+134,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+135,,"O Group related. Wheels 1, 3, 4, and 5"
+136,,Group W related. 1X
+137,,Group W related. 1Y
+138,,Group W related. 1Z
+139,,Group W related. 1W
+140,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+141,,"O Group related. Wheels 1, 3, 4, and 5"
+142,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+143,,"O Group related. Wheels 1, 3, 4, and 5"
+144,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+145,,"O Group related. Wheels 1, 3, 4, and 5"
+146,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+147,,"O Group related. Wheels 1, 3, 4, and 5"
+148,,Group W related. 2X
+149,,Group W related. 2Y
+150,,"Group W related. 2Z. O Group related. Wheels NOT 1, 3, 4, or 5"
+151,,"O Group related. Wheels 1, 3, 4, and 5"
+152,,Group W related. 3X. Related to vp128. used in 1.0 - (velocity - 0.75 * vp152) / (vp152 - 0.75 * vp152)
+153,,P Group related. Group W related. 3Y
+154,,Wheel related. Group W related. 3Z
+155,,Wheel related
+156,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+157,,"O Group related. Wheels 1, 3, 4, and 5"
+158,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+159,,"O Group related. Wheels 1, 3, 4, and 5"
+160,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+161,,"O Group related. Wheels 1, 3, 4, and 5"
+162,,O Group related. All Wheels
+163,,O Group related. All Wheels
+164,,Group AA related
+165,,Group AA related
+166,,Group AA related
+167,,Group AA related
+168,,Group AA related
+169,,Group AA related
+170,,Group AA related
+171,,Group AA related
+172,,Group AA related
+173,,Group AA related
+174,,Group AA related
+175,,Group AA related
+176,,Group AA related
+177,,Group AA related
+178,,Group AA related
+179,,Group AA related
+180,,Group AA related
+181,,Group AA related
+182,,Group AA related
+183,,Group AA related
+184,,Group AA related
+185,,Group AA related
+186,,Group AA related
+187,,Group AA related
+188,,Group AA related
+189,,Group AA related
+190,,Group AA related
+191,,Group AA related
+192,,Group AA related
+193,,Group AA related
+194,,Group AA related
+195,,Group AA related
+196,,Group AA related
+197,,Group AA related
+198,,Group AA related
+199,,Group AA related
+200,,Group AA related
+201,,Group AA related
+202,,Group AA related
+203,,Group AA related
+204,,Z Group related
+205,,Z Group related
+206,,Z Group related
+207,,Z Group related
+208,,Z Group related
+209,,Z Group related
+210,,Z Group related
+211,,Z Group related
+212,,Z Group related
+213,,Z Group related
+214,,Z Group related
+215,,Z Group related
+216,,Z Group related
+217,,Z Group related
+218,,Z Group related
+219,,Z Group related
+220,,Z Group related
+221,,Z Group related
+222,,Z Group related
+223,,Z Group related
+224,,Z Group related
+225,,Z Group related
+226,,Z Group related
+227,,Z Group related
+228,,Z Group related
+229,,Z Group related
+230,,Z Group related
+231,,Z Group related
+232,,Z Group related
+233,,Z Group related
+234,,Z Group related
+235,,Z Group related
+236,,Z Group related
+237,,Z Group related
+238,,Z Group related
+239,,Z Group related
+240,,Z Group related
+241,,Z Group related
+242,,Z Group related
+243,,Z Group related
+244,,Z Group related
+245,,Z Group related
+246,,Group Y related. Array 0
+247,,Group Y related. Array 1
+248,,Group Y related. Array 2
+249,,Group Y related. Array 3
+250,,Group Y related. Array 4
+251,,Group Y related. Array 5
+252,,Group Y related. Array 6
+253,,Group Y related. Array 7
+254,,Group Y related. Array 8
+255,,Group Y related. Array 9
+256,,Group Y related. Array 10
+257,,Group Y related. Array 11
+258,,Group Y related. Array 12
+259,,Group Y related. Array 13
+260,,Group Y related. Array 14
+261,,Group Y related. Array 15
+262,,Group Y related. Array 16
+263,,Group Y related. Array 17
+264,,Group Y related
+265,,Z Group related
+266,,Wheel related
+267,,Wheel related
+268,,Wheel related
+269,,Wheel related
+270,,Group Y related. Checked against <= 0.001
+271,,Group Y related
+272,,Group Y related
+273,,Group Y related
+274,,Group Y related
+275,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+276,,"O Group related. Wheels 1, 3, 4, and 5"
+277,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+278,,"O Group related. Wheels 1, 3, 4, and 5"
+279,,Checked if <= 0.000001
+280,,"O Group related. Wheels NOT 1, 3, 4, or 5"
+281,,"O Group related. Wheels 1, 3, 4, and 5. "
+282,,DD Group related
+283,,DD Group related
+284,,EE Group related
+285,,EE Group related. Clamped to >=0
+286,,EE Group related
+287,,H Group related. Option selector. Option 1 if some value is <= to this Option 2 otherwise
+288,,H Group related. Option 2A
+289,,H Group related. Option 1A
+290,Unused?,Breakpoint wont hit
+291,,H Group related. Option 2B
+292,,H Group related. Option 1B
+293,Unused?,Breakpoint wont hit
+294,Unused?,Breakpoint wont hit
+295,,FF Group related
+296,,FF Group related
+297,,FF Group related
+298,,FF Group related
+299,,FF Group related
+300,,FF Group related
+301,,FF Group related
+302,,FF Group related
+303,,FF Group related
+304,,FF Group related
+305,,FF Group related
+306,,T Group related
+307,,T Group related
+308,,T Group related
+309,,T Group related
+310,,T Group related
+311,,T Group related
+312,,Group Y related
+313,,Group Y related
+314,,FF Group related
+315,,T Group related
+316,,T Group related
+317,,T Group related
+318,,T Group related
+319,,T Group related
+320,,T Group related
+321,,T Group related
+322,,E Group related. Checked if <= 0.5. Z Group related
+323,,gear related
+324,,E Group related. to set max engine RPM
+325,,E Group related. U Group related Equation A Added after pow
+326,,gear related. U Group related
+327,,E Group related. for engine power
+328,,gear related
+329,,gear related
+330,,GG Group related
+331,,GG Group related
+332,,GG Group related
+333,,GG Group related
+334,,GG Group related
+335,,B Group related. Option 0
+336,,B Group related. Option 1
+337,,B Group related. Option 2
+338,Curve height 0,curve 0
+339,Curve height 1,curve 1
+340,Curve height 2,curve 2
+341,Curve height 3,curve 3
+342,Curve height 4,curve 4
+343,Curve height 5,curve 5
+344,Curve height 6,curve 6
+345,Curve height 7,curve 7
+346,Curve height 8,curve 8
+347,Curve height 9,curve 9
+348,Curve height 10,curve 10
+349,Number of gears,Num Gears. Group Y related
+350,Gear factor,factor
+351,Gear 0 width,gear 0 width div
+352,Gear 1 width,gear 1
+353,Gear 2 width,gear 2
+354,Gear 3 width,gear 3
+355,Gear 4 width,gear 4
+356,Gear 5 width,gear 5
+357,Gear 6 width,gear 6
+358,Gear 0 height,gear 0 height mul
+359,Gear 1 height,gear 1
+360,Gear 2 height,gear 2
+361,Gear 3 height,gear 3
+362,Gear 4 height,gear 4
+363,Gear 5 height,gear 5
+364,Gear 6 height,gear 6
+365,Unused?,Breakpoint wont hit
+366,Unused?,Breakpoint wont hit
+367,,U Group related Equation A exponent in pow
+368,,E Group related
+369,,E Group related
+370,,E Group related
+371,,E Group related
+372,Unused?,Breakpoint wont hit
+373,Unused?,Breakpoint wont hit
+374,,V Group. < something. Group Y related
+375,,V Group. < something. Group Y related
+376,,V Group. < something.Group W related. 4X. Group Y related
+377,,ESpd WSpd chained (1-chained).Group W related. 4Y
+378,,Group W related. 4Z
+379,,Group W related. 4W
+380,,Group W related. 4X
+381,,Group W related. 4Y
+382,,Group W related. 4Z. Group X related. 1X
+383,,Group X related. 1Y
+384,,Group X related. 1Z
+385,,Group X related.2X
+386,,Group X related. 2Y
+387,,Group X related. 2Z
+388,,U Group related. Used as an upper bound clamp
+389,,E Group related.
+390,,E Group related.
+391,,E Group related.
+392,,E Group related.
+393,,Group Y related
+394,,Group X related
+395,,"P Group related. Wheels NOT 1, 3, 4, and 5"
+396,,"P Group related. Wheels 1, 3, 4, and 5"
+397,,"P Group related. Wheels 1, 3, 4, and 5. Checked if less than 0.1 for all wheels. E Group related also. Checked if >= 0.1. FF Group related"
+398,,P Group related. Checked if greater than 0.5 for all wheels
+399,,Wheel related. Option 1
+400,,Wheel related. Option 2
+401,,U Group related. Checked if > 0.5.
+402,,U Group related
+403,,U Group related
+404,,CameraMove_G related
+405,,CameraMove_G related
+406,,Camera 1 Param 406
+407,,Camera 1 Param 407
+408,,Camera 1 Param 408
+409,,Camera 1 Param 409
+410,,Camera 1 Param 410
+411,,Camera 1 Param 411
+412,,Camera 1 Param 412
+413,,Camera 1 Param 413. Stationary FOV
+414,,Camera 1 Param 414. Slow FOV
+415,,Camera 1 Param 415. Fast FOV
+416,,Camera 1 Param 416
+417,,Camera 1 Param 417
+418,,Camera 1 Param 418
+419,,Camera 1 Param 419
+420,,Camera 1 Param 420
+421,,Camera 1 Param 421
+422,,Camera 1 Param 422
+423,,Camera 1 Param 423
+424,,Camera 1 Param 424
+425,,Camera 1 Param 425
+426,,Camera 1 Param 426
+427,,Camera 1 Param 427
+428,,Camera 1 Param 428
+429,,Camera 1 Param 429
+430,,Camera 1 Param 430
+431,,Camera 1 Param 431
+432,,Camera 1 Param 432
+433,,Camera 1 Param 433
+434,,Camera 1 Param 434
+435,,Camera 1 Param 435
+436,,Camera 1 Param 436
+437,,Camera 1 Param 437
+438,,Camera 1 Param 438
+439,,Camera 2 Param 406
+440,,Camera 2 Param 407
+441,,Camera 2 Param 408
+442,,Camera 2 Param 409
+443,,Camera 2 Param 410
+444,,Camera 2 Param 411
+445,,Camera 2 Param 412
+446,,Camera 2 Param 413. Stationary FOV
+447,,Camera 2 Param 414. Slow FOV
+448,,Camera 2 Param 415. Fast FOV
+449,,Camera 2 Param 416
+450,,Camera 2 Param 417
+451,,Camera 2 Param 418
+452,,Camera 2 Param 419
+453,,Camera 2 Param 420
+454,,Camera 2 Param 421
+455,,Camera 2 Param 422
+456,,Camera 2 Param 423
+457,,Camera 2 Param 424
+458,,Camera 2 Param 425
+459,,Camera 2 Param 426
+460,,Camera 2 Param 427
+461,,Camera 2 Param 428
+462,,Camera 2 Param 429
+463,,Camera 2 Param 430
+464,,Camera 2 Param 431
+465,,Camera 2 Param 432
+466,,Camera 2 Param 433
+467,,Camera 2 Param 434
+468,,Camera 2 Param 435
+469,,Camera 2 Param 436
+470,,Camera 2 Param 437
+471,,Camera 2 Param 438
+472,,Camera 3 Param 406
+473,,Camera 3 Param 407
+474,,Camera 3 Param 408
+475,,Camera 3 Param 409
+476,,Camera 3 Param 410
+477,,Camera 3 Param 411
+478,,Camera 3 Param 412
+479,,Camera 3 Param 413. Stationary FOV
+480,,Camera 3 Param 414. Slow FOV
+481,,Camera 3 Param 415. Fast FOV
+482,,Camera 3 Param 416
+483,,Camera 3 Param 417
+484,,Camera 3 Param 418
+485,,Camera 3 Param 419
+486,,Camera 3 Param 420
+487,,Camera 3 Param 421
+488,,Camera 3 Param 422
+489,,Camera 3 Param 423
+490,,Camera 3 Param 424
+491,,Camera 3 Param 425
+492,,Camera 3 Param 426
+493,,Camera 3 Param 427
+494,,Camera 3 Param 428
+495,,Camera 3 Param 429
+496,,Camera 3 Param 430
+497,,Camera 3 Param 431
+498,,Camera 3 Param 432
+499,,Camera 3 Param 433
+500,,Camera 3 Param 434
+501,,Camera 3 Param 435
+502,,Camera 3 Param 436
+503,,Camera 3 Param 437
+504,,Camera 3 Param 438
+505,,Camera 4 Param 406
+506,,Camera 4 Param 407
+507,,Camera 4 Param 408
+508,,Camera 4 Param 409
+509,,Camera 4 Param 410
+510,,Camera 4 Param 411
+511,,Camera 4 Param 412
+512,,Camera 4 Param 413. Stationary FOV
+513,,Camera 4 Param 414. Slow FOV
+514,,Camera 4 Param 415. Fast FOV
+515,,Camera 4 Param 416
+516,,Camera 4 Param 417
+517,,Camera 4 Param 418
+518,,Camera 4 Param 419
+519,,Camera 4 Param 420
+520,,Camera 4 Param 421
+521,,Camera 4 Param 422
+522,,Camera 4 Param 423
+523,,Camera 4 Param 424
+524,,Camera 4 Param 425
+525,,Camera 4 Param 426
+526,,Camera 4 Param 427
+527,,Camera 4 Param 428
+528,,Camera 4 Param 429
+529,,Camera 4 Param 430
+530,,Camera 4 Param 431
+531,,Camera 4 Param 432
+532,,Camera 4 Param 433
+533,,Camera 4 Param 434
+534,,Camera 4 Param 435
+535,,Camera 4 Param 436
+536,,Camera 4 Param 437
+537,,Camera 4 Param 438
+538,,Camera 5 Param 406
+539,,Camera 5 Param 407
+540,,Camera 5 Param 408
+541,,Camera 5 Param 409
+542,,Camera 5 Param 410
+543,,Camera 5 Param 411
+544,,Camera 5 Param 412
+545,,Camera 5 Param 413. Stationary FOV
+546,,Camera 5 Param 414. Slow FOV
+547,,Camera 5 Param 415. Fast FOV
+548,,Camera 5 Param 416
+549,,Camera 5 Param 417
+550,,Camera 5 Param 418
+551,,Camera 5 Param 419
+552,,Camera 5 Param 420
+553,,Camera 5 Param 421
+554,,Camera 5 Param 422
+555,,Camera 5 Param 423
+556,,Camera 5 Param 424
+557,,Camera 5 Param 425
+558,,Camera 5 Param 426
+559,,Camera 5 Param 427
+560,,Camera 5 Param 428
+561,,Camera 5 Param 429
+562,,Camera 5 Param 430
+563,,Camera 5 Param 431
+564,,Camera 5 Param 432
+565,,Camera 5 Param 433
+566,,Camera 5 Param 434
+567,,Camera 5 Param 435
+568,,Camera 5 Param 436
+569,,Camera 5 Param 437
+570,,Camera 5 Param 438
+571,Unused?,Always equal to Camera 5 Param 438. Probably unused. Breakpoint wont hit
+572,,CameraMove_G related
+573,Screen border blur,CameraMove_G related. Screen border blur
+574,,CameraMove_G related
+575,,Checked if <= some field
+576,Unused?,Breakpoint wont hit
+577,,Wheel related. Water
+578,Unused?,Breakpoint wont hit
+579,,Wheel related. Water
+580,,Wheel related. Water
+581,,Wheel related. Water
+582,,Death related
+583,,Death related
+584,,Death related
+585,,Damage related
+586,,Damage related. Vec 1 X
+587,,Damage related. Vec 2 X
+588,,Damage related. Vec 1 Y
+589,,Damage related. Vec 2 Y
+590,,Damage related. Vec 1 Z
+591,,Damage related. Vec 2 Z
+592,,Damage related
+593,,Damage related
+594,,A Group related
+595,,A Group related
+596,,A Group related
+597,,A Group related
+598,,A Group related
+599,,Death related
+600,Point value for a SMALL DRIFT stunt,StuntHUD
+601,Point value for a DRIFT stunt,StuntHUD
+602,Point value for a BIG DRIFT stunt,StuntHUD
+603,Point value for a SMALL JUMP stunt,StuntHUD
+604,Point value for a JUMP stunt,StuntHUD
+605,Point value for a BIG JUMP stunt,StuntHUD
+606,Point value for a SMALL DESTRUCTION stunt,StuntHUD
+607,Point value for a DESTRUCTION stunt,StuntHUD
+608,Point value for a BIG DESTRUCTION stunt,StuntHUD
+609,Point value for a SMALL WHEELING stunt,StuntHUD
+610,Point value for a WHEELING stunt,StuntHUD
+611,Point value for a BIG WHEELING stunt,StuntHUD
+612,Point value for a ELUSIVE stunt,StuntHUD
+613,Unused?,Breakpoint wont hit
+614,Unused?,Breakpoint wont hit
+615,Unused?,Breakpoint wont hit
+616,Unused?,Breakpoint wont hit
+617,Unused?,Breakpoint wont hit
+618,Unused?,Breakpoint wont hit
+619,,N Group related. Multiplied by 0.86956525 * 0.27777779 sometimes
+620,,N Group related.
+621,Unused?,Breakpoint wont hit
+622,Unused?,Breakpoint wont hit
+623,,N Group related.
+624,,N Group related.
+625,Unused?,Breakpoint wont hit
+626,Unused?,Breakpoint wont hit
+627,,Death related
+628,,Death related
+629,,Death related
+630,,Death related
+631,Drive on water,O Group related. drive on water
+632,,Multiplied by a vector
+633,,If this is less than 0.5 or the player is dead or some other stuff then a function returns early
+634,,If something is greater than this then this is subtracted from that
+635,,Subtracted from something
+636,,CC Group related
+637,,CC Group related
+638,,CC Group related
+639,,CC Group related
+640,,CC Group related
+641,,CC Group related
+642,,CC Group related
+643,,Negated and checked if >= some field
+644,,CC Group related
+645,,HH Group related. Multiplied by a random number. E Group related
+646,,HH Group related. Multiplied by a random number. E Group related
+647,Unused?,Breakpoint wont hit
+648,Unused?,Breakpoint wont hit
+649,,CC Group related
+650,,Multiplied by a field and a function argument
+651,,Subtracted from something and multiplied by vp652 and game param 2011
+652,,multiplied by vp652 subtracted from something and game param 2011
+653,,E Group related
+654,,E Group related
+655,,Death related
+656,,C Group related
+657,,C Group related
+658,,C Group related
+659,,C Group related
+660,,C Group related
+661,,D Group related
+662,,R Group related
+663,,Checked if > velocity
+664,,"G Group related. Clamped to [0.0099999998, 5.0]"
+665,,"G Group related. Clamped to [0.75, 5.0]"
+666,,"G Group related. Clamped to [0.25, 2.0]"
+667,,"Wheel related. Clamped to [0.25, 2.0]"
+668,,BB Group related
+669,,BB Group related
+670,,Wheel related
+671,,Wheel related
+672,,Wheel related
+673,,Wheel related
+674,,Wheel related
+675,,Wheel related
+676,,Wheel related
+677,,E Group related
+678,Unused,Sentinel Value. Resets some counter of sum of all values to 0 and does nothing with the value.
