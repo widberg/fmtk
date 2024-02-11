@@ -127,8 +127,9 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
-html_logo = abspath('img/logo.png')
+html_logo = abspath('img/icon.png')
 
+html_favicon = abspath('../../fmtk/icon.ico')
 
 # -- Options for HTMLHelp output ---------------------------------------------
 

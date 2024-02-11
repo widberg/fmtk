@@ -13,4 +13,4 @@ set(CMAKE_LINKER "link.exe")
 set(CMAKE_AR "lib.exe")
 set(CMAKE_RC "rc.exe")
 
-set(CMAKE_CROSSCOMPILING FALSE)
+# set(CMAKE_CROSSCOMPILING FALSE)
