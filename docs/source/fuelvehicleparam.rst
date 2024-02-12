@@ -14,17 +14,17 @@ A few of the parameters have been investigated on the `FUEL Fandom Wiki Vehicles
 Hot Reload
 ----------
 
-The ``Param/VehicleParam.tsc`` file can be hot reloaded by editing and saving ``Param/VehicleParam.tsc`` then running the ``ReloadVehicleParameters`` / ``RVP`` command via the :doc:`in-game developer command palette <fuelcommands>` and switching to another vehicle and back for the changes to take place without restarting the game. Only code reading parameters after the reload will use the new values. Code that reads a parameter once at startup will not receive the new value.
+The ``Param/VehicleParam.tsc`` file can be hot reloaded by editing and saving ``Param/VehicleParam.tsc`` then running the ``ReloadVehicleParameters`` command via the :doc:`in-game developer command palette <fuelcommands>` and switching to another vehicle and back for the changes to take place without restarting the game. Only code reading parameters after the reload will use the new values. Code that reads a parameter once at startup will not receive the new value.
 
 Debugging
 ---------
 
 The ``DeBugInfos`` command will enable a debug view of the current vehicle's configuration.
 
-Vehicle Internal Names
-----------------------
+More Information
+----------------
 
-A table of English vehicle names mapped to their internal name can be found on the `Vehicle Details entry of the FMTK Developers wiki <https://github.com/widberg/fmtk/wiki/Vehicle-Details>`_.
+A table of English vehicle names mapped to their internal name can be found on the `Vehicle Details entry of the FMTK Developers wiki <https://github.com/widberg/fmtk/wiki/Vehicle-Details>`_. Some files that could help reverse engineer the vehicle parameters are the can be found in the `VehiclesParam.tsc entry of the FMTK Developers wiki <https://github.com/widberg/fmtk/wiki/VehiclesParam.tsc>`_.
 
 Parameter Table
 ---------------
