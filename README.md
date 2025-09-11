@@ -12,7 +12,7 @@ FUEL Modding Toolkit
 ## Features
 
 * Fully compatible with "FUEL: REFUELED", "FUEL: RESHADED", and other legacy mods by default
-* Lua scripting engine
+* Lua scripting
 * C++ Native Mod interface for advanced mods
 * Callback hooks to game events
 * Interface functions to peek and poke game data
@@ -79,7 +79,6 @@ You can support the project by [contributing](#Contributing).
 
 * Git
 * CMake
-* Bison or [WinFlexBison](https://github.com/lexxmark/winflexbison)
 * [llvm-project-widberg-extensions](https://github.com/widberg/llvm-project-widberg-extensions)
 * Any Win32 toolchain
 * A PC copy of FUEL (Optional)
@@ -98,6 +97,6 @@ project.
 #### Ninja
 
 ```sh
-cmake -B build -G Ninja -DWIDBERG_CLANG_CL="/path/to/llvm-project-widberg-extensions/clang-cl.exe"
+cmake -B build -G Ninja -DWIDBERG_CLANG_CL="/path/to/llvm-project-widberg-extensions/clang-cl.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build
 ```

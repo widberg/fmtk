@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.15)
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "Prevented in-tree built. Please create a build directory outside of the fmtk source code and call cmake from there")
@@ -24,14 +24,14 @@ option(FMTK_DOCS        "Build the documentation." OFF)
 
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE INTERNAL "")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 add_definitions(-DUNICODE -D_UNICODE)
-add_compile_options("/clang:-fdebug-prefix-map=${PROJECT_SOURCE_DIR}=." "/MT$<$<CONFIG:Debug>:d>")
+add_compile_options("/clang:-fdebug-prefix-map=${PROJECT_SOURCE_DIR}=.")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" CACHE INTERNAL "")
 
 find_package(FUEL)
 add_subdirectory(dependencies)
 
-add_subdirectory(pigeon)
 add_subdirectory(fmtksdk)
 add_subdirectory(common)
 add_subdirectory(fmtklua)

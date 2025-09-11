@@ -17,9 +17,9 @@ public:
                   .c_str());
     discord::Activity activity{};
     activity.SetType(discord::ActivityType::Playing);
-    activity.GetAssets().SetLargeImage("blacktrail_pass");
+    activity.GetAssets().SetLargeImage("drownington_cove");
     activity.GetAssets().SetSmallImage("freeride");
-    activity.SetDetails("Blacktrail Pass");
+    activity.SetDetails("Drownington Cove");
     activity.SetState("In offline free ride");
     activity.GetTimestamps().SetStart(std::time(0));
     core->ActivityManager().UpdateActivity(

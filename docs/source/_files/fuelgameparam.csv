@@ -31,11 +31,11 @@ Index,Type,Description,Notes
 30,,,
 31,,,
 32-38,Unused,Unused,Unused
-39,Numeric,Menu tint red,Red component of the menu tint color
-40,Numeric,Menu tint green,Green component of the menu tint color
-41,Numeric,Menu tint blue,Blue component of the menu tint color
+39,Numeric,Menu tint red,Red component of the menu tint and out of area color
+40,Numeric,Menu tint green,Green component of the menu tint and out of area color
+41,Numeric,Menu tint blue,Blue component of the menu tint and out of area color
 42,Numeric,Menu distortion,Amount of distortion around the edge of the screen in menus
-43,Numeric,Menu tint amount,Amount of tint over the camera view behind the menus
+43,Numeric,Menu tint amount,Amount of tint over the camera view behind the menus and out of area
 44,Unused,Unused,Unused
 45,,,Related to menus
 46,,,

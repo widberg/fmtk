@@ -9,7 +9,7 @@ Index,Description,Notes
 7,,F Group related
 8,,F Group related
 9,,F Group related
-10,,R Group related
+10,Chassis descent,R Group related. How far to lower the vehicle chassis (both rendered and physical) below the normal origin. Wheels will be rendered with the new chassis but the physical wheels will remain at their normal origin.
 11,,F Group related
 12,,F Group related
 13,,K Group related
@@ -48,26 +48,26 @@ Index,Description,Notes
 46,,gear related
 47,,gear related
 48,,gear related
-49,,gear related. Even Wheels A
-50,,gear related. Odd Wheels A
-51,,gear related. Even Wheels B
-52,,gear related. Even Odd B
+49,,gear related. Even Wheels A. 0 makes the wheels not render and vehicle not move.
+50,,gear related. Odd Wheels A. 0 makes the wheels not render and vehicle not move.
+51,Even wheels trail width,gear related. Even Wheels B
+52,Odd wheels trail width,gear related. Odd Wheels B
 53,,"P Group related. Wheels NOT 1, 3, 4, and 5"
-54,,"P Group related. Wheels 1, 3, 4, and 5"
+54,,"P Group related. Wheels 1, 3, 4, and 5. If 0 wheels are invisible."
 55,,"O Group related. Wheels NOT 1, 3, 4, or 5"
 56,,"O Group related. Wheels 1, 3, 4, and 5"
 57,,Q Group related. Wheels 0 and 2
 58,,Q Group related. Wheels 0 and 2
 59,,Q Group related. Wheels 0 and 2
-60,,"Q Group related. Wheels 1, 3, 5, and 4"
-61,,"Q Group related. Wheels 1, 3, 5, and 4"
-62,,"Q Group related. Wheels 1, 3, 5, and 4"
+60,,"Q Group related. Wheels 1, 3, 5, and 4. Outward offset."
+61,,"Q Group related. Wheels 1, 3, 5, and 4. Ascent."
+62,,"Q Group related. Wheels 1, 3, 5, and 4. Physical ascent."
 63,,"gear related.  Wheels 1, 3, 4, and 5"
 64,,"gear related.  Wheels NOT 1, 3, 4, and 5"
 65,,gear related
 66,,gear related
 67,,gear related
-68,,Wheel stuff is multiplies by this. seems to make gears longer (not sure)
+68,,Wheel stuff is multiplied by this. seems to make gears longer (not sure)
 69,,gear related
 70,Unused?,Breakpoint wont hit
 71,,"O Group related. Wheels NOT 1, 3, 4, or 5"
@@ -412,9 +412,9 @@ Index,Description,Notes
 410,,Camera 1 Param 410
 411,,Camera 1 Param 411
 412,,Camera 1 Param 412
-413,,Camera 1 Param 413. Stationary FOV
-414,,Camera 1 Param 414. Slow FOV
-415,,Camera 1 Param 415. Fast FOV
+413,Stationary FOV,Camera 1 Param 413
+414,Slow FOV,Camera 1 Param 414
+415,Fast FOV,Camera 1 Param 415
 416,,Camera 1 Param 416
 417,,Camera 1 Param 417
 418,,Camera 1 Param 418
@@ -445,9 +445,9 @@ Index,Description,Notes
 443,,Camera 2 Param 410
 444,,Camera 2 Param 411
 445,,Camera 2 Param 412
-446,,Camera 2 Param 413. Stationary FOV
-447,,Camera 2 Param 414. Slow FOV
-448,,Camera 2 Param 415. Fast FOV
+446,Stationary FOV,Camera 2 Param 413
+447,Slow FOV,Camera 2 Param 414
+448,Fast FOV,Camera 2 Param 415
 449,,Camera 2 Param 416
 450,,Camera 2 Param 417
 451,,Camera 2 Param 418
@@ -478,9 +478,9 @@ Index,Description,Notes
 476,,Camera 3 Param 410
 477,,Camera 3 Param 411
 478,,Camera 3 Param 412
-479,,Camera 3 Param 413. Stationary FOV
-480,,Camera 3 Param 414. Slow FOV
-481,,Camera 3 Param 415. Fast FOV
+479,Stationary FOV,Camera 3 Param 413
+480,Slow FOV,Camera 3 Param 414
+481,Fast FOV,Camera 3 Param 415
 482,,Camera 3 Param 416
 483,,Camera 3 Param 417
 484,,Camera 3 Param 418
@@ -511,9 +511,9 @@ Index,Description,Notes
 509,,Camera 4 Param 410
 510,,Camera 4 Param 411
 511,,Camera 4 Param 412
-512,,Camera 4 Param 413. Stationary FOV
-513,,Camera 4 Param 414. Slow FOV
-514,,Camera 4 Param 415. Fast FOV
+512,Stationary FOV,Camera 4 Param 413
+513,Slow FOV,Camera 4 Param 414
+514,Fast FOV,Camera 4 Param 415
 515,,Camera 4 Param 416
 516,,Camera 4 Param 417
 517,,Camera 4 Param 418
@@ -544,9 +544,9 @@ Index,Description,Notes
 542,,Camera 5 Param 410
 543,,Camera 5 Param 411
 544,,Camera 5 Param 412
-545,,Camera 5 Param 413. Stationary FOV
-546,,Camera 5 Param 414. Slow FOV
-547,,Camera 5 Param 415. Fast FOV
+545,Stationary FOV,Camera 5 Param 413
+546,Slow FOV,Camera 5 Param 414
+547,Fast FOV,Camera 5 Param 415
 548,,Camera 5 Param 416
 549,,Camera 5 Param 417
 550,,Camera 5 Param 418
@@ -584,7 +584,7 @@ Index,Description,Notes
 582,,Death related
 583,,Death related
 584,,Death related
-585,,Damage related
+585,,Damage related. Damage factor. 100 divided by this number is used to calculate damage.
 586,,Damage related. Vec 1 X
 587,,Damage related. Vec 2 X
 588,,Damage related. Vec 1 Y
@@ -654,14 +654,14 @@ Index,Description,Notes
 652,,multiplied by vp652 subtracted from something and game param 2011
 653,,E Group related
 654,,E Group related
-655,,Death related
-656,,C Group related
-657,,C Group related
-658,,C Group related
-659,,C Group related
-660,,C Group related
+655,,"Death related. If > 0.5 does something. 1 for all bikes, quads, hovercraft, except the mosquito. 0 for everything else."
+656,,C Group related. Leaning related.
+657,,C Group related. Leaning related.
+658,,C Group related. Leaning related.
+659,,C Group related. Leaning related.
+660,,C Group related. Leaning related.
 661,,D Group related
-662,,R Group related
+662,Driver brightness multiplier,"R Group related. How bright to make the driver. [0,1) dims it, [1, +inf) brightens it."
 663,,Checked if > velocity
 664,,"G Group related. Clamped to [0.0099999998, 5.0]"
 665,,"G Group related. Clamped to [0.75, 5.0]"

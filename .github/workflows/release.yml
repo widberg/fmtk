@@ -17,25 +17,17 @@ jobs:
       with:
         arch: win32
       
-    - name: Download WinFlexBison
-      uses: suisei-cn/actions-download-file@v1.3.0
-      with:
-        url: "https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip"
-    
-    - name: Unzip WinFlexBison
-      run: 7z x win_flex_bison-2.5.25.zip -obin
-      
     - name: Download llvm-project-with-widberg-extensions
       uses: suisei-cn/actions-download-file@v1.3.0
       with:
-        url: "https://github.com/widberg/llvm-project-widberg-extensions/releases/download/widberg-0.0.3/widberg-0.0.3-windows-x86_64-ebf30081beeca3bf1ec166f789c0c1889e0c27c1.zip"
+        url: "https://github.com/widberg/llvm-project-widberg-extensions/releases/download/widberg-21.1.0/widberg-21.1.0-windows-x86_64-affc3306571df779c1e54d34e6f919da52093067.zip"
     
     - name: Unzip llvm-project-with-widberg-extensions
-      run: 7z x widberg-0.0.3-windows-x86_64-ebf30081beeca3bf1ec166f789c0c1889e0c27c1.zip -obin
+      run: 7z x widberg-21.1.0-windows-x86_64-affc3306571df779c1e54d34e6f919da52093067.zip -obin
 
     - name: Package
       run: |
-           cmake -B build -G Ninja -DWIDBERG_CLANG_CL="${{ github.workspace }}/bin/clang-cl.exe" -DBISON_EXECUTABLE="${{ github.workspace }}/bin/win_bison.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo
+           cmake -B build -G Ninja -DWIDBERG_CLANG_CL="${{ github.workspace }}/bin/clang-cl.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo
            cmake --build build --target package_fmtk --config RelWithDebInfo
     
     - name: Create Release

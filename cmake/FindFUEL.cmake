@@ -3,6 +3,7 @@ set(FUEL_SEARCH_PATHS
 	"$ENV{FUEL_DIR}"
 	"D:\\SteamLibrary\\steamapps\\common\\FUEL"
 	"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FUEL"
+	"C:\\Program Files (x86)\\Codemasters\\FUEL"
 )
 
 find_program(FUEL FUEL.exe

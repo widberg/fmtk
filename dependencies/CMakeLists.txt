@@ -1,38 +1,29 @@
 # CLI11
 if(NOT TARGET CLI11::CLI11)
-    add_subdirectory(CLI11 SYSTEM)
+    add_subdirectory(CLI11 EXCLUDE_FROM_ALL SYSTEM)
 endif()
 
 # D3D9
-add_subdirectory(d3d9 SYSTEM)
+add_subdirectory(d3d9 EXCLUDE_FROM_ALL SYSTEM)
 
 # Discord GameSDK
-add_subdirectory(discord_game_sdk SYSTEM)
+add_subdirectory(discord_game_sdk EXCLUDE_FROM_ALL SYSTEM)
 
-# LuaJIT
-set(BUILD_SHARED_LIBS ON CACHE PATH "LuaJIT Shared" FORCE)
-set(LUAJIT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/LuaJIT" CACHE PATH "LuaJIT directory")
-add_subdirectory(luajit-cmake SYSTEM)
-set_target_properties(libluajit PROPERTIES OUTPUT_NAME "lua5.1")
-set(BUILD_SHARED_LIBS OFF CACHE PATH "" FORCE)
+# LuaBridge3
+add_subdirectory(LuaBridge3 EXCLUDE_FROM_ALL SYSTEM)
 
-# re2c
-if(NOT TARGET re2c)
-    add_subdirectory(re2c SYSTEM)
-endif()
+# Luau
+set(LUAU_BUILD_CLI OFF CACHE BOOL "" FORCE)
+set(LUAU_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(LUAU_STATIC_CRT ON CACHE BOOL "" FORCE)
+add_subdirectory(luau EXCLUDE_FROM_ALL SYSTEM)
 
 # sinker
-add_subdirectory(sinker SYSTEM)
-
-# sol2
-add_subdirectory(sol2 SYSTEM)
+add_subdirectory(sinker EXCLUDE_FROM_ALL SYSTEM)
 
 # spdlog
-add_subdirectory(spdlog SYSTEM)
+add_subdirectory(spdlog EXCLUDE_FROM_ALL SYSTEM)
 target_compile_definitions(spdlog PUBLIC "SPDLOG_WCHAR_TO_UTF8_SUPPORT" "SPDLOG_DISABLE_DEFAULT_LOGGER")
 
 # tomlplusplus
-add_subdirectory(tomlplusplus SYSTEM)
-
-# bison
-find_package(BISON 3.4.1 REQUIRED)
+add_subdirectory(tomlplusplus EXCLUDE_FROM_ALL SYSTEM)

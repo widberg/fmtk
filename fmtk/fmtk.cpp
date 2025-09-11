@@ -68,7 +68,9 @@ int main(int argc, char** argv)
 
     std::wstringstream ss;
 
-    ss << L"\"../../FUEL.exe\" " << arguments;
+    // this needs to be absolute or the game lags like shit
+    // like 2-3x slower opening shader cache and other files
+    ss << L"\"" << std::filesystem::absolute("../../FUEL.exe").wstring() << L"\" " << arguments;
 
     std::vector<wchar_t> buf;
     buf.resize(ss.str().size() + 1);

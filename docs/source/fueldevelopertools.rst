@@ -24,7 +24,7 @@ Debug Tools
 Native Popup Menu
 -----------------
 
-When the game is launched in windowed mode with the ``-W`` command line option, right-clicking on the game window will bring up a native style popup menu with developer options.
+When the game is launched in windowed mode with the ``-W`` command-line option, right-clicking on the game window will bring up a native style popup menu with developer options.
 
 Immediate Mode Popup Menu
 -------------------------

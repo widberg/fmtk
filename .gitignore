@@ -32,17 +32,20 @@
 *.app
 
 # Build
-/build
-/_build
+/build/
+/_build/
 
 # VsCode
-.vscode/
+/.vscode/
 
 # woke
 .wokeignore
 
 # docs
-docs/build
+/docs/build/
 
 # idea
-.idea/
+/.idea/
+
+# clangd
+/.cache/
