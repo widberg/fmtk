@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   build:
     name: Build
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
       with:
@@ -15,12 +15,12 @@ jobs:
       uses: TheMrMilchmann/setup-msvc-dev@v3.0.0
       with:
         arch: x86
-      
+
     - name: Download llvm-project-with-widberg-extensions
       uses: suisei-cn/actions-download-file@v1.3.0
       with:
         url: "https://github.com/widberg/llvm-project-widberg-extensions/releases/download/widberg-21.1.0/widberg-21.1.0-windows-x86_64-affc3306571df779c1e54d34e6f919da52093067.zip"
-    
+
     - name: Unzip llvm-project-with-widberg-extensions
       run: 7z x widberg-21.1.0-windows-x86_64-affc3306571df779c1e54d34e6f919da52093067.zip -obin
 
@@ -30,7 +30,7 @@ jobs:
            cmake --build build --target package_fmtk --config RelWithDebInfo
 
     - name: Archive Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: fmtk-${{ github.sha }}
         path: |
