@@ -1,5 +1,4 @@
 markupsafe
-sphinx-lua
 breathe
 six
 sphinx-rtd-theme

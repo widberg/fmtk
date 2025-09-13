@@ -52,11 +52,7 @@ release = version
 extensions = [
 	'sphinx.ext.autosectionlabel',
     'breathe',
-    'sphinxcontrib.luadomain',
-    'sphinx_lua'
 ]
-
-lua_source_path = [ abspath("../../fmtklua/fmtk.luadoc") ]
 
 breathe_projects = {
    'fmtk': abspath('../build/doxygen/xml/')

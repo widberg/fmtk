@@ -22,6 +22,5 @@ Welcome to FMTK's documentation!
    :caption: FMTK
    :name: sec-fmtk
 
-   fmtksdk
    fmtklua
    fmtkmodreleaseguidelines
