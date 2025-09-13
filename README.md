@@ -12,18 +12,12 @@ FUEL Modding Toolkit
 ## Features
 
 * Fully compatible with "FUEL: REFUELED", "FUEL: RESHADED", and other legacy mods by default
-* Lua scripting
-* C++ Native Mod interface for advanced mods
+* [Luau](https://luau.org/) scripting
 * Callback hooks to game events
 * Interface functions to peek and poke game data
-* Full integration with the in-game command palette
 * Works with Games for Windows Live if present
 * Better error messages for shaders and crashes
-* File aliasing (like a programmatic REFUELED)
-* Seamless mod compatibility so everyone plays nice
-* Configurable launcher and mods
 * Cool "Blue FUEL" launcher logo [:)](https://github.com/widberg/fmtk/wiki/Logo-Lore)
-* Easy to install for inexperienced users
 
 ## Compatibility
 
@@ -31,13 +25,10 @@ FMTK is fully compatible with legally obtained retail and Steam release copies o
 
 ## Installing (For Users and Mod Developers)
 
-1. Verify that your FUEL installation is stock and all of the executable files have their original names.
-  - If you have renamed `FUEL.exe`, `GameSetup.exe`, or `SecuLauncher.exe`, now would be the time to revert them to their original names. If you have a Steam copy, this can be done with the "Verify integrity of game files..." button in the "Local Files" tab of FUEL's Steam "Properties..." menu.
-  - This requirement will be removed in future releases once fingerprinting is implemented.
-2. Download the latest release from the [releases page](https://github.com/widberg/fmtk/releases). This will be the asset with a name matching the pattern `fmtk-*.zip`.
-3. Unzip the release into the root FUEL directory (the directory containing `FUEL.exe`)
-4. Verify that the `mods` directory and `FUEL.exe` are in the same directory.
-5. Run `fmtk.exe` in the `mods/fmtk` directory.
+1. Download the latest release from the [releases page](https://github.com/widberg/fmtk/releases). This will be the asset with a name matching the pattern `fmtk-*.zip`.
+2. Unzip the release into the root FUEL directory (the directory containing `FUEL.exe`)
+3. Verify that `fmtk.exe` and `FUEL.exe` are in the same directory.
+4. Run `fmtk.exe`.
 
 In the event of a crash or other game state locking event, i.e. "Error: Shaders processing has failed."  or "The Game Disc could not be read.", please check the `fmtk.log` file in the `mods/fmtk` directory. If you cannot resolve the reported error yourself then please open an issue or contact an FMTK developer directly.
 
@@ -60,14 +51,14 @@ See the [FMTK Contributing Guidelines](https://github.com/widberg/fmtk/blob/mast
 These are projects that are related to researching FUEL but not directly part of the modding process.
 
 * [bff](https://github.com/widberg/bff) - A GUI/CLI utility to work with Zouna BigFiles
-* [dpc](https://github.com/widberg/dpc) - Tar analogous utility to work with the DPC file format
-* [fuel-brute](https://github.com/widberg/fuel-brute) - CRC32 Brute Force Solver For FUEL
-* [fuel-map](https://github.com/widberg/fuel-map) - It's just information about the map
-* [fmt_fuel](https://github.com/widberg/fmt_fuel) - Noesis scripts for object formats
-* [blender_fuel](https://github.com/widberg/blender_fuel) - Blender scripts for object formats
-* [atk](https://github.com/widberg/atk) - Frida agent for asobo games
+* [fuel-map](https://github.com/widberg/fuel-map) - Information about the map and a website
 * [fuel-save-editor](https://github.com/widberg/fuel-save-editor) - Save editor for Asobo's FUEL
+* [blender_fuel](https://github.com/widberg/blender_fuel) - Blender scripts for object formats
+* [fuel-brute](https://github.com/widberg/fuel-brute) - CRC32 Brute Force Solver For FUEL
+* [atk](https://github.com/widberg/atk) - Frida agent for asobo games
 * [ImZouna](https://github.com/widberg/ImZouna) - ImHex patterns for Zouna data structures
+* ~~[dpc](https://github.com/widberg/dpc) - Tar analogous utility to work with the DPC file format~~
+* ~~[fmt_fuel](https://github.com/widberg/fmt_fuel) - Noesis scripts for object formats~~
 
 ## Support
 

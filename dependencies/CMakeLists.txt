@@ -4,9 +4,6 @@ set(USE_NON_MATCHING ON CACHE BOOL "" FORCE)
 set(USE_FMTK ON CACHE BOOL "" FORCE)
 add_subdirectory(FUELDecompilation)
 
-# D3D9
-add_subdirectory(d3d9 EXCLUDE_FROM_ALL SYSTEM)
-
 # Discord GameSDK
 add_subdirectory(discord_game_sdk EXCLUDE_FROM_ALL SYSTEM)
 

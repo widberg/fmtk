@@ -11,28 +11,27 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Cache Tools
+      id: cache-tools
+      uses: actions/cache@v3
+      with:
+        path: C:\Tools
+        key: tools-${{ runner.os }}-${{ hashFiles('.github\workflows\build.yml') }}
+
+    - if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
+      name: Setup Tools
+      run: |
+        curl.exe --location --create-dirs -oC:\TEMP\widberg-windows-x86_64-efda76da4bd39b3115047593539488f6d887a562.zip https://nightly.link/widberg/llvm-project-widberg-extensions/workflows/widberg-build/main/widberg-windows-x86_64-efda76da4bd39b3115047593539488f6d887a562.zip
+        7z.exe x C:\TEMP\widberg-windows-x86_64-efda76da4bd39b3115047593539488f6d887a562.zip -aoa -oC:\Tools\llvm-widberg
+        curl.exe --location --create-dirs -oC:\TEMP\DXSDK_Aug08.exe https://archive.org/download/dxsdk_aug08/DXSDK_Aug08.exe
+        7z.exe x C:\TEMP\DXSDK_Aug08.exe -aoa -oC:\Tools\DXSDK_Aug08 DXSDK/Include DXSDK/Lib
+
     - name: Setup MSVC Developer Command Prompt
       uses: TheMrMilchmann/setup-msvc-dev@v3.0.0
       with:
         arch: x86
 
-    - name: Download llvm-project-with-widberg-extensions
-      uses: suisei-cn/actions-download-file@v1.3.0
-      with:
-        url: "https://github.com/widberg/llvm-project-widberg-extensions/releases/download/widberg-21.1.0/widberg-21.1.0-windows-x86_64-affc3306571df779c1e54d34e6f919da52093067.zip"
-
-    - name: Unzip llvm-project-with-widberg-extensions
-      run: 7z x widberg-21.1.0-windows-x86_64-affc3306571df779c1e54d34e6f919da52093067.zip -obin
-
     - name: Build
       run: |
-           cmake -B build -GNinja -DWIDBERG_CLANG_CL="${{ github.workspace }}/bin/clang-cl.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo
-           cmake --build build --target package_fmtk --config RelWithDebInfo
-
-    - name: Archive Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: fmtk-${{ github.sha }}
-        path: |
-          build/fmtk.zip
-          build/fmtksdk.zip
+           cmake -B build -GNinja -DLLVM_WIDBERG="C:\Tools\llvm-widberg" -DDXSDK_DIR=C:\Tools\DXSDK_Aug08\DXSDK
+           cmake --build build
