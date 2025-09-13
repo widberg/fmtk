@@ -1,7 +1,8 @@
-# CLI11
-if(NOT TARGET CLI11::CLI11)
-    add_subdirectory(CLI11 EXCLUDE_FROM_ALL SYSTEM)
-endif()
+# FUELDecompilation
+set(FUEL_DECOMPILATION_NAME "fmtk" CACHE STRING "" FORCE)
+set(USE_NON_MATCHING ON CACHE BOOL "" FORCE)
+set(USE_FMTK ON CACHE BOOL "" FORCE)
+add_subdirectory(FUELDecompilation)
 
 # D3D9
 add_subdirectory(d3d9 EXCLUDE_FROM_ALL SYSTEM)
@@ -18,12 +19,6 @@ set(LUAU_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(LUAU_STATIC_CRT ON CACHE BOOL "" FORCE)
 add_subdirectory(luau EXCLUDE_FROM_ALL SYSTEM)
 
-# sinker
-add_subdirectory(sinker EXCLUDE_FROM_ALL SYSTEM)
-
 # spdlog
+set(SPDLOG_WCHAR_TO_UTF8_SUPPORT ON CACHE BOOL "" FORCE)
 add_subdirectory(spdlog EXCLUDE_FROM_ALL SYSTEM)
-target_compile_definitions(spdlog PUBLIC "SPDLOG_WCHAR_TO_UTF8_SUPPORT" "SPDLOG_DISABLE_DEFAULT_LOGGER")
-
-# tomlplusplus
-add_subdirectory(tomlplusplus EXCLUDE_FROM_ALL SYSTEM)

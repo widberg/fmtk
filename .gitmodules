@@ -1,18 +1,12 @@
 [submodule "dependencies/spdlog"]
 	path = dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "dependencies/tomlplusplus"]
-	path = dependencies/tomlplusplus
-	url = https://github.com/marzer/tomlplusplus.git
-[submodule "dependencies/CLI11"]
-	path = dependencies/CLI11
-	url = https://github.com/CLIUtils/CLI11.git
-[submodule "dependencies/sinker"]
-	path = dependencies/sinker
-	url = https://github.com/widberg/sinker.git
 [submodule "dependencies/LuaBridge3"]
 	path = dependencies/LuaBridge3
 	url = https://github.com/kunitoki/LuaBridge3.git
 [submodule "dependencies/luau"]
 	path = dependencies/luau
 	url = https://github.com/luau-lang/luau.git
+[submodule "dependencies/FUELDecompilation"]
+	path = dependencies/FUELDecompilation
+	url = https://github.com/widberg/FUELDecompilation.git

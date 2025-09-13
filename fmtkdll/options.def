@@ -1,4 +1,0 @@
-FMTK_OPTION(unsigned int,              "--width",     width,     "resolution width")
-FMTK_OPTION(unsigned int,              "--height",    height,    "resolution height")
-FMTK_OPTION(std::string,               "--log-level", log_level, "log level")
-FMTK_OPTION(std::vector<std::string>,  "--log-level", log_level, "log level")

@@ -1,8 +1,0 @@
-module fuel;
-variant fuel, retail, "ac1b2077137b7c6299c344111857b032635fe3d4794bc5135dad7c35feeda856";
-module kernel32, "Kernel32.dll";
-module user32, "User32.dll";
-module advapi32, "Advapi32.dll";
-module d3dx9_39, "d3dx9_39.dll";
-module xlive, "xlive.dll";
-variant xlive, v3_5_95_0, "8ae328cc7e9f22a8ed1b63f7f0c4977e36bc6c7f7582f1b8e41f1fdf960d5796";

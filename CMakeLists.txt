@@ -24,21 +24,10 @@ option(FMTK_DOCS        "Build the documentation." OFF)
 
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "")
 set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE INTERNAL "")
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-add_definitions(-DUNICODE -D_UNICODE)
 add_compile_options("/clang:-fdebug-prefix-map=${PROJECT_SOURCE_DIR}=.")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" CACHE INTERNAL "")
 
-find_package(FUEL)
 add_subdirectory(dependencies)
-
-add_subdirectory(fmtksdk)
-add_subdirectory(common)
-add_subdirectory(fmtklua)
-add_subdirectory(fmtkdiscord)
-add_subdirectory(fmtkdll)
-add_subdirectory(fmtk)
-add_subdirectory(package_fmtk)
 
 if(FMTK_DOCS)
 	add_subdirectory(docs)

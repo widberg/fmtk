@@ -97,6 +97,6 @@ project.
 #### Ninja
 
 ```sh
-cmake -B build -G Ninja -DWIDBERG_CLANG_CL="/path/to/llvm-project-widberg-extensions/clang-cl.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake -B build -G Ninja -DLLVM_WIDBERG="/path/to/llvm-project-widberg-extensions/"
 cmake --build build
 ```
