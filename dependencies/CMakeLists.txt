@@ -1,6 +1,4 @@
 # FUELDecompilation
-set(FUEL_DECOMPILATION_NAME "fmtk" CACHE STRING "" FORCE)
-set(USE_NON_MATCHING ON CACHE BOOL "" FORCE)
 set(USE_FMTK ON CACHE BOOL "" FORCE)
 add_subdirectory(FUELDecompilation)
 
