@@ -21,8 +21,8 @@ jobs:
     - if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
       name: Setup Tools
       run: |
-        curl.exe --location --create-dirs -oC:\TEMP\widberg-windows-x86_64-efda76da4bd39b3115047593539488f6d887a562.zip https://nightly.link/widberg/llvm-project-widberg-extensions/workflows/widberg-build/main/widberg-windows-x86_64-efda76da4bd39b3115047593539488f6d887a562.zip
-        7z.exe x C:\TEMP\widberg-windows-x86_64-efda76da4bd39b3115047593539488f6d887a562.zip -aoa -oC:\Tools\llvm-widberg
+        curl.exe --location --create-dirs -oC:\TEMP\widberg-windows-x86_64-1039ba27632b46760b87c45fc92df9dc35d5e530.zip https://nightly.link/widberg/llvm-project-widberg-extensions/workflows/widberg-build/main/widberg-windows-x86_64-1039ba27632b46760b87c45fc92df9dc35d5e530.zip
+        7z.exe x C:\TEMP\widberg-windows-x86_64-1039ba27632b46760b87c45fc92df9dc35d5e530.zip -aoa -oC:\Tools\llvm-widberg
         curl.exe --location --create-dirs -oC:\TEMP\DXSDK_Aug08.exe https://archive.org/download/dxsdk_aug08/DXSDK_Aug08.exe
         7z.exe x C:\TEMP\DXSDK_Aug08.exe -aoa -oC:\Tools\DXSDK_Aug08 DXSDK/Include DXSDK/Lib
 

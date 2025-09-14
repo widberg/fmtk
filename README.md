@@ -44,7 +44,7 @@ Documentation for users and mod developers is available on [Read the Docs](https
 
 ## Contributing
 
-See the [FMTK Contributing Guidelines](https://github.com/widberg/fmtk/blob/master/CONTRIBUTING.md). For an inexhaustive list of things you can help with check out the [How To Help](https://github.com/widberg/fmtk/wiki/How-To-Help) wiki entry.
+For an inexhaustive list of things you can help with check out the [How To Help](https://github.com/widberg/fmtk/wiki/How-To-Help) wiki entry.
 
 ## Related Projects
 
@@ -59,10 +59,6 @@ These are projects that are related to researching FUEL but not directly part of
 * [ImZouna](https://github.com/widberg/ImZouna) - ImHex patterns for Zouna data structures
 * ~~[dpc](https://github.com/widberg/dpc) - Tar analogous utility to work with the DPC file format~~
 * ~~[fmt_fuel](https://github.com/widberg/fmt_fuel) - Noesis scripts for object formats~~
-
-## Support
-
-You can support the project by [contributing](#Contributing).
 
 ## Getting Started (For FMTK Developers)
 
