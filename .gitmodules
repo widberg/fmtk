@@ -10,3 +10,6 @@
 [submodule "dependencies/FUELDecompilation"]
 	path = dependencies/FUELDecompilation
 	url = https://github.com/widberg/FUELDecompilation.git
+[submodule "dependencies/imgui/imgui"]
+	path = dependencies/imgui/imgui
+	url = https://github.com/ocornut/imgui.git

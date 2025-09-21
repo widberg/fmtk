@@ -5,6 +5,9 @@ add_subdirectory(FUELDecompilation)
 # Discord GameSDK
 add_subdirectory(discord_game_sdk EXCLUDE_FROM_ALL SYSTEM)
 
+# ImGui
+add_subdirectory(imgui EXCLUDE_FROM_ALL SYSTEM)
+
 # LuaBridge3
 add_subdirectory(LuaBridge3 EXCLUDE_FROM_ALL SYSTEM)
 
