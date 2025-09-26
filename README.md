@@ -11,14 +11,16 @@ FUEL Modding Toolkit
 
 ## Features
 
-* Fully compatible with "FUEL: REFUELED", "FUEL: RESHADED", and other legacy mods by default
+* Fully compatible with [FUEL: REFUELED](https://www.moddb.com/mods/fuel-refueled), [FUEL: RESHADED](https://www.moddb.com/mods/fuel-reshaded), and other legacy mods by default
 * [Luau](https://luau.org/) scripting
 * Callback hooks to game events
 * Interface functions to peek and poke game data
-* Works with Games for Windows Live if present
+* Works with [Games for Windows Live](https://www.pcgamingwiki.com/wiki/Games_for_Windows_-_LIVE), [XLiveLess](https://steamcommunity.com/sharedfiles/filedetails/?id=268031297), and [XLiveLessNess](https://gitlab.com/GlitchyScripts/xlivelessness)
+* Discord Rich Presence
+* Bug fixes and performance improvements
 * Better error messages for shaders and crashes
-* Cool "Blue FUEL" launcher logo [:)](https://github.com/widberg/fmtk/wiki/Logo-Lore)
-
+* Cool "Blue FUEL" logo [:)](https://github.com/widberg/fmtk/wiki/Logo-Lore)
+f
 ## Compatibility
 
 FMTK is fully compatible with legally obtained retail and Steam release copies of FUEL. Pirated versions of the game are not explicitly compatible with FMTK although they may work.
@@ -27,8 +29,8 @@ FMTK is fully compatible with legally obtained retail and Steam release copies o
 
 1. Download the latest release from the [releases page](https://github.com/widberg/fmtk/releases). This will be the asset with a name matching the pattern `fmtk-*.zip`.
 2. Unzip the release into the root FUEL directory (the directory containing `FUEL.exe`)
-3. Verify that `fmtk.exe` and `FUEL.exe` are in the same directory.
-4. Run `fmtk.exe`.
+3. Verify that `FMTK.exe` and `FUEL.exe` are in the same directory.
+4. Run `FMTK.exe`.
 
 In the event of a crash or other game state locking event, i.e. "Error: Shaders processing has failed."  or "The Game Disc could not be read.", please check the `fmtk.log` file in the `mods/fmtk` directory. If you cannot resolve the reported error yourself then please open an issue or contact an FMTK developer directly.
 

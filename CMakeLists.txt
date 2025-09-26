@@ -41,7 +41,7 @@ add_subdirectory(dependencies)
 target_sources(defuel PRIVATE
   fmtk/fmtk.cpp
 )
-target_link_libraries(defuel PUBLIC imgui)
+target_link_libraries(defuel PUBLIC imgui discord_game_sdk)
 
 if(FMTK_DOCS)
 	add_subdirectory(docs)
