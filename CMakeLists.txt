@@ -41,7 +41,7 @@ add_subdirectory(dependencies)
 target_sources(defuel PRIVATE
   fmtk/fmtk.cpp
 )
-target_link_libraries(defuel PUBLIC imgui discord_game_sdk)
+target_link_libraries(defuel PUBLIC imgui discord_game_sdk spdlog Luau.VM Luau.Compiler Luau.Common LuaBridge)
 
 if(FMTK_DOCS)
 	add_subdirectory(docs)
