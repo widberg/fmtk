@@ -29,6 +29,7 @@ jobs:
     - name: Build
       shell: cmd
       run: |
-           call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
+           for /f "delims=" %%i in ('"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath') do set VS_PATH=%%i
+           call "%VS_PATH%\VC\Auxiliary\Build\vcvarsall.bat" x86
            cmake -B build -GNinja -DLLVM_WIDBERG="C:\Tools\llvm-widberg" -DDXSDK_DIR=C:\Tools\DXSDK_Aug08\DXSDK
            cmake --build build
