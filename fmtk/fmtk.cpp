@@ -152,11 +152,17 @@ inline int traceback(lua_State* L)
 
 static lua_State *L = nullptr;
 
-#pragma init_seg(lib)
-backward::SignalHandling sh;
+// Can't make this a global because of static initialization fiasco
+backward::SignalHandling &theSignalHandling()
+{
+    static backward::SignalHandling sh;
+    return sh;
+}
 
 void fmtk_extension_point_before_win_main(void)
 {
+    theSignalHandling();
+
     auto console_sink = std::make_shared<spdlog::sinks::wincolor_stdout_sink_mt>();
     auto rotating_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/fmtk.txt", 1024ull * 1024ull * 1024ull, 5, true);
     auto ringbuffer_sink = std::make_shared<spdlog::sinks::ringbuffer_sink_mt>(256);
