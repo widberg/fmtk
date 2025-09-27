@@ -26,12 +26,9 @@ jobs:
         curl.exe --location --create-dirs -oC:\TEMP\DXSDK_Aug08.exe https://archive.org/download/dxsdk_aug08/DXSDK_Aug08.exe
         7z.exe x C:\TEMP\DXSDK_Aug08.exe -aoa -oC:\Tools\DXSDK_Aug08 DXSDK/Include DXSDK/Lib
 
-    - name: Setup MSVC Developer Command Prompt
-      uses: TheMrMilchmann/setup-msvc-dev@v3.0.0
-      with:
-        arch: x86
-
     - name: Build
+      shell: cmd
       run: |
+           call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
            cmake -B build -GNinja -DLLVM_WIDBERG="C:\Tools\llvm-widberg" -DDXSDK_DIR=C:\Tools\DXSDK_Aug08\DXSDK
            cmake --build build
