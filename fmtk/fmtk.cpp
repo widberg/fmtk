@@ -25,6 +25,8 @@
 
 #include "D3DTnL_Renderer_Z.h"
 
+#include "backward.hpp"
+
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -150,6 +152,9 @@ inline int traceback(lua_State* L)
 
 static lua_State *L = nullptr;
 
+#pragma init_seg(lib)
+backward::SignalHandling sh;
+
 void fmtk_extension_point_before_win_main(void)
 {
     auto console_sink = std::make_shared<spdlog::sinks::wincolor_stdout_sink_mt>();
@@ -167,6 +172,10 @@ void fmtk_extension_point_before_win_main(void)
     luabridge::getGlobalNamespace(L)
         .beginNamespace("fmtk")
             .addFunction("info", [](std::string msg) { SPDLOG_INFO(msg); })
+            .addFunction("crash", []() {
+                volatile int *null = nullptr;
+                (void)*null;
+            })
         .endNamespace();
 }
 
