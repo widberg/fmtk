@@ -12,7 +12,7 @@ FUEL Modding Toolkit
 ## Features
 
 * Fully compatible with [FUEL: REFUELED](https://www.moddb.com/mods/fuel-refueled), [FUEL: RESHADED](https://www.moddb.com/mods/fuel-reshaded), and other legacy mods by default
-* [Luau](https://luau.org/) scripting
+* Lua scripting
 * Callback hooks to game events
 * Interface functions to peek and poke game data
 * Works with [Games for Windows Live](https://www.pcgamingwiki.com/wiki/Games_for_Windows_-_LIVE), [XLiveLess](https://steamcommunity.com/sharedfiles/filedetails/?id=268031297), and [XLiveLessNess](https://gitlab.com/GlitchyScripts/xlivelessness)
@@ -20,7 +20,7 @@ FUEL Modding Toolkit
 * Bug fixes and performance improvements
 * Better error messages for shaders and crashes
 * Cool "Blue FUEL" logo [:)](https://github.com/widberg/fmtk/wiki/Logo-Lore)
-f
+
 ## Compatibility
 
 FMTK is fully compatible with legally obtained retail and Steam release copies of FUEL. Pirated versions of the game are not explicitly compatible with FMTK although they may work.

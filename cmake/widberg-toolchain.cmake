@@ -1,4 +1,5 @@
 set(CMAKE_SYSTEM_NAME Windows)
+set(CMAKE_SYSTEM_VERSION 10)
 set(CMAKE_SYSTEM_PROCESSOR X86)
 
 set(triple i386-pc-win32-msvc)
@@ -14,3 +15,6 @@ set(CMAKE_ASM_COMPILER_TARGET "${triple}")
 set(CMAKE_LINKER "${LLVM_WIDBERG}/lld-link.exe")
 set(CMAKE_AR "${LLVM_WIDBERG}/llvm-lib.exe")
 set(CMAKE_RC "${LLVM_WIDBERG}/llvm-rc.exe")
+
+# Keep LuaJIT from building host tools for 64-bit Windows
+set(CMAKE_CROSSCOMPILING FALSE)

@@ -1,15 +1,15 @@
 [submodule "dependencies/spdlog"]
 	path = dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "dependencies/LuaBridge3"]
-	path = dependencies/LuaBridge3
-	url = https://github.com/kunitoki/LuaBridge3.git
-[submodule "dependencies/luau"]
-	path = dependencies/luau
-	url = https://github.com/luau-lang/luau.git
 [submodule "dependencies/FUELDecompilation"]
 	path = dependencies/FUELDecompilation
 	url = https://github.com/widberg/FUELDecompilation.git
 [submodule "dependencies/imgui/imgui"]
 	path = dependencies/imgui/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "LuaJIT"]
+	path = dependencies/LuaJIT
+	url = https://github.com/WohlSoft/LuaJIT.git
+[submodule "sol2"]
+	path = dependencies/sol2
+	url = https://github.com/ThePhD/sol2.git

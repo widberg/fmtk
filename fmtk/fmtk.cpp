@@ -1,6 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
+#include <shellapi.h>
 
 #include <ctime>
 #include <optional>
@@ -14,12 +15,11 @@
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/wincolor_sink.h>
 
-#include <lua.h>
-#include <luaconf.h>
-#include <lualib.h>
-#include <luacode.h>
-#include <LuaBridge/LuaBridge.h>
-#include <Luau/Common.h>
+#define SOL_ALL_SAFETIES_ON 1
+#define SOL_USING_CXX_LUA_JIT 1
+#define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
+#define SOL_DEFAULT_PASS_ON_ERROR 1
+#include <sol/sol.hpp>
 
 #include <discord.h>
 
@@ -109,49 +109,6 @@ void update_discord_activity(void)
     core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {});
 }
 
-inline int luaL_loadstring(lua_State *L, const char *s)
-{
-    std::size_t bytecodeSize = 0;
-
-    auto bytecode = std::shared_ptr<char>(
-        luau_compile(s, std::strlen(s), nullptr, &bytecodeSize),
-        [](char* x) { std::free(x); }
-    );
-
-    return luau_load(L, "...", bytecode.get(), bytecodeSize, 0);
-}
-
-inline int traceback(lua_State* L)
-{
-    // look up Lua's 'debug.traceback' function
-    lua_getglobal(L, "debug");
-    if (!lua_istable(L, -1))
-    {
-        lua_pop(L, 1);
-        return 1;
-    }
-
-    lua_getfield(L, -1, "traceback");
-    if (!lua_isfunction(L, -1))
-    {
-        lua_pop(L, 2);
-        return 1;
-    }
-
-    lua_pushvalue(L, 1);
-    lua_pushinteger(L, 2);
-    lua_call(L, 2, 1);
-
-    const char *tracebackString = lua_tostring(L, -1);
-    SPDLOG_ERROR(tracebackString);
-
-    lua_pop(L, 2);
-
-    return 1;
-}
-
-static lua_State *L = nullptr;
-
 // Can't make this a global because of static initialization fiasco
 backward::SignalHandling &theSignalHandling()
 {
@@ -159,10 +116,42 @@ backward::SignalHandling &theSignalHandling()
     return sh;
 }
 
+sol::state &theLua()
+{
+    static sol::state lua;
+    return lua;
+}
+
+struct FMTKLuaFlags
+{
+    bool allow_out_of_area;
+    bool allow_damocles_anywhere;
+};
+
+FMTKLuaFlags &theFMTKLuaFlags()
+{
+    static FMTKLuaFlags flags;
+    return flags;
+}
+
+std::string variadic_args_to_string(const sol::variadic_args &args)
+{
+    sol::state_view lua(args.lua_state());
+    auto tostring = lua["tostring"];
+
+    std::string message;
+    for (const auto &arg : args) {
+        if (arg.stack_index() != args[0].stack_index()) {
+            message += "\t";
+        }
+        sol::object str_obj = tostring(arg);
+        message += str_obj.as<std::string>();
+    }
+    return message;
+}
+
 void fmtk_extension_point_before_win_main(void)
 {
-    theSignalHandling();
-
     auto console_sink = std::make_shared<spdlog::sinks::wincolor_stdout_sink_mt>();
     auto rotating_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/fmtk.txt", 1024ull * 1024ull * 1024ull, 5, true);
     auto ringbuffer_sink = std::make_shared<spdlog::sinks::ringbuffer_sink_mt>(256);
@@ -171,23 +160,85 @@ void fmtk_extension_point_before_win_main(void)
     spdlog::set_default_logger(logger);
     SPDLOG_INFO("Logging initialized");
 
-    L = luaL_newstate();
+    theSignalHandling();
 
-    luaL_openlibs(L);
+    sol::state &lua = theLua();
+    lua.open_libraries(
+		sol::lib::base,
+		sol::lib::package,
+		sol::lib::coroutine,
+		sol::lib::string,
+		sol::lib::os,
+		sol::lib::math,
+		sol::lib::table,
+		sol::lib::debug,
+		sol::lib::bit32,
+		sol::lib::io,
+		sol::lib::ffi,
+		sol::lib::jit,
+		sol::lib::utf8
+    );
 
-    luabridge::getGlobalNamespace(L)
-        .beginNamespace("fmtk")
-            .addFunction("info", [](std::string msg) { SPDLOG_INFO(msg); })
-            .addFunction("crash", []() {
-                volatile int *null = nullptr;
-                (void)*null;
-            })
-        .endNamespace();
+    lua.new_usertype<FMTKLuaFlags>("Flags",
+        "allow_out_of_area", &FMTKLuaFlags::allow_out_of_area,
+        "allow_damocles_anywhere", &FMTKLuaFlags::allow_damocles_anywhere
+    );
+
+    lua["fmtk"] = lua.create_table_with(
+        "log", lua.create_table_with(
+            "level", lua.create_table_with(
+                "trace", spdlog::level::trace,
+                "debug", spdlog::level::debug,
+                "info", spdlog::level::info,
+                "warn", spdlog::level::warn,
+                "err", spdlog::level::err,
+                "critical", spdlog::level::critical,
+                "off", spdlog::level::off
+            ),
+            "trace", [](const sol::variadic_args &args) { SPDLOG_TRACE(variadic_args_to_string(args)); },
+            "debug", [](const sol::variadic_args &args) { SPDLOG_DEBUG(variadic_args_to_string(args)); },
+            "info", [](const sol::variadic_args &args) { SPDLOG_INFO(variadic_args_to_string(args)); },
+            "warn", [](const sol::variadic_args &args) { SPDLOG_WARN(variadic_args_to_string(args)); },
+            "error", [](const sol::variadic_args &args) { SPDLOG_ERROR(variadic_args_to_string(args)); },
+            "critical", [](const sol::variadic_args &args) { SPDLOG_CRITICAL(variadic_args_to_string(args)); },
+            "log", [](spdlog::level::level_enum level, const sol::variadic_args &args) { spdlog::log(level, variadic_args_to_string(args)); }
+        ),
+        "flags", &theFMTKLuaFlags(),
+        "console", lua.create_table_with(
+            "interp_command", [](const char *command) -> bool {
+                return _0x0069A590(_0x00A7C080, command, 0);
+            }
+        )
+    );
+
+    lua["print"] = lua["fmtk"]["log"]["info"];
+
+    auto result = lua.load_file("fmtk.lua");
+    if (!result.valid())
+    {
+        sol::error err = result;
+        SPDLOG_ERROR(err.what());
+        return;
+    }
+
+    int wargc;
+    LPWSTR *wargv = CommandLineToArgvW(GetCommandLineW(), &wargc);
+
+    auto res = result(sol::as_args(std::vector<std::wstring>(wargv, wargv + wargc)));
+
+    if (!res.valid())
+    {
+        sol::error err = res;
+        SPDLOG_ERROR(err.what());
+        return;
+    }
+
+    SPDLOG_INFO(res.return_count());
+    lua["fmtk"]["log"]["info"](res);
 }
 
 void fmtk_extension_point_after_win_main(void)
 {
-    lua_close(L);
 }
 
 void fmtk_extension_point_after_engine_init(void)
@@ -268,7 +319,7 @@ void fmtk_extension_point_before_engine_shutdown(void)
 struct Console
 {
     char                  TSCInputBuf[2048];
-    char                  LuauInputBuf[2048];
+    char                  LuaInputBuf[2048];
     ImVector<char*>       History;
     int                   HistoryPos;    // -1: new line, 0..History.Size-1 browsing history.
     ImGuiTextFilter       Filter;
@@ -279,7 +330,7 @@ struct Console
     {
         ClearLog();
         memset(TSCInputBuf, 0, sizeof(TSCInputBuf));
-        memset(LuauInputBuf, 0, sizeof(LuauInputBuf));
+        memset(LuaInputBuf, 0, sizeof(LuaInputBuf));
         HistoryPos = -1;
 
         AutoScroll = true;
@@ -374,14 +425,20 @@ struct Console
                 switch (item.level)
                 {
                 case spdlog::level::trace:
+                    color = ImVec4(0.0f, 0.0f, 7.0f, 1.0f);
+                    break;
                 case spdlog::level::debug:
+                    color = ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
+                    break;
                 case spdlog::level::info:
                     color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
                     break;
                 case spdlog::level::warn:
-                    color = ImVec4(1.0f, 0.85f, 1.0f, 1.0f);
+                    color = ImVec4(1.0f, 0.85f, 0.0f, 1.0f);
                     break;
                 case spdlog::level::err:
+                    color = ImVec4(8.0f, 0.4f, 0.4f, 1.0f);
+                    break;
                 case spdlog::level::critical:
                     color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
                     break;
@@ -425,12 +482,21 @@ struct Console
         if (reclaim_focus)
             ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 
-        if (ImGui::InputText("Luau", LuauInputBuf, IM_ARRAYSIZE(LuauInputBuf), ImGuiInputTextFlags_EnterReturnsTrue))
+        if (ImGui::InputText("Lua", LuaInputBuf, IM_ARRAYSIZE(LuaInputBuf), ImGuiInputTextFlags_EnterReturnsTrue))
         {
-            luabridge::lua_pushcfunction_x(L, &traceback, "traceback");
-            luaL_loadstring(L, LuauInputBuf);
-            lua_pcall(L, 0, 0, -2);
-            LuauInputBuf[0] = '\0';
+            SPDLOG_INFO("# {}", LuaInputBuf);
+            sol::state &lua = theLua();
+            auto result = lua.safe_script(LuaInputBuf);
+            if (!result.valid())
+            {
+                sol::error err = result;
+                SPDLOG_ERROR(err.what());
+            }
+            else
+            {
+                lua["fmtk"]["log"]["info"](result);
+            }
+            LuaInputBuf[0] = '\0';
         }
 
         ImGui::End();
