@@ -6,6 +6,8 @@
 #include <ctime>
 #include <optional>
 
+#include <d3d9.h>
+
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx9.h>
@@ -33,6 +35,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 EXTERN_C HWND _0x00A7D36C;
 
 EXTERN_C D3D_Renderer_Z *_0x00A7C084;
+EXTERN_C U8 _0x00A7D7A6;
 
 EXTERN_C bool __stdcall _0x0069A590(void *a1, const char *a2, int a3) asm("__0x0069A590");
 EXTERN_C void *_0x00A7C080;
@@ -82,9 +85,132 @@ static const ActivityInfo status_infos[] = {
 
 static std::optional<int> current_hub = {};
 static int current_status = 0;
+static bool show_imgui_demo = false;
+
+enum class FMTKDX9DeviceState
+{
+    Unknown,
+    Ready,
+    Lost,
+    Unavailable,
+};
+
+struct FMTKDX9StateTracker
+{
+    FMTKDX9DeviceState last_state = FMTKDX9DeviceState::Unknown;
+    bool imgui_device_objects_valid = false;
+};
+
+static FMTKDX9StateTracker g_fmtk_dx9_state{};
+
+static void fmtk_update_imgui_cursor_policy(void)
+{
+    if (ImGui::GetCurrentContext() == nullptr)
+        return;
+
+    ImGuiIO &io = ImGui::GetIO();
+    // Let the game own the OS cursor and draw an ImGui cursor only when overlay is open.
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+    io.MouseDrawCursor = show_imgui_demo;
+}
+
+static const char *fmtk_dx9_device_state_to_string(FMTKDX9DeviceState state)
+{
+    switch (state)
+    {
+    case FMTKDX9DeviceState::Ready:
+        return "ready";
+    case FMTKDX9DeviceState::Lost:
+        return "lost";
+    case FMTKDX9DeviceState::Unavailable:
+        return "unavailable";
+    case FMTKDX9DeviceState::Unknown:
+    default:
+        return "unknown";
+    }
+}
+
+static FMTKDX9DeviceState fmtk_get_dx9_device_state(HRESULT test_result, bool engine_device_lost)
+{
+    if (engine_device_lost || test_result == D3DERR_DEVICELOST || test_result == D3DERR_DEVICENOTRESET)
+        return FMTKDX9DeviceState::Lost;
+    if (test_result == D3D_OK)
+        return FMTKDX9DeviceState::Ready;
+    return FMTKDX9DeviceState::Unavailable;
+}
+
+static void fmtk_update_dx9_imgui_device_state(void)
+{
+    if (ImGui::GetCurrentContext() == nullptr)
+        return;
+
+    if (_0x00A7C084 == nullptr || _0x00A7C084->pD3DDevice == nullptr)
+    {
+        if (g_fmtk_dx9_state.last_state != FMTKDX9DeviceState::Unavailable)
+        {
+            SPDLOG_WARN("DX9 transition: {} -> {}", fmtk_dx9_device_state_to_string(g_fmtk_dx9_state.last_state), fmtk_dx9_device_state_to_string(FMTKDX9DeviceState::Unavailable));
+            g_fmtk_dx9_state.last_state = FMTKDX9DeviceState::Unavailable;
+        }
+        if (g_fmtk_dx9_state.imgui_device_objects_valid)
+        {
+            ImGui_ImplDX9_InvalidateDeviceObjects();
+            g_fmtk_dx9_state.imgui_device_objects_valid = false;
+            SPDLOG_INFO("DX9 ImGui: invalidated device objects (device unavailable)");
+        }
+        return;
+    }
+
+    HRESULT test_result = _0x00A7C084->pD3DDevice->TestCooperativeLevel();
+    // In some alt-tab paths the engine's lost flag can remain set after the device is already ready again.
+    if (_0x00A7D7A6 == 1 && test_result == D3D_OK)
+    {
+        SPDLOG_WARN("DX9: engine_lost was set while device is ready; clearing stale lost flag");
+        _0x00A7D7A6 = 0;
+    }
+
+    FMTKDX9DeviceState next_state = fmtk_get_dx9_device_state(test_result, _0x00A7D7A6 == 1);
+    if (next_state != g_fmtk_dx9_state.last_state)
+    {
+        SPDLOG_INFO(
+            "DX9 transition: {} -> {} (TestCooperativeLevel=0x{:08X}, engine_lost={})",
+            fmtk_dx9_device_state_to_string(g_fmtk_dx9_state.last_state),
+            fmtk_dx9_device_state_to_string(next_state),
+            static_cast<unsigned int>(test_result),
+            _0x00A7D7A6 == 1 ? 1 : 0
+        );
+        g_fmtk_dx9_state.last_state = next_state;
+    }
+
+    if (next_state == FMTKDX9DeviceState::Lost || next_state == FMTKDX9DeviceState::Unavailable)
+    {
+        if (g_fmtk_dx9_state.imgui_device_objects_valid)
+        {
+            ImGui_ImplDX9_InvalidateDeviceObjects();
+            g_fmtk_dx9_state.imgui_device_objects_valid = false;
+            SPDLOG_INFO("DX9 ImGui: invalidated device objects");
+        }
+        return;
+    }
+
+    if (next_state == FMTKDX9DeviceState::Ready && !g_fmtk_dx9_state.imgui_device_objects_valid)
+    {
+        if (ImGui_ImplDX9_CreateDeviceObjects())
+        {
+            g_fmtk_dx9_state.imgui_device_objects_valid = true;
+            SPDLOG_INFO("DX9 ImGui: recreated device objects");
+        }
+        else
+        {
+            SPDLOG_WARN("DX9 ImGui: failed to recreate device objects");
+        }
+    }
+}
 
 void update_discord_activity(void)
 {
+    if (core == nullptr)
+        return;
+
     if (current_status != 0 && !current_hub.has_value())
         return;
 
@@ -258,35 +384,49 @@ void fmtk_extension_point_after_engine_init(void)
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(_0x00A7D36C);
     ImGui_ImplDX9_Init(_0x00A7C084->pD3DDevice);
+    fmtk_update_imgui_cursor_policy();
+    g_fmtk_dx9_state.last_state = FMTKDX9DeviceState::Unknown;
+    g_fmtk_dx9_state.imgui_device_objects_valid = true;
+    fmtk_update_dx9_imgui_device_state();
 
-    discord::Core::Create(1053341192026333264, DiscordCreateFlags_Default, &core);
-    core->SetLogHook(discord::LogLevel::Debug, [](discord::LogLevel discord_log_level, const char *msg) {
-        switch (discord_log_level)
-        {
-        case discord::LogLevel::Error:
-            SPDLOG_ERROR(msg);
-            break;
-        case discord::LogLevel::Warn:
-            SPDLOG_WARN(msg);
-            break;
-        case discord::LogLevel::Info:
-            SPDLOG_INFO(msg);
-            break;
-        case discord::LogLevel::Debug:
-        default:
-            SPDLOG_DEBUG(msg);
-            break;
-        }
-    });
+    discord::Result create_result = discord::Core::Create(1053341192026333264, DiscordCreateFlags_Default, &core);
+    if (create_result != discord::Result::Ok || core == nullptr)
+    {
+        core = nullptr;
+        SPDLOG_ERROR("Discord initialization failed: {}", static_cast<int>(create_result));
+    }
+    else
+    {
+        core->SetLogHook(discord::LogLevel::Debug, [](discord::LogLevel discord_log_level, const char *msg) {
+            switch (discord_log_level)
+            {
+            case discord::LogLevel::Error:
+                SPDLOG_ERROR(msg);
+                break;
+            case discord::LogLevel::Warn:
+                SPDLOG_WARN(msg);
+                break;
+            case discord::LogLevel::Info:
+                SPDLOG_INFO(msg);
+                break;
+            case discord::LogLevel::Debug:
+            default:
+                SPDLOG_DEBUG(msg);
+                break;
+            }
+        });
 
-    activity.SetType(discord::ActivityType::Playing);
-    activity.GetTimestamps().SetStart(std::time(0));
-    update_discord_activity();
+        activity.SetType(discord::ActivityType::Playing);
+        activity.GetTimestamps().SetStart(std::time(0));
+        update_discord_activity();
+    }
 }
 
 void fmtk_extension_point_before_core_main_loop(void)
 {
-    core->RunCallbacks();
+    fmtk_update_dx9_imgui_device_state();
+    if (core != nullptr)
+        core->RunCallbacks();
 }
 
 void fmtk_extension_point_map_hud_info(int hub)
@@ -309,7 +449,12 @@ void fmtk_extension_point_presence_updated(int context_value)
 
 void fmtk_extension_point_before_engine_shutdown(void)
 {
+    fmtk_update_dx9_imgui_device_state();
+    g_fmtk_dx9_state.last_state = FMTKDX9DeviceState::Unknown;
+    g_fmtk_dx9_state.imgui_device_objects_valid = false;
+
     delete core;
+    core = nullptr;
 
     ImGui_ImplDX9_Shutdown();
     ImGui_ImplWin32_Shutdown();
@@ -685,8 +830,6 @@ void fmtk_extension_point_imgui_frame_inner(void)
     }
 }
 
-static bool show_imgui_demo = false;
-
 void fmtk_extension_point_imgui_frame(void)
 {
     // Start the Dear ImGui frame
@@ -705,6 +848,10 @@ void fmtk_extension_point_imgui_frame(void)
 
 void fmtk_extension_point_before_d3d_end_scene(void)
 {
+    fmtk_update_dx9_imgui_device_state();
+    if (g_fmtk_dx9_state.last_state != FMTKDX9DeviceState::Ready || !g_fmtk_dx9_state.imgui_device_objects_valid)
+        return;
+
     fmtk_extension_point_imgui_frame(); // do this somewhere else
 
     ImGui::Render();
@@ -713,6 +860,14 @@ void fmtk_extension_point_before_d3d_end_scene(void)
 
 bool fmtk_extension_point_before_winproc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+    fmtk_update_imgui_cursor_policy();
+
+    if (show_imgui_demo && Msg == WM_SETCURSOR)
+    {
+        SetCursor(LoadCursor(nullptr, IDC_ARROW));
+        return true;
+    }
+
     if (ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam))
         return true;
 
@@ -725,6 +880,7 @@ bool fmtk_extension_point_before_winproc(HWND hWnd, UINT Msg, WPARAM wParam, LPA
             if (wParam == VK_OEM_3 && (lParam & 0x40000000) == 0)
             {
                 show_imgui_demo = !show_imgui_demo;
+                fmtk_update_imgui_cursor_policy();
                 return true;
             }
             break;
