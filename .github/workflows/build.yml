@@ -2,34 +2,63 @@ name: Build
 
 on: [push, pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       with:
         submodules: recursive
+        persist-credentials: false
 
-    - name: Cache Tools
-      id: cache-tools
-      uses: actions/cache@v3
-      with:
-        path: C:\Tools
-        key: tools-${{ runner.os }}-${{ hashFiles('.github\workflows\build.yml') }}
-
-    - if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
-      name: Setup Tools
+    - name: Resolve LLVM Nightly Installer
+      id: resolve-llvm
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
-        curl.exe --location --create-dirs -oC:\TEMP\widberg-windows-x86_64-a651e95e126117fa5d1323834c3aa9b18561d325.zip https://nightly.link/widberg/llvm-project-widberg-extensions/workflows/widberg-build/main/widberg-windows-x86_64-a651e95e126117fa5d1323834c3aa9b18561d325.zip
-        7z.exe x C:\TEMP\widberg-windows-x86_64-a651e95e126117fa5d1323834c3aa9b18561d325.zip -aoa -oC:\Tools\llvm-widberg
+        "asset_name=$(gh release view nightly --repo widberg/llvm-project-widberg-extensions --json assets --jq '.assets[] | select(.name | endswith(".exe")) | .name')" >> $env:GITHUB_OUTPUT
+
+    - name: Cache LLVM Widberg
+      id: cache-llvm
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      with:
+        path: C:\Tools\llvm-widberg
+        key: llvm-widberg-${{ runner.os }}-${{ steps.resolve-llvm.outputs.asset_name }}
+
+    - if: ${{ steps.cache-llvm.outputs.cache-hit != 'true' }}
+      name: Install LLVM Widberg
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ github.token }}
+        LLVM_ASSET_NAME: ${{ steps.resolve-llvm.outputs.asset_name }}
+      run: |
+        gh release download nightly --repo widberg/llvm-project-widberg-extensions --pattern "$env:LLVM_ASSET_NAME" --dir C:\TEMP --clobber
+        Start-Process -FilePath "C:\TEMP\$env:LLVM_ASSET_NAME" -ArgumentList '/S','/D=C:\Tools\llvm-widberg' -Wait
+
+    - name: Cache DXSDK
+      id: cache-dxsdk
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      with:
+        path: C:\Tools\DXSDK_Aug08
+        key: dxsdk-aug08-${{ runner.os }}-1
+
+    - if: ${{ steps.cache-dxsdk.outputs.cache-hit != 'true' }}
+      name: Install DXSDK
+      shell: pwsh
+      run: |
         curl.exe --location --create-dirs -oC:\TEMP\DXSDK_Aug08.exe https://archive.org/download/dxsdk_aug08/DXSDK_Aug08.exe
         7z.exe x C:\TEMP\DXSDK_Aug08.exe -aoa -oC:\Tools\DXSDK_Aug08 DXSDK/Include DXSDK/Lib
 
     - name: Build
-      shell: cmd
+      shell: pwsh
       run: |
-           for /f "delims=" %%i in ('"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath') do set VS_PATH=%%i
-           call "%VS_PATH%\VC\Auxiliary\Build\vcvarsall.bat" x86
-           cmake -B build -GNinja -DLLVM_WIDBERG="C:\Tools\llvm-widberg" -DDXSDK_DIR=C:\Tools\DXSDK_Aug08\DXSDK
-           cmake --build build
+        cmd /d /s /c ('"' + (& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath) + '\VC\Auxiliary\Build\vcvarsall.bat" x86 && cmake -B build -GNinja -DLLVM_WIDBERG="C:\Tools\llvm-widberg" -DDXSDK_DIR=C:\Tools\DXSDK_Aug08\DXSDK && cmake --build build')

@@ -86,6 +86,6 @@ project.
 #### Ninja
 
 ```sh
-cmake -B build -G Ninja -DLLVM_WIDBERG="/path/to/llvm-project-widberg-extensions/"
+cmake -B build -G Ninja -DLLVM_WIDBERG="C:\Program Files\LLVM Widberg"
 cmake --build build
 ```
